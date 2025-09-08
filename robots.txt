@@ -1,14 +1,25 @@
 User-agent: *
 Allow: /
 
-# サイトマップの場所
+# Sitemap location
 Sitemap: https://firebird-techtalktech.com/sitemap.xml
 
-# AdSense用
-User-agent: Mediapartners-Google
-Disallow:
+# Allow crawling of all content
+Crawl-delay: 1
 
-# 特定のページは除外
-Disallow: /admin/
-Disallow: /private/
-Disallow: /*.json$
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot  
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+# Disallow admin/backend areas (if any)
+# Disallow: /admin/
+# Disallow: /.git/
+
+# Allow ads.txt for AdSense
+Allow: /ads.txt
