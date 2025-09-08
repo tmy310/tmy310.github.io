@@ -1,0 +1,494 @@
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="概要 IPアドレス設計は、ネットワーク構築の最重要基盤です。適切な設計により、将来の拡張性確保、重複回避、管理効率化が実現できます。本記事では、RFC1918プライベートアドレス帯の使い分けから、予約アドレス、階層設計まで実践的なベストプラクティスを解説します。\n"><title>📐 IPアドレス設計のベストプラクティス - 重複回避と階層設計</title><link rel=canonical href=https://firebird-techtalktech.com/post/ip%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E8%A8%AD%E8%A8%88%E3%81%AE%E3%83%99%E3%82%B9%E3%83%88%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9-%E9%87%8D%E8%A4%87%E5%9B%9E%E9%81%BF%E3%81%A8%E9%9A%8E%E5%B1%A4%E8%A8%AD%E8%A8%88/><link rel=stylesheet href=/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css><meta property='og:title' content="📐 IPアドレス設計のベストプラクティス - 重複回避と階層設計"><meta property='og:description' content="概要 IPアドレス設計は、ネットワーク構築の最重要基盤です。適切な設計により、将来の拡張性確保、重複回避、管理効率化が実現できます。本記事では、RFC1918プライベートアドレス帯の使い分けから、予約アドレス、階層設計まで実践的なベストプラクティスを解説します。\n"><meta property='og:url' content='https://firebird-techtalktech.com/post/ip%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E8%A8%AD%E8%A8%88%E3%81%AE%E3%83%99%E3%82%B9%E3%83%88%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9-%E9%87%8D%E8%A4%87%E5%9B%9E%E9%81%BF%E3%81%A8%E9%9A%8E%E5%B1%A4%E8%A8%AD%E8%A8%88/'><meta property='og:site_name' content='firebirdテクテクテクブログ'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='design'><meta property='article:tag' content='gcp'><meta property='article:tag' content='google'><meta property='article:tag' content='ip-address'><meta property='article:tag' content='network'><meta property='article:tag' content='rfc1918'><meta property='article:tag' content='subnet'><meta property='article:tag' content='vpc'><meta property='article:published_time' content='2025-09-09T00:32:00+09:00'><meta property='article:modified_time' content='2025-09-09T00:32:00+09:00'><meta name=twitter:title content="📐 IPアドレス設計のベストプラクティス - 重複回避と階層設計"><meta name=twitter:description content="概要 IPアドレス設計は、ネットワーク構築の最重要基盤です。適切な設計により、将来の拡張性確保、重複回避、管理効率化が実現できます。本記事では、RFC1918プライベートアドレス帯の使い分けから、予約アドレス、階層設計まで実践的なベストプラクティスを解説します。\n"><link rel="shortcut icon" href=/images/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_762f71fa991dd853.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎯</span></figure><div class=site-meta><h1 class=site-name><a href=/>firebirdテクテクテクブログ</a></h1><h2 class=site-description>技術ネタ、趣味や備忘録などを書いているブログです</h2></div></header><ol class=menu-social><li><a href=https://twitter.com/firebird19245 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/categories/><span>カテゴリー</span></a></li><li><a href=/tags/><span>タグ</span></a></li><li><a href=/archives/><span>アーカイブ</span></a></li><li><a href=/search/><span>検索</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目次</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#概要>概要</a></li><li><a href=#rfc1918-プライベートアドレス帯の使い分け>RFC1918 プライベートアドレス帯の使い分け</a><ol><li><a href=#3つの選択肢と特徴>3つの選択肢と特徴</a></li><li><a href=#企業規模別推奨設計>企業規模別推奨設計</a><ol><li><a href=#小規模企業50人>小規模企業（~50人）</a></li><li><a href=#中規模企業50-500人>中規模企業（50-500人）</a></li><li><a href=#大企業500人以上多拠点>大企業（500人以上・多拠点）</a></li></ol></li></ol></li><li><a href=#重複回避の重要性と対策>重複回避の重要性と対策</a><ol><li><a href=#重複が引き起こす問題>重複が引き起こす問題</a><ol><li><a href=#1-同一ネットワーク内での重複>1. 同一ネットワーク内での重複</a></li><li><a href=#2-拠点間接続時の重複>2. 拠点間接続時の重複</a></li></ol></li><li><a href=#対策方法>対策方法</a><ol><li><a href=#option-a-セグメント変更>Option A: セグメント変更</a></li><li><a href=#option-b-大規模再設計>Option B: 大規模再設計</a></li></ol></li></ol></li><li><a href=#予約慣例アドレスの理解>予約・慣例アドレスの理解</a><ol><li><a href=#技術的予約アドレス必須>技術的予約アドレス（必須）</a></li><li><a href=#慣例的予約アドレス推奨>慣例的予約アドレス（推奨）</a></li><li><a href=#標準的な範囲割り当て>標準的な範囲割り当て</a></li></ol></li><li><a href=#dhcp設計のベストプラクティス>DHCP設計のベストプラクティス</a><ol><li><a href=#範囲分離設計>範囲分離設計</a></li><li><a href=#dhcp予約設定>DHCP予約設定</a></li></ol></li><li><a href=#gcpでのip設計適用>GCPでのIP設計適用</a><ol><li><a href=#gcp-subnetでの予約アドレス>GCP Subnetでの予約アドレス</a></li><li><a href=#gcpでの実践的割り当て>GCPでの実践的割り当て</a></li><li><a href=#マルチvpc設計例>マルチVPC設計例</a></li></ol></li><li><a href=#クラウド移行での注意点>クラウド移行での注意点</a><ol><li><a href=#ハイブリッド接続での設計>ハイブリッド接続での設計</a></li><li><a href=#避けるべき設計>避けるべき設計</a></li></ol></li><li><a href=#ドキュメント化の重要性>ドキュメント化の重要性</a><ol><li><a href=#ip管理台帳テンプレート>IP管理台帳テンプレート</a></li><li><a href=#自動化ツール活用>自動化ツール活用</a></li></ol></li><li><a href=#将来拡張を考慮した設計>将来拡張を考慮した設計</a><ol><li><a href=#スケーラブルな階層設計>スケーラブルな階層設計</a></li><li><a href=#クラウドネイティブ移行準備>クラウドネイティブ移行準備</a></li></ol></li><li><a href=#トラブルシューティング>トラブルシューティング</a><ol><li><a href=#よくある問題と解決法>よくある問題と解決法</a><ol><li><a href=#1-ip重複検出>1. IP重複検出</a></li><li><a href=#2-dhcp範囲枯渇>2. DHCP範囲枯渇</a></li><li><a href=#3-サブネット不足>3. サブネット不足</a></li></ol></li></ol></li><li><a href=#まとめ>まとめ</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B/>技術記事</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/ip%E3%82%A2%E3%83%89%E3%83%AC%E3%82%B9%E8%A8%AD%E8%A8%88%E3%81%AE%E3%83%99%E3%82%B9%E3%83%88%E3%83%97%E3%83%A9%E3%82%AF%E3%83%86%E3%82%A3%E3%82%B9-%E9%87%8D%E8%A4%87%E5%9B%9E%E9%81%BF%E3%81%A8%E9%9A%8E%E5%B1%A4%E8%A8%AD%E8%A8%88/>📐 IPアドレス設計のベストプラクティス - 重複回避と階層設計</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025年9月9日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 5分</time></div></footer></div></header><section class=article-content><h2 id=概要>概要</h2><p>IPアドレス設計は、ネットワーク構築の最重要基盤です。適切な設計により、将来の拡張性確保、重複回避、管理効率化が実現できます。本記事では、RFC1918プライベートアドレス帯の使い分けから、予約アドレス、階層設計まで実践的なベストプラクティスを解説します。</p><h2 id=rfc1918-プライベートアドレス帯の使い分け>RFC1918 プライベートアドレス帯の使い分け</h2><h3 id=3つの選択肢と特徴>3つの選択肢と特徴</h3><div class=table-wrapper><table><thead><tr><th>アドレス帯</th><th>範囲</th><th>利用可能数</th><th>推奨用途</th></tr></thead><tbody><tr><td><strong>10.0.0.0/8</strong></td><td>10.0.0.0 - 10.255.255.255</td><td>16,777,216個</td><td>大企業・多拠点</td></tr><tr><td><strong>172.16.0.0/12</strong></td><td>172.16.0.0 - 172.31.255.255</td><td>1,048,576個</td><td>中規模企業</td></tr><tr><td><strong>192.168.0.0/16</strong></td><td>192.168.0.0 - 192.168.255.255</td><td>65,536個</td><td>小規模企業</td></tr></tbody></table></div><h3 id=企業規模別推奨設計>企業規模別推奨設計</h3><h4 id=小規模企業50人>小規模企業（~50人）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Network</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Usage</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Gateway</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>DNS</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>DHCP Pool</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.10-99</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Servers</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.100-199</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Printers</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.200-230</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Reserve</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.240-254</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Advantages</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>覚えやすい</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>設定シンプル</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>家庭用ルーターと区別可能</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=中規模企業50-500人>中規模企業（50-500人）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Network</span><span class=p>:</span><span class=w> </span><span class=m>172.16.0.0</span><span class=l>/12</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Departments</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>General</span><span class=p>:</span><span class=w> </span><span class=m>172.16.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Accounting</span><span class=p>:</span><span class=w> </span><span class=m>172.16.2.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Development</span><span class=p>:</span><span class=w> </span><span class=m>172.16.3.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Servers</span><span class=p>:</span><span class=w> </span><span class=m>172.16.99.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Future_Expansion</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>支社追加</span><span class=p>:</span><span class=w> </span><span class=m>172.17</span><span class=l>.x.x/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>新部署</span><span class=p>:</span><span class=w> </span><span class=m>172.16.4.0-254.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>クラウド統合</span><span class=p>:</span><span class=w> </span><span class=m>172.18</span><span class=l>.x.x/16</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=大企業500人以上多拠点>大企業（500人以上・多拠点）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Network</span><span class=p>:</span><span class=w> </span><span class=m>10.0.0.0</span><span class=l>/8</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Hierarchical_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Format</span><span class=p>:</span><span class=w> </span><span class=m>10</span><span class=l>.{region}.{dept}.{host}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Regions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Tokyo</span><span class=p>:</span><span class=w> </span><span class=m>10.1.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Osaka</span><span class=p>:</span><span class=w> </span><span class=m>10.2.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Singapore</span><span class=p>:</span><span class=w> </span><span class=m>10.3.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Departments_per_Region</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>General</span><span class=p>:</span><span class=w> </span><span class=l>.1.0/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Accounting</span><span class=p>:</span><span class=w> </span><span class=l>.2.0/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Development</span><span class=p>:</span><span class=w> </span><span class=l>.3.0/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Servers</span><span class=p>:</span><span class=w> </span><span class=l>.99.0/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Example</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Tokyo_General</span><span class=p>:</span><span class=w> </span><span class=m>10.1.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Osaka_Accounting</span><span class=p>:</span><span class=w> </span><span class=m>10.2.2.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Singapore_Servers</span><span class=p>:</span><span class=w> </span><span class=m>10.3.99.0</span><span class=l>/24</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=重複回避の重要性と対策>重複回避の重要性と対策</h2><h3 id=重複が引き起こす問題>重複が引き起こす問題</h3><h4 id=1-同一ネットワーク内での重複>1. 同一ネットワーク内での重複</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>❌ 問題例:
+</span></span><span class=line><span class=cl>PC-A: 192.168.1.10
+</span></span><span class=line><span class=cl>PC-B: 192.168.1.10 (同じIP)
+</span></span><span class=line><span class=cl>→ 通信不可・ネットワーク障害
+</span></span></code></pre></td></tr></table></div></div><h4 id=2-拠点間接続時の重複>2. 拠点間接続時の重複</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>❌ 問題例:
+</span></span><span class=line><span class=cl>本社: 192.168.1.0/24
+</span></span><span class=line><span class=cl>支社: 192.168.1.0/24 (同じセグメント)
+</span></span><span class=line><span class=cl>→ VPN接続時にルーティング衝突
+</span></span></code></pre></td></tr></table></div></div><h3 id=対策方法>対策方法</h3><h4 id=option-a-セグメント変更>Option A: セグメント変更</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Before</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Head_Office</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Branch</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24 </span><span class=w> </span><span class=c># 重複</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>After</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Head_Office</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Branch</span><span class=p>:</span><span class=w> </span><span class=m>192.168.2.0</span><span class=l>/24 </span><span class=w> </span><span class=c># 変更</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=option-b-大規模再設計>Option B: 大規模再設計</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Migration_Plan</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Current</span><span class=p>:</span><span class=w> </span><span class=m>192.168</span><span class=l>.x.x/24 (各拠点)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Target</span><span class=p>:</span><span class=w> </span><span class=m>10</span><span class=l>.{site}.x.x/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Head_Office</span><span class=p>:</span><span class=w> </span><span class=m>10.1.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Branch_A</span><span class=p>:</span><span class=w> </span><span class=m>10.2.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Branch_B</span><span class=p>:</span><span class=w> </span><span class=m>10.3.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=予約慣例アドレスの理解>予約・慣例アドレスの理解</h2><h3 id=技術的予約アドレス必須>技術的予約アドレス（必須）</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Network</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Technical_Reserved</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.0</span><span class=p>:</span><span class=w> </span><span class=l>ネットワークアドレス</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.255</span><span class=p>:</span><span class=w> </span><span class=l>ブロードキャストアドレス</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Available</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.1-254</span><span class=w> </span><span class=l>(254個)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=慣例的予約アドレス推奨>慣例的予約アドレス（推奨）</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Conventional_Reserved</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Gateway</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Primary</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.1</span><span class=w> </span><span class=l>(最も一般的)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Alternative</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.254</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>DNS_Servers</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Primary</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Secondary</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.3</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Network_Equipment</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Router</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>L3_Switch</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.2</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Management</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.3-9</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=標準的な範囲割り当て>標準的な範囲割り当て</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>IP_Allocation_Standard</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>&#34;1-9&#34;: </span><span class=s2>&#34;ネットワーク機器&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>&#34;10-99&#34;: </span><span class=s2>&#34;クライアント機器（DHCP）&#34;</span><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>&#34;100-199&#34;: </span><span class=s2>&#34;サーバー機器（Static）&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>&#34;200-230&#34;: </span><span class=s2>&#34;プリンター・IoT機器&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>&#34;240-254&#34;: </span><span class=s2>&#34;管理・特殊用途&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Example</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.1</span><span class=p>:</span><span class=w> </span><span class=l>Gateway</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.10-99</span><span class=p>:</span><span class=w> </span><span class=l>PC (DHCP Pool)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.100</span><span class=p>:</span><span class=w> </span><span class=l>Web Server</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.101</span><span class=p>:</span><span class=w> </span><span class=l>Database Server</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>192.168.1.200</span><span class=p>:</span><span class=w> </span><span class=l>Network Printer</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=dhcp設計のベストプラクティス>DHCP設計のベストプラクティス</h2><h3 id=範囲分離設計>範囲分離設計</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># DHCP設定例</span>
+</span></span><span class=line><span class=cl>subnet 192.168.1.0 netmask 255.255.255.0 <span class=o>{</span>
+</span></span><span class=line><span class=cl>    range 192.168.1.10 192.168.1.99<span class=p>;</span>     <span class=c1># DHCP Pool</span>
+</span></span><span class=line><span class=cl>    option routers 192.168.1.1<span class=p>;</span>
+</span></span><span class=line><span class=cl>    option domain-name-servers 192.168.1.2, 8.8.8.8<span class=p>;</span>
+</span></span><span class=line><span class=cl><span class=o>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># Static範囲: 192.168.1.100-199 (手動割り当て)</span>
+</span></span><span class=line><span class=cl><span class=c1># 衝突回避完全保証</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=dhcp予約設定>DHCP予約設定</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>DHCP_Reservations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>MAC</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;00:11:22:33:44:55&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>IP</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.50&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Hostname</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;manager-pc&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>MAC</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;AA:BB:CC:DD:EE:FF&#34;</span><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>IP</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.51&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Hostname</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;reception-printer&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=gcpでのip設計適用>GCPでのIP設計適用</h2><h3 id=gcp-subnetでの予約アドレス>GCP Subnetでの予約アドレス</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>GCP_Reserved</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.0</span><span class=p>:</span><span class=w> </span><span class=l>ネットワークアドレス</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.1</span><span class=p>:</span><span class=w> </span><span class=l>デフォルトゲートウェイ (Google)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.2</span><span class=p>:</span><span class=w> </span><span class=l>DNS (Google)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.3</span><span class=p>:</span><span class=w> </span><span class=l>将来の利用 (Google)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.255</span><span class=p>:</span><span class=w> </span><span class=l>ブロードキャスト</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Available</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.4</span><span class=w> </span>- <span class=m>10.0.1.254</span><span class=w> </span><span class=l>(251個)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=gcpでの実践的割り当て>GCPでの実践的割り当て</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Allocation</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Static_Reserved</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>10.0.1.10-50</span><span class=p>:</span><span class=w> </span><span class=l>重要サーバー</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>10.0.1.100-200</span><span class=p>:</span><span class=w> </span><span class=l>アプリケーションサーバー</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Ephemeral</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>10.0.1.51-99</span><span class=p>:</span><span class=w> </span><span class=l>開発・テスト用</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>10.0.1.201-254</span><span class=p>:</span><span class=w> </span><span class=l>一時的リソース</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=マルチvpc設計例>マルチVPC設計例</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>VPC_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Production</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>prod-vpc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.1.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>web-tier</span><span class=p>:</span><span class=w> </span><span class=m>10.1.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>app-tier</span><span class=p>:</span><span class=w> </span><span class=m>10.1.2.0</span><span class=l>/24  </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>db-tier</span><span class=p>:</span><span class=w> </span><span class=m>10.1.3.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Development</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>dev-vpc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.2.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>web-tier</span><span class=p>:</span><span class=w> </span><span class=m>10.2.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>app-tier</span><span class=p>:</span><span class=w> </span><span class=m>10.2.2.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>db-tier</span><span class=p>:</span><span class=w> </span><span class=m>10.2.3.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>No_Overlap</span><span class=p>:</span><span class=w> </span><span class=l>✅ 完全分離</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=クラウド移行での注意点>クラウド移行での注意点</h2><h3 id=ハイブリッド接続での設計>ハイブリッド接続での設計</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Hybrid_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>On_Premises</span><span class=p>:</span><span class=w> </span><span class=m>192.168.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>GCP_VPC</span><span class=p>:</span><span class=w> </span><span class=m>10.0.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Connection</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Method</span><span class=p>:</span><span class=w> </span><span class=l>Cloud VPN</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Routing</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;No conflicts&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Communication</span><span class=p>:</span><span class=w> </span><span class=l>✅ 正常</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=避けるべき設計>避けるべき設計</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>❌ Bad_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>On_Premises</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>GCP_VPC</span><span class=p>:</span><span class=w> </span><span class=m>192.168.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Result</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>ルーティング衝突</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>通信不可</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>トラブルシューティング困難</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=ドキュメント化の重要性>ドキュメント化の重要性</h2><h3 id=ip管理台帳テンプレート>IP管理台帳テンプレート</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>IP_Management_Sheet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Network</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.0/24&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Gateway</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.1&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Allocations</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>IP</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.10&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Hostname</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;web-server-01&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>MAC</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;00:11:22:33:44:55&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Owner</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;IT部門&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Purpose</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Webサーバー&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Active&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>IP</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.11&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Hostname</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;db-server-01&#34;</span><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>MAC</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;AA:BB:CC:DD:EE:FF&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Owner</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;IT部門&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Purpose</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;データベースサーバー&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>Status</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Active&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=自動化ツール活用>自動化ツール活用</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># nmap によるIP使用状況調査</span>
+</span></span><span class=line><span class=cl>nmap -sn 192.168.1.0/24
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># ARPテーブルチェック</span>
+</span></span><span class=line><span class=cl>arp -a <span class=p>|</span> grep 192.168.1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 使用中IPの特定</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> i in <span class=o>{</span>1..254<span class=o>}</span><span class=p>;</span> <span class=k>do</span>
+</span></span><span class=line><span class=cl>  ping -c1 192.168.1.<span class=nv>$i</span> &gt; /dev/null <span class=o>&amp;&amp;</span> <span class=nb>echo</span> <span class=s2>&#34;192.168.1.</span><span class=nv>$i</span><span class=s2> is alive&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>done</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=将来拡張を考慮した設計>将来拡張を考慮した設計</h2><h3 id=スケーラブルな階層設計>スケーラブルな階層設計</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Scalable_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Current_Need</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/24 (256個)&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Design_With</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;/16 (65,536個)&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Usage</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Phase1</span><span class=p>:</span><span class=w> </span><span class=m>10.1.1.0</span><span class=l>/24 (256個使用)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Phase2</span><span class=p>:</span><span class=w> </span><span class=m>10.1.2.0</span><span class=l>/24 (拡張)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=nt>Phase3</span><span class=p>:</span><span class=w> </span><span class=m>10.1.3.0-255.0</span><span class=l>/24 (大幅拡張)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Benefits</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>再設計不要</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>移行作業なし</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span>- <span class=l>管理継続性</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=クラウドネイティブ移行準備>クラウドネイティブ移行準備</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Cloud_Ready_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>On_Premises</span><span class=p>:</span><span class=w> </span><span class=m>10.0.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>AWS_VPC</span><span class=p>:</span><span class=w> </span><span class=m>10.1.0.0</span><span class=l>/16  </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>GCP_VPC</span><span class=p>:</span><span class=w> </span><span class=m>10.2.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Azure_VNet</span><span class=p>:</span><span class=w> </span><span class=m>10.3.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Multi_Cloud</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=kc>No</span><span class=w> </span><span class=l>IP conflicts</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Seamless integration</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Unified management</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=トラブルシューティング>トラブルシューティング</h2><h3 id=よくある問題と解決法>よくある問題と解決法</h3><h4 id=1-ip重複検出>1. IP重複検出</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 重複チェックスクリプト</span>
+</span></span><span class=line><span class=cl><span class=c1>#!/bin/bash</span>
+</span></span><span class=line><span class=cl><span class=nv>network</span><span class=o>=</span><span class=s2>&#34;192.168.1&#34;</span>
+</span></span><span class=line><span class=cl><span class=k>for</span> i in <span class=o>{</span>1..254<span class=o>}</span><span class=p>;</span> <span class=k>do</span>
+</span></span><span class=line><span class=cl>    <span class=nv>count</span><span class=o>=</span><span class=k>$(</span>arp -a <span class=p>|</span> grep -c <span class=s2>&#34;</span><span class=nv>$network</span><span class=s2>.</span><span class=nv>$i</span><span class=s2>&#34;</span><span class=k>)</span>
+</span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=o>[</span> <span class=nv>$count</span> -gt <span class=m>1</span> <span class=o>]</span><span class=p>;</span> <span class=k>then</span>
+</span></span><span class=line><span class=cl>        <span class=nb>echo</span> <span class=s2>&#34;Duplicate IP detected: </span><span class=nv>$network</span><span class=s2>.</span><span class=nv>$i</span><span class=s2>&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=k>fi</span>
+</span></span><span class=line><span class=cl><span class=k>done</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=2-dhcp範囲枯渇>2. DHCP範囲枯渇</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Problem</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;DHCP Pool満杯&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Solutions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Option A</span><span class=p>:</span><span class=w> </span><span class=l>範囲拡大 (.10-99 → .10-149)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Option B</span><span class=p>:</span><span class=w> </span><span class=l>リース時間短縮 (24h → 4h)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Option C</span><span class=p>:</span><span class=w> </span><span class=l>未使用IP回収・再利用</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h4 id=3-サブネット不足>3. サブネット不足</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Problem</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;部署追加でサブネット不足&#34;</span><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Solutions</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Option A</span><span class=p>:</span><span class=w> </span><span class=l>より大きなCIDRに移行</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Option B</span><span class=p>:</span><span class=w> </span><span class=l>VLAN Trunk利用</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Option C</span><span class=p>:</span><span class=w> </span><span class=l>L3スイッチ増設</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=まとめ>まとめ</h2><p>効果的なIPアドレス設計の要点：</p><p><strong>基本原則:</strong></p><ul><li><strong>重複回避</strong>: 企業全体での一意性確保</li><li><strong>階層設計</strong>: 拡張可能な体系的構造</li><li><strong>予約理解</strong>: 技術的制約と慣例の把握</li></ul><p><strong>企業規模別選択:</strong></p><ul><li><strong>小規模</strong>: 192.168.x.x/16（シンプル）</li><li><strong>中規模</strong>: 172.16.x.x/12（バランス）</li><li><strong>大規模</strong>: 10.x.x.x/8（柔軟性）</li></ul><p><strong>運用効率化:</strong></p><ul><li>標準的な範囲割り当て</li><li>詳細なドキュメント化</li><li>自動化ツールの活用</li></ul><p>適切なIP設計により、長期的に安定したネットワーク運用が実現できます。</p><hr><p>📅 <strong>作成日</strong>: 2025年09月09日</p><p><strong>参考リンク:</strong></p><ul><li><a class=link href=https://tools.ietf.org/html/rfc1918 target=_blank rel=noopener>RFC 1918 - プライベートインターネットアドレス</a></li><li><a class=link href=https://www.subnet-calculator.com/ target=_blank rel=noopener>CIDR表記法とサブネット計算</a></li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/design/>Design</a>
+<a href=/tags/gcp/>Gcp</a>
+<a href=/tags/google/>Google</a>
+<a href=/tags/ip-address/>Ip-Address</a>
+<a href=/tags/network/>Network</a>
+<a href=/tags/rfc1918/>Rfc1918</a>
+<a href=/tags/subnet/>Subnet</a>
+<a href=/tags/vpc/>Vpc</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/><div class=article-details><h2 class=article-title>🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン</h2></div></a></article><article><a href=/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/><div class=article-details><h2 class=article-title>🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</h2></div></a></article><article><a href=/post/ai-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/><div class=article-details><h2 class=article-title>🔥 [AI] なぜあなたの指示はAIに「響かない」のか？ Context Is All You Need</h2></div></a></article><article><a href=/post/chatgpt-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/><div class=article-details><h2 class=article-title>🔥 [CHATGPT] なぜあなたの指示はAIに「響かない」のか？ Context Is All You Need</h2></div></a></article><article><a href=/post/%EF%B8%8F-aws-s3-/-google-cloud-storage%E3%81%8B%E3%82%89%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%89%E3%83%AA%E3%83%96%E3%83%B3%E3%81%A7trocco%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8Bterraform-module%E4%BB%98%E3%81%8D/><div class=article-details><h2 class=article-title>🏗️ AWS S3 / Google Cloud Storageから、イベントドリブンでTROCCOを実行する（Terraform Module付き）</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
