@@ -114,7 +114,7 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
     <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
@@ -137,13 +137,15 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
                 
                 </a>
                 
+                    <span class="emoji">🎯</span>
+                
             </figure>
             
         
         
         <div class="site-meta">
             <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description"></h2>
+            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
         </div>
     </header><ol class="menu-social">
             
@@ -249,7 +251,73 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目次</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#概要">概要</a></li>
+    <li><a href="#vpc間接続の3つの選択肢">VPC間接続の3つの選択肢</a>
+      <ol>
+        <li><a href="#1-vpc-peering---customer-vpc同士の接続">1. VPC Peering - Customer VPC同士の接続</a></li>
+        <li><a href="#2-pscprivate-service-connect---google-managed-service接続">2. PSC（Private Service Connect） - Google Managed Service接続</a></li>
+        <li><a href="#3-tcp-proxy---レガシー手法">3. TCP Proxy - レガシー手法</a></li>
+      </ol>
+    </li>
+    <li><a href="#設計判断フローチャート">設計判断フローチャート</a></li>
+    <li><a href="#実際の設計例">実際の設計例</a>
+      <ol>
+        <li><a href="#パターン1-開発本番環境分離">パターン1: 開発・本番環境分離</a></li>
+        <li><a href="#パターン2-データ基盤統合">パターン2: データ基盤統合</a></li>
+        <li><a href="#パターン3-マルチクラウド統合">パターン3: マルチクラウド統合</a></li>
+      </ol>
+    </li>
+    <li><a href="#セキュリティ考慮事項">セキュリティ考慮事項</a>
+      <ol>
+        <li><a href="#vpc-peering時のファイアウォール">VPC Peering時のファイアウォール</a></li>
+        <li><a href="#psc使用時の暗号化">PSC使用時の暗号化</a></li>
+      </ol>
+    </li>
+    <li><a href="#パフォーマンス比較">パフォーマンス比較</a></li>
+    <li><a href="#トラブルシューティング">トラブルシューティング</a>
+      <ol>
+        <li><a href="#よくある接続問題">よくある接続問題</a></li>
+      </ol>
+    </li>
+    <li><a href="#ベストプラクティス">ベストプラクティス</a>
+      <ol>
+        <li><a href="#1-設計原則">1. 設計原則</a></li>
+        <li><a href="#2-セキュリティ強化">2. セキュリティ強化</a></li>
+        <li><a href="#3-運用効率化">3. 運用効率化</a></li>
+      </ol>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -290,7 +358,7 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">9月 09, 2025</time>
+                <time class="article-time--published">2025年9月9日</time>
             </div>
         
 
@@ -838,6 +906,8 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
     </section>
     
     <section class="powerby">
+        
+            技術ネタ、趣味や備忘録などを書いているブログです <br/>
         <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
         テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
     </section>

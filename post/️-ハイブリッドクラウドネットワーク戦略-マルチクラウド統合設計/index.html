@@ -114,7 +114,7 @@
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
     <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
@@ -137,13 +137,15 @@
                 
                 </a>
                 
+                    <span class="emoji">🎯</span>
+                
             </figure>
             
         
         
         <div class="site-meta">
             <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description"></h2>
+            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
         </div>
     </header><ol class="menu-social">
             
@@ -249,7 +251,117 @@
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目次</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#概要">概要</a></li>
+    <li><a href="#ハイブリッドクラウド戦略の全体像">ハイブリッドクラウド戦略の全体像</a>
+      <ol>
+        <li><a href="#基本構成パターン">基本構成パターン</a>
+          <ol>
+            <li><a href="#パターン1-クラウドファーストハイブリッド">パターン1: クラウドファーストハイブリッド</a></li>
+            <li><a href="#パターン2-マルチクラウド分散">パターン2: マルチクラウド分散</a></li>
+            <li><a href="#パターン3-災害復旧重視">パターン3: 災害復旧重視</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#gcp中心のハイブリッド接続">GCP中心のハイブリッド接続</a>
+      <ol>
+        <li><a href="#cloud-interconnect設計">Cloud Interconnect設計</a></li>
+        <li><a href="#partner-interconnect設定">Partner Interconnect設定</a></li>
+        <li><a href="#cloud-vpn-ipsec-実装">Cloud VPN (IPsec) 実装</a></li>
+      </ol>
+    </li>
+    <li><a href="#マルチクラウドネットワーク統合">マルチクラウドネットワーク統合</a>
+      <ol>
+        <li><a href="#gcp--aws接続">GCP ⟷ AWS接続</a>
+          <ol>
+            <li><a href="#オプション1-vpn-gateway間接続">オプション1: VPN Gateway間接続</a></li>
+            <li><a href="#オプション2-direct-connect--partner-interconnect">オプション2: Direct Connect + Partner Interconnect</a></li>
+          </ol>
+        </li>
+        <li><a href="#gcp--azure接続">GCP ⟷ Azure接続</a></li>
+      </ol>
+    </li>
+    <li><a href="#統合ネットワーク設計">統合ネットワーク設計</a>
+      <ol>
+        <li><a href="#全体ipアドレス計画">全体IPアドレス計画</a></li>
+        <li><a href="#ルーティング戦略">ルーティング戦略</a></li>
+        <li><a href="#dns統合設計">DNS統合設計</a></li>
+      </ol>
+    </li>
+    <li><a href="#セキュリティ統合">セキュリティ統合</a>
+      <ol>
+        <li><a href="#identity--access-management">Identity &amp; Access Management</a></li>
+        <li><a href="#ネットワークセキュリティ統合">ネットワークセキュリティ統合</a></li>
+      </ol>
+    </li>
+    <li><a href="#データ統合戦略">データ統合戦略</a>
+      <ol>
+        <li><a href="#データ複製同期">データ複製・同期</a></li>
+        <li><a href="#データパイプライン設計">データパイプライン設計</a></li>
+      </ol>
+    </li>
+    <li><a href="#運用管理の統合">運用管理の統合</a>
+      <ol>
+        <li><a href="#監視システム統合">監視システム統合</a></li>
+        <li><a href="#統一ダッシュボード">統一ダッシュボード</a></li>
+      </ol>
+    </li>
+    <li><a href="#コスト最適化戦略">コスト最適化戦略</a>
+      <ol>
+        <li><a href="#マルチクラウドコスト管理">マルチクラウドコスト管理</a></li>
+        <li><a href="#finops実装">FinOps実装</a></li>
+      </ol>
+    </li>
+    <li><a href="#災害復旧bcp">災害復旧・BCP</a>
+      <ol>
+        <li><a href="#マルチクラウドdr戦略">マルチクラウドDR戦略</a></li>
+        <li><a href="#自動化されたdrテスト">自動化されたDRテスト</a></li>
+      </ol>
+    </li>
+    <li><a href="#パフォーマンス最適化">パフォーマンス最適化</a>
+      <ol>
+        <li><a href="#レイテンシ最適化">レイテンシ最適化</a></li>
+        <li><a href="#帯域幅管理">帯域幅管理</a></li>
+      </ol>
+    </li>
+    <li><a href="#管理運用のベストプラクティス">管理・運用のベストプラクティス</a>
+      <ol>
+        <li><a href="#インフラアズコード">インフラ・アズ・コード</a></li>
+        <li><a href="#変更管理プロセス">変更管理プロセス</a></li>
+      </ol>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -290,7 +402,7 @@
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">9月 09, 2025</time>
+                <time class="article-time--published">2025年9月9日</time>
             </div>
         
 
@@ -1638,6 +1750,8 @@
     </section>
     
     <section class="powerby">
+        
+            技術ネタ、趣味や備忘録などを書いているブログです <br/>
         <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
         テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
     </section>

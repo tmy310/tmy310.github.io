@@ -114,7 +114,7 @@ IPアドレス設計は、ネットワーク構築の最重要基盤です。適
         }
     })();
 </script>
-<div class="container main-container flex on-phone--column compact"><aside class="sidebar left-sidebar sticky ">
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
     <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
         <span class="hamburger-box">
             <span class="hamburger-inner"></span>
@@ -137,13 +137,15 @@ IPアドレス設計は、ネットワーク構築の最重要基盤です。適
                 
                 </a>
                 
+                    <span class="emoji">🎯</span>
+                
             </figure>
             
         
         
         <div class="site-meta">
             <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description"></h2>
+            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
         </div>
     </header><ol class="menu-social">
             
@@ -249,7 +251,116 @@ IPアドレス設計は、ネットワーク構築の最重要基盤です。適
     </ol>
 </aside>
 
-    
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">目次</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#概要">概要</a></li>
+    <li><a href="#rfc1918-プライベートアドレス帯の使い分け">RFC1918 プライベートアドレス帯の使い分け</a>
+      <ol>
+        <li><a href="#3つの選択肢と特徴">3つの選択肢と特徴</a></li>
+        <li><a href="#企業規模別推奨設計">企業規模別推奨設計</a>
+          <ol>
+            <li><a href="#小規模企業50人">小規模企業（~50人）</a></li>
+            <li><a href="#中規模企業50-500人">中規模企業（50-500人）</a></li>
+            <li><a href="#大企業500人以上多拠点">大企業（500人以上・多拠点）</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#重複回避の重要性と対策">重複回避の重要性と対策</a>
+      <ol>
+        <li><a href="#重複が引き起こす問題">重複が引き起こす問題</a>
+          <ol>
+            <li><a href="#1-同一ネットワーク内での重複">1. 同一ネットワーク内での重複</a></li>
+            <li><a href="#2-拠点間接続時の重複">2. 拠点間接続時の重複</a></li>
+          </ol>
+        </li>
+        <li><a href="#対策方法">対策方法</a>
+          <ol>
+            <li><a href="#option-a-セグメント変更">Option A: セグメント変更</a></li>
+            <li><a href="#option-b-大規模再設計">Option B: 大規模再設計</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#予約慣例アドレスの理解">予約・慣例アドレスの理解</a>
+      <ol>
+        <li><a href="#技術的予約アドレス必須">技術的予約アドレス（必須）</a></li>
+        <li><a href="#慣例的予約アドレス推奨">慣例的予約アドレス（推奨）</a></li>
+        <li><a href="#標準的な範囲割り当て">標準的な範囲割り当て</a></li>
+      </ol>
+    </li>
+    <li><a href="#dhcp設計のベストプラクティス">DHCP設計のベストプラクティス</a>
+      <ol>
+        <li><a href="#範囲分離設計">範囲分離設計</a></li>
+        <li><a href="#dhcp予約設定">DHCP予約設定</a></li>
+      </ol>
+    </li>
+    <li><a href="#gcpでのip設計適用">GCPでのIP設計適用</a>
+      <ol>
+        <li><a href="#gcp-subnetでの予約アドレス">GCP Subnetでの予約アドレス</a></li>
+        <li><a href="#gcpでの実践的割り当て">GCPでの実践的割り当て</a></li>
+        <li><a href="#マルチvpc設計例">マルチVPC設計例</a></li>
+      </ol>
+    </li>
+    <li><a href="#クラウド移行での注意点">クラウド移行での注意点</a>
+      <ol>
+        <li><a href="#ハイブリッド接続での設計">ハイブリッド接続での設計</a></li>
+        <li><a href="#避けるべき設計">避けるべき設計</a></li>
+      </ol>
+    </li>
+    <li><a href="#ドキュメント化の重要性">ドキュメント化の重要性</a>
+      <ol>
+        <li><a href="#ip管理台帳テンプレート">IP管理台帳テンプレート</a></li>
+        <li><a href="#自動化ツール活用">自動化ツール活用</a></li>
+      </ol>
+    </li>
+    <li><a href="#将来拡張を考慮した設計">将来拡張を考慮した設計</a>
+      <ol>
+        <li><a href="#スケーラブルな階層設計">スケーラブルな階層設計</a></li>
+        <li><a href="#クラウドネイティブ移行準備">クラウドネイティブ移行準備</a></li>
+      </ol>
+    </li>
+    <li><a href="#トラブルシューティング">トラブルシューティング</a>
+      <ol>
+        <li><a href="#よくある問題と解決法">よくある問題と解決法</a>
+          <ol>
+            <li><a href="#1-ip重複検出">1. IP重複検出</a></li>
+            <li><a href="#2-dhcp範囲枯渇">2. DHCP範囲枯渇</a></li>
+            <li><a href="#3-サブネット不足">3. サブネット不足</a></li>
+          </ol>
+        </li>
+      </ol>
+    </li>
+    <li><a href="#まとめ">まとめ</a></li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
 
             <main class="main full-width">
     <article class="main-article">
@@ -290,7 +401,7 @@ IPアドレス設計は、ネットワーク構築の最重要基盤です。適
   <path d="M3 11h16" />
   <path d="M18 16.496v1.504l1 1" />
 </svg>
-                <time class="article-time--published">9月 09, 2025</time>
+                <time class="article-time--published">2025年9月9日</time>
             </div>
         
 
@@ -1162,6 +1273,8 @@ IPアドレス設計は、ネットワーク構築の最重要基盤です。適
     </section>
     
     <section class="powerby">
+        
+            技術ネタ、趣味や備忘録などを書いているブログです <br/>
         <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
         テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
     </section>
