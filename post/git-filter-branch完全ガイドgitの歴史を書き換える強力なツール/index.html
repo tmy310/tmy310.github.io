@@ -1,939 +1,184 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。">
-<title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title>
-
-<link rel='canonical' href='https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/'>
-
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール">
-<meta property='og:description' content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。">
-<meta property='og:url' content='https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/'>
-<meta property='og:site_name' content='firebirdテクテクテクブログ'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Git' /><meta property='article:tag' content='DevOps' /><meta property='article:tag' content='バージョン管理' /><meta property='article:tag' content='コマンドライン' /><meta property='article:published_time' content='2025-09-09T11:30:00&#43;09:00'/><meta property='article:modified_time' content='2025-09-09T11:30:00&#43;09:00'/>
-<meta name="twitter:title" content="Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール">
-<meta name="twitter:description" content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。"><link rel="alternate" type="application/json" href="https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/index.json">
-    <link rel="shortcut icon" href="/images/favicon.ico" />
-
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script>
-      <script>
-        var doNotTrack = false;
-        if ( false ) {
-          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
-          var doNotTrack = (dnt == "1" || dnt == "yes");
-        }
-        if (!doNotTrack) {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-J8ND35KCZW');
-        }
-      </script>
-
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "firebirdテクテクテクブログ",
-  "url": "https:\/\/firebird-techtalktech.com\/",
-  "description": "技術ネタ、趣味や備忘録などを書いているブログです",
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール",
-  "description": "git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。",
-  "author": {
-    "@type": "Person",
-    "name": "トミー"
-  },
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "datePublished": "2025-09-09T11:30:00\u002b09:00",
-  "dateModified": "2025-09-09T11:30:00\u002b09:00",
-  "url": "https:\/\/firebird-techtalktech.com\/post\/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB\/",
-  "wordCount": "2070",
-  "keywords": ["Git", "DevOps", "バージョン管理", "コマンドライン"]
-}
-</script>
-
-
-
-
-<meta name="description" content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。">
-
-
-
-<meta property="og:site_name" content="firebirdテクテクテクブログ">
-
-<meta property="og:type" content="article">
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎯</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/firebird19245'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/categories/' >
-                
-                
-                
-                <span>カテゴリー</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/tags/' >
-                
-                
-                
-                <span>タグ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                <span>アーカイブ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                <span>このサイトについて</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                <span>検索</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>ダークモード</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                
-    <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">目次</h2>
-        
-        <div class="widget--toc">
-            <nav id="TableOfContents">
-  <ol>
-    <li><a href="#はじめに">はじめに</a></li>
-    <li><a href="#git-filter-branchとは">git filter-branchとは？</a>
-      <ol>
-        <li><a href="#基本構文">基本構文</a></li>
-      </ol>
-    </li>
-    <li><a href="#実践例1機密情報の削除">実践例1：機密情報の削除</a>
-      <ol>
-        <li><a href="#パスワードファイルを全履歴から削除">パスワードファイルを全履歴から削除</a></li>
-        <li><a href="#envファイルを削除より安全な方法">.envファイルを削除（より安全な方法）</a></li>
-      </ol>
-    </li>
-    <li><a href="#実践例2著者情報の変更">実践例2：著者情報の変更</a>
-      <ol>
-        <li><a href="#特定の著者名を一括変更">特定の著者名を一括変更</a></li>
-        <li><a href="#実際の使用例tmy-ss-310--tmy-310">実際の使用例：tmy-ss-310 → tmy-310</a></li>
-      </ol>
-    </li>
-    <li><a href="#実践例3ディレクトリ構造の変更">実践例3：ディレクトリ構造の変更</a>
-      <ol>
-        <li><a href="#サブディレクトリを新しいリポジトリとして切り出す">サブディレクトリを新しいリポジトリとして切り出す</a></li>
-        <li><a href="#全ファイルをサブディレクトリに移動">全ファイルをサブディレクトリに移動</a></li>
-      </ol>
-    </li>
-    <li><a href="#実践例4大きなファイルの削除">実践例4：大きなファイルの削除</a></li>
-    <li><a href="#filter-branchの注意点">filter-branchの注意点</a>
-      <ol>
-        <li><a href="#-破壊的操作">⚠️ 破壊的操作</a></li>
-        <li><a href="#パフォーマンスの問題">パフォーマンスの問題</a></li>
-      </ol>
-    </li>
-    <li><a href="#代替ツールgit-filter-repo">代替ツール：git filter-repo</a>
-      <ol>
-        <li><a href="#filter-repoの利点">filter-repoの利点</a></li>
-      </ol>
-    </li>
-    <li><a href="#実用的な使い分け">実用的な使い分け</a>
-      <ol>
-        <li><a href="#git-filter-branchを使うべき場合">git filter-branchを使うべき場合</a></li>
-        <li><a href="#git-rebaseやresetで十分な場合">git rebaseやresetで十分な場合</a></li>
-        <li><a href="#git-filter-repoを使うべき場合">git filter-repoを使うべき場合</a></li>
-      </ol>
-    </li>
-    <li><a href="#トラブルシューティング">トラブルシューティング</a>
-      <ol>
-        <li><a href="#エラー-cannot-create-a-new-backup">エラー: &ldquo;Cannot create a new backup&rdquo;</a></li>
-        <li><a href="#リモートとの同期問題">リモートとの同期問題</a></li>
-        <li><a href="#容量が減らない場合">容量が減らない場合</a></li>
-      </ol>
-    </li>
-    <li><a href="#まとめ">まとめ</a></li>
-    <li><a href="#参考リンク">参考リンク</a></li>
-  </ol>
-</nav>
-        </div>
-    </section>
-
-            
-        
-    </aside>
-
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/%E6%8A%80%E8%A1%93/" >
-                技術
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/">Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</a>
-        </h2>
-    
-        
-        <h3 class="article-subtitle">
-            git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。
-        </h3>
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">2025年9月9日</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    読了時間: 5分
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h2 id="はじめに">はじめに
-</h2><p>Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？</p>
-<p>今回は、そんな時に役立つ<code>git filter-branch</code>という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。</p>
-<h2 id="git-filter-branchとは">git filter-branchとは？
-</h2><p><code>git filter-branch</code>は、Gitリポジトリの履歴を書き換えるためのコマンドです。単一のコミットだけでなく、<strong>全履歴を対象に一括で変更を適用</strong>できるのが特徴です。</p>
-<h3 id="基本構文">基本構文
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git filter-branch <span class="o">[</span>--option<span class="o">]</span> <span class="s1">&#39;&lt;command&gt;&#39;</span> <span class="o">[</span>revision-range<span class="o">]</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>主なオプション：</p>
-<ul>
-<li><code>--tree-filter</code>: 各コミットのファイルツリーを直接編集</li>
-<li><code>--index-filter</code>: インデックス（ステージング）を編集</li>
-<li><code>--env-filter</code>: 環境変数（著者情報など）を編集</li>
-<li><code>--msg-filter</code>: コミットメッセージを編集</li>
-</ul>
-<h2 id="実践例1機密情報の削除">実践例1：機密情報の削除
-</h2><p>最も一般的な使用例は、誤ってコミットしてしまった機密情報の削除です。</p>
-<h3 id="パスワードファイルを全履歴から削除">パスワードファイルを全履歴から削除
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># passwords.txtを全履歴から削除</span>
-</span></span><span class="line"><span class="cl">git filter-branch --force --index-filter <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  <span class="s1">&#39;git rm --cached --ignore-unmatch passwords.txt&#39;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --prune-empty --tag-name-filter cat -- --all
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="envファイルを削除より安全な方法">.envファイルを削除（より安全な方法）
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># バックアップを作成</span>
-</span></span><span class="line"><span class="cl">git branch backup-before-cleanup
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># .envファイルを全履歴から削除</span>
-</span></span><span class="line"><span class="cl">git filter-branch --force --index-filter <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  <span class="s1">&#39;git rm --cached --ignore-unmatch .env&#39;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --prune-empty --tag-name-filter cat -- --all
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 削除を確認</span>
-</span></span><span class="line"><span class="cl">git log --all --full-history -- .env
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="実践例2著者情報の変更">実践例2：著者情報の変更
-</h2><p>GitHubのユーザー名を変更した場合など、過去のコミットの著者名を変更したい場合があります。</p>
-<h3 id="特定の著者名を一括変更">特定の著者名を一括変更
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="cp">#!/bin/bash
-</span></span></span><span class="line"><span class="cl"><span class="cp"></span>git filter-branch --env-filter <span class="s1">&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">OLD_EMAIL=&#34;old@example.com&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">CORRECT_NAME=&#34;新しい名前&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">CORRECT_EMAIL=&#34;new@example.com&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">
-</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_COMMITTER_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
-</span></span></span><span class="line"><span class="cl"><span class="s1">then
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_NAME=&#34;$CORRECT_NAME&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_EMAIL=&#34;$CORRECT_EMAIL&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">fi
-</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_AUTHOR_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
-</span></span></span><span class="line"><span class="cl"><span class="s1">then
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_NAME=&#34;$CORRECT_NAME&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_EMAIL=&#34;$CORRECT_EMAIL&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">fi
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;</span> --tag-name-filter cat -- --branches --tags
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="実際の使用例tmy-ss-310--tmy-310">実際の使用例：tmy-ss-310 → tmy-310
-</h3><p>私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git filter-branch -f --env-filter <span class="s1">&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_AUTHOR_NAME&#34; = &#34;tmy-ss-310&#34; ]; then
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_NAME=&#34;tmy-310&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_AUTHOR_EMAIL=&#34;mito.motohiro@gmail.com&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">fi
-</span></span></span><span class="line"><span class="cl"><span class="s1">if [ &#34;$GIT_COMMITTER_NAME&#34; = &#34;tmy-ss-310&#34; ]; then
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_NAME=&#34;tmy-310&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">    export GIT_COMMITTER_EMAIL=&#34;mito.motohiro@gmail.com&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s1">fi
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;</span> -- --all
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="実践例3ディレクトリ構造の変更">実践例3：ディレクトリ構造の変更
-</h2><h3 id="サブディレクトリを新しいリポジトリとして切り出す">サブディレクトリを新しいリポジトリとして切り出す
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># frontendディレクトリだけを抽出して新しいリポジトリに</span>
-</span></span><span class="line"><span class="cl">git filter-branch --subdirectory-filter frontend HEAD
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># これにより、frontendディレクトリがルートディレクトリになる</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="全ファイルをサブディレクトリに移動">全ファイルをサブディレクトリに移動
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git filter-branch --index-filter <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  <span class="s1">&#39;git ls-files -s | sed &#34;s-\t\&#34;*-&amp;newsubdir/-&#34; |
-</span></span></span><span class="line"><span class="cl"><span class="s1">   GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
-</span></span></span><span class="line"><span class="cl"><span class="s1">   git update-index --index-info &amp;&amp;
-</span></span></span><span class="line"><span class="cl"><span class="s1">   mv &#34;$GIT_INDEX_FILE.new&#34; &#34;$GIT_INDEX_FILE&#34;&#39;</span> HEAD
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="実践例4大きなファイルの削除">実践例4：大きなファイルの削除
-</h2><p>リポジトリサイズを削減するため、大きなファイルを履歴から削除します。</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 100MB以上のファイルを検出</span>
-</span></span><span class="line"><span class="cl">git rev-list --objects --all <span class="p">|</span>
-</span></span><span class="line"><span class="cl">  git cat-file --batch-check<span class="o">=</span><span class="s1">&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39;</span> <span class="p">|</span>
-</span></span><span class="line"><span class="cl">  sed -n <span class="s1">&#39;s/^blob //p&#39;</span> <span class="p">|</span>
-</span></span><span class="line"><span class="cl">  sort --numeric-sort --key<span class="o">=</span><span class="m">2</span> <span class="p">|</span>
-</span></span><span class="line"><span class="cl">  tail -10
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 大きなファイル（例：huge-video.mp4）を削除</span>
-</span></span><span class="line"><span class="cl">git filter-branch --force --index-filter <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  <span class="s1">&#39;git rm --cached --ignore-unmatch huge-video.mp4&#39;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>  --prune-empty --tag-name-filter cat -- --all
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="filter-branchの注意点">filter-branchの注意点
-</h2><h3 id="-破壊的操作">⚠️ 破壊的操作
-</h3><p><code>git filter-branch</code>は履歴を完全に書き換えるため：</p>
-<ol>
-<li><strong>必ずバックアップを作成</strong></li>
-</ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git branch backup-<span class="k">$(</span>date +%Y%m%d<span class="k">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><ol start="2">
-<li><strong>強制プッシュが必要</strong></li>
-</ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">git push --force origin main
-</span></span></code></pre></td></tr></table>
-</div>
-</div><ol start="3">
-<li><strong>チームメンバーへの影響</strong>
-<ul>
-<li>他の開発者は再クローンが必要</li>
-<li>進行中の作業がある場合は要調整</li>
-</ul>
-</li>
-</ol>
-<h3 id="パフォーマンスの問題">パフォーマンスの問題
-</h3><p>大規模なリポジトリでは処理に時間がかかります：</p>
-<ul>
-<li>1000コミット: 数分</li>
-<li>10000コミット: 30分以上</li>
-</ul>
-<h2 id="代替ツールgit-filter-repo">代替ツール：git filter-repo
-</h2><p>Git 2.24以降では、<code>git filter-repo</code>が推奨されています：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># インストール</span>
-</span></span><span class="line"><span class="cl">pip install git-filter-repo
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 使用例：メールアドレスの変更</span>
-</span></span><span class="line"><span class="cl">git filter-repo --email-callback <span class="s1">&#39;
-</span></span></span><span class="line"><span class="cl"><span class="s1">  return email.replace(b&#34;old@example.com&#34;, b&#34;new@example.com&#34;)
-</span></span></span><span class="line"><span class="cl"><span class="s1">&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># パスの削除</span>
-</span></span><span class="line"><span class="cl">git filter-repo --path passwords.txt --invert-paths
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="filter-repoの利点">filter-repoの利点
-</h3><ul>
-<li><strong>高速</strong>: filter-branchの10-720倍高速</li>
-<li><strong>安全</strong>: デフォルトで新しいリポジトリに出力</li>
-<li><strong>使いやすい</strong>: より直感的なオプション</li>
-</ul>
-<h2 id="実用的な使い分け">実用的な使い分け
-</h2><h3 id="git-filter-branchを使うべき場合">git filter-branchを使うべき場合
-</h3><ul>
-<li>Gitの標準機能のみで完結したい</li>
-<li>簡単な著者名変更や単一ファイル削除</li>
-<li>追加ツールのインストールが困難な環境</li>
-</ul>
-<h3 id="git-rebaseやresetで十分な場合">git rebaseやresetで十分な場合
-</h3><ul>
-<li>最近のコミット（10個程度）の修正</li>
-<li>個人プロジェクトで履歴の詳細が不要</li>
-<li>クリーンな履歴を優先</li>
-</ul>
-<h3 id="git-filter-repoを使うべき場合">git filter-repoを使うべき場合
-</h3><ul>
-<li>大規模なリポジトリ</li>
-<li>複雑なフィルタリング条件</li>
-<li>パフォーマンスが重要</li>
-</ul>
-<h2 id="トラブルシューティング">トラブルシューティング
-</h2><h3 id="エラー-cannot-create-a-new-backup">エラー: &ldquo;Cannot create a new backup&rdquo;
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 既存のバックアップを削除</span>
-</span></span><span class="line"><span class="cl">rm -rf .git/refs/original/
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="リモートとの同期問題">リモートとの同期問題
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ローカルの変更を強制的に反映</span>
-</span></span><span class="line"><span class="cl">git push --force-with-lease origin main
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># より安全：新しいブランチにプッシュ</span>
-</span></span><span class="line"><span class="cl">git push origin main:main-filtered
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="容量が減らない場合">容量が減らない場合
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ガベージコレクションを実行</span>
-</span></span><span class="line"><span class="cl">git reflog expire --expire<span class="o">=</span>now --all
-</span></span><span class="line"><span class="cl">git gc --prune<span class="o">=</span>now --aggressive
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="まとめ">まとめ
-</h2><p><code>git filter-branch</code>は強力なツールですが、使用には注意が必要です：</p>
-<p>✅ <strong>使うべき時</strong></p>
-<ul>
-<li>機密情報の緊急削除</li>
-<li>著者情報の一括修正</li>
-<li>リポジトリの大規模なリファクタリング</li>
-</ul>
-<p>❌ <strong>避けるべき時</strong></p>
-<ul>
-<li>公開済みの大規模プロジェクト</li>
-<li>チーム開発中のアクティブなリポジトリ</li>
-<li>簡単な修正で済む場合</li>
-</ul>
-<p>適切に使えば、Gitの履歴をクリーンに保ち、セキュリティ問題を解決できる強力な味方になります。ただし、「大いなる力には大いなる責任が伴う」ことを忘れずに！</p>
-<h2 id="参考リンク">参考リンク
-</h2><ul>
-<li><a class="link" href="https://git-scm.com/docs/git-filter-branch"  target="_blank" rel="noopener"
-    >Git公式ドキュメント - git-filter-branch</a></li>
-<li><a class="link" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository"  target="_blank" rel="noopener"
-    >GitHub - Removing sensitive data</a></li>
-<li><a class="link" href="https://github.com/newren/git-filter-repo"  target="_blank" rel="noopener"
-    >git-filter-repo</a></li>
-</ul>
-<hr>
-<p><em>この記事が役に立ったら、ぜひシェアしてください！Gitの困った時の救世主として、多くの開発者の助けになれば幸いです。</em></p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/git/">Git</a>
-        
-            <a href="/tags/devops/">Devops</a>
-        
-            <a href="/tags/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86/">バージョン管理</a>
-        
-            <a href="/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/">コマンドライン</a>
-        
-    </section>
-
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-<aside class="related-content--wrapper">
-    <h2 class="section-title">関連するコンテンツ</h2>
-    <div class="related-content">
-        <div class="flex article-list--tile">
-            
-                
-<article class="">
-    <a href="/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">Docker入門：コンテナ技術の基礎から実践まで</h2>
-        </div>
-    </a>
-</article>
-
-            
-        </div>
-    </div>
-</aside>
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 トミー
-    </section>
-    
-    <section class="powerby">
-        
-            技術ネタ、趣味や備忘録などを書いているブログです <br/>
-        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
-        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。"><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link rel=canonical href=https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール"><meta property='og:description' content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/'><meta property='og:site_name' content='firebirdテクテクテクブログ'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Git'><meta property='article:tag' content='DevOps'><meta property='article:tag' content='バージョン管理'><meta property='article:tag' content='コマンドライン'><meta property='article:published_time' content='2025-09-09T11:30:00+09:00'><meta property='article:modified_time' content='2025-09-09T11:30:00+09:00'><meta name=twitter:title content="Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール"><meta name=twitter:description content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。"><link rel=alternate type=application/json href=https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/index.json><link rel="shortcut icon" href=/images/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテクテクテクブログ","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール","description":"git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-09T11:30:00\u002b09:00","dateModified":"2025-09-09T11:30:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB\/","wordCount":"2070","keywords":["Git","DevOps","バージョン管理","コマンドライン"]}</script><meta name=description content="git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。"><meta property="og:site_name" content="firebirdテクテクテクブログ"><meta property="og:type" content="article"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_762f71fa991dd853.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎯</span></figure><div class=site-meta><h1 class=site-name><a href=/>firebirdテクテクテクブログ</a></h1><h2 class=site-description>技術ネタ、趣味や備忘録などを書いているブログです</h2></div></header><ol class=menu-social><li><a href=https://twitter.com/firebird19245 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/categories/><span>カテゴリー</span></a></li><li><a href=/tags/><span>タグ</span></a></li><li><a href=/archives/><span>アーカイブ</span></a></li><li><a href=/about/><span>このサイトについて</span></a></li><li><a href=/search/><span>検索</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目次</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#はじめに>はじめに</a></li><li><a href=#git-filter-branchとは>git filter-branchとは？</a><ol><li><a href=#基本構文>基本構文</a></li></ol></li><li><a href=#実践例1機密情報の削除>実践例1：機密情報の削除</a><ol><li><a href=#パスワードファイルを全履歴から削除>パスワードファイルを全履歴から削除</a></li><li><a href=#envファイルを削除より安全な方法>.envファイルを削除（より安全な方法）</a></li></ol></li><li><a href=#実践例2著者情報の変更>実践例2：著者情報の変更</a><ol><li><a href=#特定の著者名を一括変更>特定の著者名を一括変更</a></li><li><a href=#実際の使用例tmy-ss-310--tmy-310>実際の使用例：tmy-ss-310 → tmy-310</a></li></ol></li><li><a href=#実践例3ディレクトリ構造の変更>実践例3：ディレクトリ構造の変更</a><ol><li><a href=#サブディレクトリを新しいリポジトリとして切り出す>サブディレクトリを新しいリポジトリとして切り出す</a></li><li><a href=#全ファイルをサブディレクトリに移動>全ファイルをサブディレクトリに移動</a></li></ol></li><li><a href=#実践例4大きなファイルの削除>実践例4：大きなファイルの削除</a></li><li><a href=#filter-branchの注意点>filter-branchの注意点</a><ol><li><a href=#-破壊的操作>⚠️ 破壊的操作</a></li><li><a href=#パフォーマンスの問題>パフォーマンスの問題</a></li></ol></li><li><a href=#代替ツールgit-filter-repo>代替ツール：git filter-repo</a><ol><li><a href=#filter-repoの利点>filter-repoの利点</a></li></ol></li><li><a href=#実用的な使い分け>実用的な使い分け</a><ol><li><a href=#git-filter-branchを使うべき場合>git filter-branchを使うべき場合</a></li><li><a href=#git-rebaseやresetで十分な場合>git rebaseやresetで十分な場合</a></li><li><a href=#git-filter-repoを使うべき場合>git filter-repoを使うべき場合</a></li></ol></li><li><a href=#トラブルシューティング>トラブルシューティング</a><ol><li><a href=#エラー-cannot-create-a-new-backup>エラー: &ldquo;Cannot create a new backup&rdquo;</a></li><li><a href=#リモートとの同期問題>リモートとの同期問題</a></li><li><a href=#容量が減らない場合>容量が減らない場合</a></li></ol></li><li><a href=#まとめ>まとめ</a></li><li><a href=#参考リンク>参考リンク</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E8%A1%93/>技術</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</a></h2><h3 class=article-subtitle>git filter-branchの使い方を実例を交えて解説。機密情報の削除、著者名の変更、ディレクトリ構造の変更など、Gitの履歴を書き換える様々なテクニックを紹介します。</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025年9月9日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 5分</time></div></footer></div></header><section class=article-content><h2 id=はじめに>はじめに</h2><p>Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？</p><p>今回は、そんな時に役立つ<code>git filter-branch</code>という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。</p><h2 id=git-filter-branchとは>git filter-branchとは？</h2><p><code>git filter-branch</code>は、Gitリポジトリの履歴を書き換えるためのコマンドです。単一のコミットだけでなく、<strong>全履歴を対象に一括で変更を適用</strong>できるのが特徴です。</p><h3 id=基本構文>基本構文</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git filter-branch <span class=o>[</span>--option<span class=o>]</span> <span class=s1>&#39;&lt;command&gt;&#39;</span> <span class=o>[</span>revision-range<span class=o>]</span>
+</span></span></code></pre></td></tr></table></div></div><p>主なオプション：</p><ul><li><code>--tree-filter</code>: 各コミットのファイルツリーを直接編集</li><li><code>--index-filter</code>: インデックス（ステージング）を編集</li><li><code>--env-filter</code>: 環境変数（著者情報など）を編集</li><li><code>--msg-filter</code>: コミットメッセージを編集</li></ul><h2 id=実践例1機密情報の削除>実践例1：機密情報の削除</h2><p>最も一般的な使用例は、誤ってコミットしてしまった機密情報の削除です。</p><h3 id=パスワードファイルを全履歴から削除>パスワードファイルを全履歴から削除</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># passwords.txtを全履歴から削除</span>
+</span></span><span class=line><span class=cl>git filter-branch --force --index-filter <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  <span class=s1>&#39;git rm --cached --ignore-unmatch passwords.txt&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  --prune-empty --tag-name-filter cat -- --all
+</span></span></code></pre></td></tr></table></div></div><h3 id=envファイルを削除より安全な方法>.envファイルを削除（より安全な方法）</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># バックアップを作成</span>
+</span></span><span class=line><span class=cl>git branch backup-before-cleanup
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># .envファイルを全履歴から削除</span>
+</span></span><span class=line><span class=cl>git filter-branch --force --index-filter <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  <span class=s1>&#39;git rm --cached --ignore-unmatch .env&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  --prune-empty --tag-name-filter cat -- --all
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 削除を確認</span>
+</span></span><span class=line><span class=cl>git log --all --full-history -- .env
+</span></span></code></pre></td></tr></table></div></div><h2 id=実践例2著者情報の変更>実践例2：著者情報の変更</h2><p>GitHubのユーザー名を変更した場合など、過去のコミットの著者名を変更したい場合があります。</p><h3 id=特定の著者名を一括変更>特定の著者名を一括変更</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=cp>#!/bin/bash
+</span></span></span><span class=line><span class=cl><span class=cp></span>git filter-branch --env-filter <span class=s1>&#39;
+</span></span></span><span class=line><span class=cl><span class=s1>OLD_EMAIL=&#34;old@example.com&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>CORRECT_NAME=&#34;新しい名前&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>CORRECT_EMAIL=&#34;new@example.com&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>
+</span></span></span><span class=line><span class=cl><span class=s1>if [ &#34;$GIT_COMMITTER_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
+</span></span></span><span class=line><span class=cl><span class=s1>then
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_COMMITTER_NAME=&#34;$CORRECT_NAME&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_COMMITTER_EMAIL=&#34;$CORRECT_EMAIL&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>fi
+</span></span></span><span class=line><span class=cl><span class=s1>if [ &#34;$GIT_AUTHOR_EMAIL&#34; = &#34;$OLD_EMAIL&#34; ]
+</span></span></span><span class=line><span class=cl><span class=s1>then
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_AUTHOR_NAME=&#34;$CORRECT_NAME&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_AUTHOR_EMAIL=&#34;$CORRECT_EMAIL&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>fi
+</span></span></span><span class=line><span class=cl><span class=s1>&#39;</span> --tag-name-filter cat -- --branches --tags
+</span></span></code></pre></td></tr></table></div></div><h3 id=実際の使用例tmy-ss-310--tmy-310>実際の使用例：tmy-ss-310 → tmy-310</h3><p>私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git filter-branch -f --env-filter <span class=s1>&#39;
+</span></span></span><span class=line><span class=cl><span class=s1>if [ &#34;$GIT_AUTHOR_NAME&#34; = &#34;tmy-ss-310&#34; ]; then
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_AUTHOR_NAME=&#34;tmy-310&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_AUTHOR_EMAIL=&#34;mito.motohiro@gmail.com&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>fi
+</span></span></span><span class=line><span class=cl><span class=s1>if [ &#34;$GIT_COMMITTER_NAME&#34; = &#34;tmy-ss-310&#34; ]; then
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_COMMITTER_NAME=&#34;tmy-310&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>    export GIT_COMMITTER_EMAIL=&#34;mito.motohiro@gmail.com&#34;
+</span></span></span><span class=line><span class=cl><span class=s1>fi
+</span></span></span><span class=line><span class=cl><span class=s1>&#39;</span> -- --all
+</span></span></code></pre></td></tr></table></div></div><h2 id=実践例3ディレクトリ構造の変更>実践例3：ディレクトリ構造の変更</h2><h3 id=サブディレクトリを新しいリポジトリとして切り出す>サブディレクトリを新しいリポジトリとして切り出す</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># frontendディレクトリだけを抽出して新しいリポジトリに</span>
+</span></span><span class=line><span class=cl>git filter-branch --subdirectory-filter frontend HEAD
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># これにより、frontendディレクトリがルートディレクトリになる</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=全ファイルをサブディレクトリに移動>全ファイルをサブディレクトリに移動</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git filter-branch --index-filter <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  <span class=s1>&#39;git ls-files -s | sed &#34;s-\t\&#34;*-&amp;newsubdir/-&#34; |
+</span></span></span><span class=line><span class=cl><span class=s1>   GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
+</span></span></span><span class=line><span class=cl><span class=s1>   git update-index --index-info &amp;&amp;
+</span></span></span><span class=line><span class=cl><span class=s1>   mv &#34;$GIT_INDEX_FILE.new&#34; &#34;$GIT_INDEX_FILE&#34;&#39;</span> HEAD
+</span></span></code></pre></td></tr></table></div></div><h2 id=実践例4大きなファイルの削除>実践例4：大きなファイルの削除</h2><p>リポジトリサイズを削減するため、大きなファイルを履歴から削除します。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 100MB以上のファイルを検出</span>
+</span></span><span class=line><span class=cl>git rev-list --objects --all <span class=p>|</span>
+</span></span><span class=line><span class=cl>  git cat-file --batch-check<span class=o>=</span><span class=s1>&#39;%(objecttype) %(objectname) %(objectsize) %(rest)&#39;</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>  sed -n <span class=s1>&#39;s/^blob //p&#39;</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>  sort --numeric-sort --key<span class=o>=</span><span class=m>2</span> <span class=p>|</span>
+</span></span><span class=line><span class=cl>  tail -10
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 大きなファイル（例：huge-video.mp4）を削除</span>
+</span></span><span class=line><span class=cl>git filter-branch --force --index-filter <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  <span class=s1>&#39;git rm --cached --ignore-unmatch huge-video.mp4&#39;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>  --prune-empty --tag-name-filter cat -- --all
+</span></span></code></pre></td></tr></table></div></div><h2 id=filter-branchの注意点>filter-branchの注意点</h2><h3 id=-破壊的操作>⚠️ 破壊的操作</h3><p><code>git filter-branch</code>は履歴を完全に書き換えるため：</p><ol><li><strong>必ずバックアップを作成</strong></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git branch backup-<span class=k>$(</span>date +%Y%m%d<span class=k>)</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li><strong>強制プッシュが必要</strong></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>git push --force origin main
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li><strong>チームメンバーへの影響</strong><ul><li>他の開発者は再クローンが必要</li><li>進行中の作業がある場合は要調整</li></ul></li></ol><h3 id=パフォーマンスの問題>パフォーマンスの問題</h3><p>大規模なリポジトリでは処理に時間がかかります：</p><ul><li>1000コミット: 数分</li><li>10000コミット: 30分以上</li></ul><h2 id=代替ツールgit-filter-repo>代替ツール：git filter-repo</h2><p>Git 2.24以降では、<code>git filter-repo</code>が推奨されています：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># インストール</span>
+</span></span><span class=line><span class=cl>pip install git-filter-repo
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 使用例：メールアドレスの変更</span>
+</span></span><span class=line><span class=cl>git filter-repo --email-callback <span class=s1>&#39;
+</span></span></span><span class=line><span class=cl><span class=s1>  return email.replace(b&#34;old@example.com&#34;, b&#34;new@example.com&#34;)
+</span></span></span><span class=line><span class=cl><span class=s1>&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># パスの削除</span>
+</span></span><span class=line><span class=cl>git filter-repo --path passwords.txt --invert-paths
+</span></span></code></pre></td></tr></table></div></div><h3 id=filter-repoの利点>filter-repoの利点</h3><ul><li><strong>高速</strong>: filter-branchの10-720倍高速</li><li><strong>安全</strong>: デフォルトで新しいリポジトリに出力</li><li><strong>使いやすい</strong>: より直感的なオプション</li></ul><h2 id=実用的な使い分け>実用的な使い分け</h2><h3 id=git-filter-branchを使うべき場合>git filter-branchを使うべき場合</h3><ul><li>Gitの標準機能のみで完結したい</li><li>簡単な著者名変更や単一ファイル削除</li><li>追加ツールのインストールが困難な環境</li></ul><h3 id=git-rebaseやresetで十分な場合>git rebaseやresetで十分な場合</h3><ul><li>最近のコミット（10個程度）の修正</li><li>個人プロジェクトで履歴の詳細が不要</li><li>クリーンな履歴を優先</li></ul><h3 id=git-filter-repoを使うべき場合>git filter-repoを使うべき場合</h3><ul><li>大規模なリポジトリ</li><li>複雑なフィルタリング条件</li><li>パフォーマンスが重要</li></ul><h2 id=トラブルシューティング>トラブルシューティング</h2><h3 id=エラー-cannot-create-a-new-backup>エラー: &ldquo;Cannot create a new backup&rdquo;</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 既存のバックアップを削除</span>
+</span></span><span class=line><span class=cl>rm -rf .git/refs/original/
+</span></span></code></pre></td></tr></table></div></div><h3 id=リモートとの同期問題>リモートとの同期問題</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># ローカルの変更を強制的に反映</span>
+</span></span><span class=line><span class=cl>git push --force-with-lease origin main
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># より安全：新しいブランチにプッシュ</span>
+</span></span><span class=line><span class=cl>git push origin main:main-filtered
+</span></span></code></pre></td></tr></table></div></div><h3 id=容量が減らない場合>容量が減らない場合</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># ガベージコレクションを実行</span>
+</span></span><span class=line><span class=cl>git reflog expire --expire<span class=o>=</span>now --all
+</span></span><span class=line><span class=cl>git gc --prune<span class=o>=</span>now --aggressive
+</span></span></code></pre></td></tr></table></div></div><h2 id=まとめ>まとめ</h2><p><code>git filter-branch</code>は強力なツールですが、使用には注意が必要です：</p><p>✅ <strong>使うべき時</strong></p><ul><li>機密情報の緊急削除</li><li>著者情報の一括修正</li><li>リポジトリの大規模なリファクタリング</li></ul><p>❌ <strong>避けるべき時</strong></p><ul><li>公開済みの大規模プロジェクト</li><li>チーム開発中のアクティブなリポジトリ</li><li>簡単な修正で済む場合</li></ul><p>適切に使えば、Gitの履歴をクリーンに保ち、セキュリティ問題を解決できる強力な味方になります。ただし、「大いなる力には大いなる責任が伴う」ことを忘れずに！</p><h2 id=参考リンク>参考リンク</h2><ul><li><a class=link href=https://git-scm.com/docs/git-filter-branch target=_blank rel=noopener>Git公式ドキュメント - git-filter-branch</a></li><li><a class=link href=https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository target=_blank rel=noopener>GitHub - Removing sensitive data</a></li><li><a class=link href=https://github.com/newren/git-filter-repo target=_blank rel=noopener>git-filter-repo</a></li></ul><hr><p><em>この記事が役に立ったら、ぜひシェアしてください！Gitの困った時の救世主として、多くの開発者の助けになれば幸いです。</em></p></section><footer class=article-footer><section class=article-tags><a href=/tags/git/>Git</a>
+<a href=/tags/devops/>Devops</a>
+<a href=/tags/%E3%83%90%E3%83%BC%E3%82%B8%E3%83%A7%E3%83%B3%E7%AE%A1%E7%90%86/>バージョン管理</a>
+<a href=/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/>コマンドライン</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/><div class=article-details><h2 class=article-title>Docker入門：コンテナ技術の基礎から実践まで</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
