@@ -1,760 +1,843 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Devops on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/devops/</link><description>Recent content in Devops on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Tue, 09 Sep 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/devops/index.xml" rel="self" type="application/rss+xml"/><item><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</link><pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</guid><description>&lt;h2 id="はじめに">はじめに
-&lt;/h2>&lt;p>Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？&lt;/p>
-&lt;p>今回は、そんな時に役立つ&lt;code>git filter-branch&lt;/code>という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。&lt;/p>
-&lt;h2 id="git-filter-branchとは">git filter-branchとは？
-&lt;/h2>&lt;p>&lt;code>git filter-branch&lt;/code>は、Gitリポジトリの履歴を書き換えるためのコマンドです。単一のコミットだけでなく、&lt;strong>全履歴を対象に一括で変更を適用&lt;/strong>できるのが特徴です。&lt;/p>
-&lt;h3 id="基本構文">基本構文
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git filter-branch &lt;span class="o">[&lt;/span>--option&lt;span class="o">]&lt;/span> &lt;span class="s1">&amp;#39;&amp;lt;command&amp;gt;&amp;#39;&lt;/span> &lt;span class="o">[&lt;/span>revision-range&lt;span class="o">]&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>主なオプション：&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>--tree-filter&lt;/code>: 各コミットのファイルツリーを直接編集&lt;/li>
-&lt;li>&lt;code>--index-filter&lt;/code>: インデックス（ステージング）を編集&lt;/li>
-&lt;li>&lt;code>--env-filter&lt;/code>: 環境変数（著者情報など）を編集&lt;/li>
-&lt;li>&lt;code>--msg-filter&lt;/code>: コミットメッセージを編集&lt;/li>
-&lt;/ul>
-&lt;h2 id="実践例1機密情報の削除">実践例1：機密情報の削除
-&lt;/h2>&lt;p>最も一般的な使用例は、誤ってコミットしてしまった機密情報の削除です。&lt;/p>
-&lt;h3 id="パスワードファイルを全履歴から削除">パスワードファイルを全履歴から削除
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># passwords.txtを全履歴から削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --force --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git rm --cached --ignore-unmatch passwords.txt&amp;#39;&lt;/span> &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --prune-empty --tag-name-filter cat -- --all
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="envファイルを削除より安全な方法">.envファイルを削除（より安全な方法）
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># バックアップを作成&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git branch backup-before-cleanup
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># .envファイルを全履歴から削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --force --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git rm --cached --ignore-unmatch .env&amp;#39;&lt;/span> &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --prune-empty --tag-name-filter cat -- --all
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 削除を確認&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git log --all --full-history -- .env
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="実践例2著者情報の変更">実践例2：著者情報の変更
-&lt;/h2>&lt;p>GitHubのユーザー名を変更した場合など、過去のコミットの著者名を変更したい場合があります。&lt;/p>
-&lt;h3 id="特定の著者名を一括変更">特定の著者名を一括変更
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>git filter-branch --env-filter &lt;span class="s1">&amp;#39;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">OLD_EMAIL=&amp;#34;old@example.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">CORRECT_NAME=&amp;#34;新しい名前&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">CORRECT_EMAIL=&amp;#34;new@example.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_COMMITTER_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_AUTHOR_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&lt;/span> --tag-name-filter cat -- --branches --tags
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="実際の使用例tmy-ss-310--tmy-310">実際の使用例：tmy-ss-310 → tmy-310
-&lt;/h3>&lt;p>私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git filter-branch -f --env-filter &lt;span class="s1">&amp;#39;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_AUTHOR_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_NAME=&amp;#34;tmy-310&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_COMMITTER_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_NAME=&amp;#34;tmy-310&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&lt;/span> -- --all
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="実践例3ディレクトリ構造の変更">実践例3：ディレクトリ構造の変更
-&lt;/h2>&lt;h3 id="サブディレクトリを新しいリポジトリとして切り出す">サブディレクトリを新しいリポジトリとして切り出す
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># frontendディレクトリだけを抽出して新しいリポジトリに&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --subdirectory-filter frontend HEAD
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># これにより、frontendディレクトリがルートディレクトリになる&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="全ファイルをサブディレクトリに移動">全ファイルをサブディレクトリに移動
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git filter-branch --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git ls-files -s | sed &amp;#34;s-\t\&amp;#34;*-&amp;amp;newsubdir/-&amp;#34; |
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> git update-index --index-info &amp;amp;&amp;amp;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> mv &amp;#34;$GIT_INDEX_FILE.new&amp;#34; &amp;#34;$GIT_INDEX_FILE&amp;#34;&amp;#39;&lt;/span> HEAD
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="実践例4大きなファイルの削除">実践例4：大きなファイルの削除
-&lt;/h2>&lt;p>リポジトリサイズを削減するため、大きなファイルを履歴から削除します。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 100MB以上のファイルを検出&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git rev-list --objects --all &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> git cat-file --batch-check&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;%(objecttype) %(objectname) %(objectsize) %(rest)&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sed -n &lt;span class="s1">&amp;#39;s/^blob //p&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sort --numeric-sort --key&lt;span class="o">=&lt;/span>&lt;span class="m">2&lt;/span> &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> tail -10
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 大きなファイル（例：huge-video.mp4）を削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --force --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git rm --cached --ignore-unmatch huge-video.mp4&amp;#39;&lt;/span> &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --prune-empty --tag-name-filter cat -- --all
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="filter-branchの注意点">filter-branchの注意点
-&lt;/h2>&lt;h3 id="-破壊的操作">⚠️ 破壊的操作
-&lt;/h3>&lt;p>&lt;code>git filter-branch&lt;/code>は履歴を完全に書き換えるため：&lt;/p>
-&lt;ol>
-&lt;li>&lt;strong>必ずバックアップを作成&lt;/strong>&lt;/li>
-&lt;/ol>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git branch backup-&lt;span class="k">$(&lt;/span>date +%Y%m%d&lt;span class="k">)&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ol start="2">
-&lt;li>&lt;strong>強制プッシュが必要&lt;/strong>&lt;/li>
-&lt;/ol>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git push --force origin main
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ol start="3">
-&lt;li>&lt;strong>チームメンバーへの影響&lt;/strong>
-&lt;ul>
-&lt;li>他の開発者は再クローンが必要&lt;/li>
-&lt;li>進行中の作業がある場合は要調整&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;h3 id="パフォーマンスの問題">パフォーマンスの問題
-&lt;/h3>&lt;p>大規模なリポジトリでは処理に時間がかかります：&lt;/p>
-&lt;ul>
-&lt;li>1000コミット: 数分&lt;/li>
-&lt;li>10000コミット: 30分以上&lt;/li>
-&lt;/ul>
-&lt;h2 id="代替ツールgit-filter-repo">代替ツール：git filter-repo
-&lt;/h2>&lt;p>Git 2.24以降では、&lt;code>git filter-repo&lt;/code>が推奨されています：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># インストール&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pip install git-filter-repo
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 使用例：メールアドレスの変更&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-repo --email-callback &lt;span class="s1">&amp;#39;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> return email.replace(b&amp;#34;old@example.com&amp;#34;, b&amp;#34;new@example.com&amp;#34;)
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># パスの削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-repo --path passwords.txt --invert-paths
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="filter-repoの利点">filter-repoの利点
-&lt;/h3>&lt;ul>
-&lt;li>&lt;strong>高速&lt;/strong>: filter-branchの10-720倍高速&lt;/li>
-&lt;li>&lt;strong>安全&lt;/strong>: デフォルトで新しいリポジトリに出力&lt;/li>
-&lt;li>&lt;strong>使いやすい&lt;/strong>: より直感的なオプション&lt;/li>
-&lt;/ul>
-&lt;h2 id="実用的な使い分け">実用的な使い分け
-&lt;/h2>&lt;h3 id="git-filter-branchを使うべき場合">git filter-branchを使うべき場合
-&lt;/h3>&lt;ul>
-&lt;li>Gitの標準機能のみで完結したい&lt;/li>
-&lt;li>簡単な著者名変更や単一ファイル削除&lt;/li>
-&lt;li>追加ツールのインストールが困難な環境&lt;/li>
-&lt;/ul>
-&lt;h3 id="git-rebaseやresetで十分な場合">git rebaseやresetで十分な場合
-&lt;/h3>&lt;ul>
-&lt;li>最近のコミット（10個程度）の修正&lt;/li>
-&lt;li>個人プロジェクトで履歴の詳細が不要&lt;/li>
-&lt;li>クリーンな履歴を優先&lt;/li>
-&lt;/ul>
-&lt;h3 id="git-filter-repoを使うべき場合">git filter-repoを使うべき場合
-&lt;/h3>&lt;ul>
-&lt;li>大規模なリポジトリ&lt;/li>
-&lt;li>複雑なフィルタリング条件&lt;/li>
-&lt;li>パフォーマンスが重要&lt;/li>
-&lt;/ul>
-&lt;h2 id="トラブルシューティング">トラブルシューティング
-&lt;/h2>&lt;h3 id="エラー-cannot-create-a-new-backup">エラー: &amp;ldquo;Cannot create a new backup&amp;rdquo;
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 既存のバックアップを削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rm -rf .git/refs/original/
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="リモートとの同期問題">リモートとの同期問題
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ローカルの変更を強制的に反映&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git push --force-with-lease origin main
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># より安全：新しいブランチにプッシュ&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git push origin main:main-filtered
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="容量が減らない場合">容量が減らない場合
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ガベージコレクションを実行&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git reflog expire --expire&lt;span class="o">=&lt;/span>now --all
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git gc --prune&lt;span class="o">=&lt;/span>now --aggressive
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="まとめ">まとめ
-&lt;/h2>&lt;p>&lt;code>git filter-branch&lt;/code>は強力なツールですが、使用には注意が必要です：&lt;/p>
-&lt;p>✅ &lt;strong>使うべき時&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>機密情報の緊急削除&lt;/li>
-&lt;li>著者情報の一括修正&lt;/li>
-&lt;li>リポジトリの大規模なリファクタリング&lt;/li>
-&lt;/ul>
-&lt;p>❌ &lt;strong>避けるべき時&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>公開済みの大規模プロジェクト&lt;/li>
-&lt;li>チーム開発中のアクティブなリポジトリ&lt;/li>
-&lt;li>簡単な修正で済む場合&lt;/li>
-&lt;/ul>
-&lt;p>適切に使えば、Gitの履歴をクリーンに保ち、セキュリティ問題を解決できる強力な味方になります。ただし、「大いなる力には大いなる責任が伴う」ことを忘れずに！&lt;/p>
-&lt;h2 id="参考リンク">参考リンク
-&lt;/h2>&lt;ul>
-&lt;li>&lt;a class="link" href="https://git-scm.com/docs/git-filter-branch" target="_blank" rel="noopener"
->Git公式ドキュメント - git-filter-branch&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository" target="_blank" rel="noopener"
->GitHub - Removing sensitive data&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener"
->git-filter-repo&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;hr>
-&lt;p>&lt;em>この記事が役に立ったら、ぜひシェアしてください！Gitの困った時の救世主として、多くの開発者の助けになれば幸いです。&lt;/em>&lt;/p></description></item><item><title>🏗️ Building a Production-Ready Terraform Project with Multi-Environment Support on AWS</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/</link><pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/</guid><description>&lt;h2 id="terraform記事紹介">Terraform記事紹介
-&lt;/h2>&lt;p>&lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://dev.to/tony_uketui_6cca68c7eba02/building-a-production-ready-terraform-project-with-multi-environment-support-on-aws-hia" target="_blank" rel="noopener"
->Dev.to&lt;/a>
-&lt;strong>著者&lt;/strong>: Anthony Uketui
-&lt;strong>作成日&lt;/strong>: 2025-08-29
-&lt;strong>統計&lt;/strong>: ❤️ 5 リアクション&lt;/p>
-&lt;h3 id="概要">概要
-&lt;/h3>&lt;p>When I started this project, my goal was simple but ambitious. I wanted to build a production-ready&amp;hellip;&amp;hellip;&lt;/p>
-&lt;h3 id="この記事について">この記事について
-&lt;/h3>&lt;p>terraformに関する記事としてDev.toから収集されました。
-最新の技術動向や実践的な知識について学べる内容です。&lt;/p>
-&lt;hr>
-&lt;p>&lt;strong>🌐 Note&lt;/strong>: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p>
-&lt;p>&lt;strong>🔗 &lt;a class="link" href="https://dev.to/tony_uketui_6cca68c7eba02/building-a-production-ready-terraform-project-with-multi-environment-support-on-aws-hia" target="_blank" rel="noopener"
->元記事を読む&lt;/a>&lt;/strong>&lt;/p>
-&lt;p>&lt;strong>📅 収集日時&lt;/strong>: 2025-08-31T11:14:36.657847&lt;/p>
-&lt;h3 id="-関連技術の学習リソース">📚 関連技術の学習リソース
-&lt;/h3>&lt;p>terraformを学習する際に参考となるリソース：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメント&lt;/li>
-&lt;li>コミュニティブログ&lt;/li>
-&lt;li>ハンズオンチュートリアル&lt;/li>
-&lt;li>ベストプラクティス集&lt;/li>
-&lt;/ul></description></item><item><title>🏗️ Bye-Bye Credentials! Automate BTP &amp; Cloud Foundry Setup with Terraform using Github Actions and Github OIDC</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-github-oidc/</link><pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-github-oidc/</guid><description>&lt;h2 id="terraform記事紹介">Terraform記事紹介
-&lt;/h2>&lt;p>&lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://dev.to/vipinvkmenon/bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-3m07" target="_blank" rel="noopener"
->Dev.to&lt;/a>
-&lt;strong>著者&lt;/strong>: Vipin Vijaykumar
-&lt;strong>作成日&lt;/strong>: 2025-07-24
-&lt;strong>統計&lt;/strong>: ❤️ 3 リアクション&lt;/p>
-&lt;h3 id="概要">概要
-&lt;/h3>&lt;p>Imagine this: You want to automate setting up SAP BTP Accounts and Cloud Foundry using Terraform, but&amp;hellip;&amp;hellip;&lt;/p>
-&lt;h3 id="この記事について">この記事について
-&lt;/h3>&lt;p>terraformに関する記事としてDev.toから収集されました。
-最新の技術動向や実践的な知識について学べる内容です。&lt;/p>
-&lt;hr>
-&lt;p>&lt;strong>🌐 Note&lt;/strong>: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p>
-&lt;p>&lt;strong>🔗 &lt;a class="link" href="https://dev.to/vipinvkmenon/bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-3m07" target="_blank" rel="noopener"
->元記事を読む&lt;/a>&lt;/strong>&lt;/p>
-&lt;p>&lt;strong>📅 収集日時&lt;/strong>: 2025-08-31T11:14:36.657863&lt;/p>
-&lt;h3 id="-関連技術の学習リソース">📚 関連技術の学習リソース
-&lt;/h3>&lt;p>terraformを学習する際に参考となるリソース：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメント&lt;/li>
-&lt;li>コミュニティブログ&lt;/li>
-&lt;li>ハンズオンチュートリアル&lt;/li>
-&lt;li>ベストプラクティス集&lt;/li>
-&lt;/ul></description></item><item><title>🏗️ GitOps and IaC at Scale – ArgoCD and Open Tofu – Part 3 – Hardening and Manage users</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users/</link><pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users/</guid><description>&lt;h2 id="terraform記事紹介">Terraform記事紹介
-&lt;/h2>&lt;p>&lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://dev.to/aws-builders/gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users-5b9m" target="_blank" rel="noopener"
->Dev.to&lt;/a>
-&lt;strong>著者&lt;/strong>: Alejandro Velez
-&lt;strong>作成日&lt;/strong>: 2025-07-19
-&lt;strong>統計&lt;/strong>: ❤️ 3 リアクション&lt;/p>
-&lt;h3 id="概要">概要
-&lt;/h3>&lt;p>Level 400 Earlier blogs covered scalable delivery, architecture patterns, and code samples. This&amp;hellip;&amp;hellip;&lt;/p>
-&lt;h3 id="この記事について">この記事について
-&lt;/h3>&lt;p>terraformに関する記事としてDev.toから収集されました。
-最新の技術動向や実践的な知識について学べる内容です。&lt;/p>
-&lt;hr>
-&lt;p>&lt;strong>🌐 Note&lt;/strong>: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p>
-&lt;p>&lt;strong>🔗 &lt;a class="link" href="https://dev.to/aws-builders/gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users-5b9m" target="_blank" rel="noopener"
->元記事を読む&lt;/a>&lt;/strong>&lt;/p>
-&lt;p>&lt;strong>📅 収集日時&lt;/strong>: 2025-08-31T11:14:36.657855&lt;/p>
-&lt;h3 id="-関連技術の学習リソース">📚 関連技術の学習リソース
-&lt;/h3>&lt;p>terraformを学習する際に参考となるリソース：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメント&lt;/li>
-&lt;li>コミュニティブログ&lt;/li>
-&lt;li>ハンズオンチュートリアル&lt;/li>
-&lt;li>ベストプラクティス集&lt;/li>
-&lt;/ul></description></item><item><title>🏗️ Spring Boot Banking Application Deployment using DevSecOps on AWS EKS</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/</link><pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/</guid><description>&lt;h2 id="terraform記事紹介">Terraform記事紹介
-&lt;/h2>&lt;p>&lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://dev.to/deepanshub09/spring-boot-banking-application-deployment-using-devsecops-on-aws-eks-27ff" target="_blank" rel="noopener"
->Dev.to&lt;/a>
-&lt;strong>著者&lt;/strong>: Deepanshu
-&lt;strong>作成日&lt;/strong>: 2025-08-09
-&lt;strong>統計&lt;/strong>: ❤️ 5 リアクション&lt;/p>
-&lt;h3 id="概要">概要
-&lt;/h3>&lt;p>A comprehensive, secure banking web application built with Spring Boot, featuring modern web&amp;hellip;&amp;hellip;&lt;/p>
-&lt;h3 id="この記事について">この記事について
-&lt;/h3>&lt;p>terraformに関する記事としてDev.toから収集されました。
-最新の技術動向や実践的な知識について学べる内容です。&lt;/p>
-&lt;hr>
-&lt;p>&lt;strong>🌐 Note&lt;/strong>: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p>
-&lt;p>&lt;strong>🔗 &lt;a class="link" href="https://dev.to/deepanshub09/spring-boot-banking-application-deployment-using-devsecops-on-aws-eks-27ff" target="_blank" rel="noopener"
->元記事を読む&lt;/a>&lt;/strong>&lt;/p>
-&lt;p>&lt;strong>📅 収集日時&lt;/strong>: 2025-08-31T11:14:36.657843&lt;/p>
-&lt;h3 id="-関連技術の学習リソース">📚 関連技術の学習リソース
-&lt;/h3>&lt;p>terraformを学習する際に参考となるリソース：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメント&lt;/li>
-&lt;li>コミュニティブログ&lt;/li>
-&lt;li>ハンズオンチュートリアル&lt;/li>
-&lt;li>ベストプラクティス集&lt;/li>
-&lt;/ul></description></item><item><title>🏗️ Terraform Modules: Your Infrastructure's Building Blocks (The Complete Guide)</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-modules-your-infrastructures-building-blocks-the-complete-guide/</link><pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-modules-your-infrastructures-building-blocks-the-complete-guide/</guid><description>&lt;h2 id="terraform記事紹介">Terraform記事紹介
-&lt;/h2>&lt;p>&lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://dev.to/deepanshub09/terraform-modules-your-infrastructures-building-blocks-the-complete-guide-25c5" target="_blank" rel="noopener"
->Dev.to&lt;/a>
-&lt;strong>著者&lt;/strong>: Deepanshu
-&lt;strong>作成日&lt;/strong>: 2025-07-30
-&lt;strong>統計&lt;/strong>: ❤️ 5 リアクション&lt;/p>
-&lt;h3 id="概要">概要
-&lt;/h3>&lt;p>Imagine if every time you wanted to build a house, you had to start from scratch - making your own&amp;hellip;&amp;hellip;&lt;/p>
-&lt;h3 id="この記事について">この記事について
-&lt;/h3>&lt;p>terraformに関する記事としてDev.toから収集されました。
-最新の技術動向や実践的な知識について学べる内容です。&lt;/p>
-&lt;hr>
-&lt;p>&lt;strong>🌐 Note&lt;/strong>: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p>
-&lt;p>&lt;strong>🔗 &lt;a class="link" href="https://dev.to/deepanshub09/terraform-modules-your-infrastructures-building-blocks-the-complete-guide-25c5" target="_blank" rel="noopener"
->元記事を読む&lt;/a>&lt;/strong>&lt;/p>
-&lt;p>&lt;strong>📅 収集日時&lt;/strong>: 2025-08-31T11:14:36.657851&lt;/p>
-&lt;h3 id="-関連技術の学習リソース">📚 関連技術の学習リソース
-&lt;/h3>&lt;p>terraformを学習する際に参考となるリソース：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメント&lt;/li>
-&lt;li>コミュニティブログ&lt;/li>
-&lt;li>ハンズオンチュートリアル&lt;/li>
-&lt;li>ベストプラクティス集&lt;/li>
-&lt;/ul></description></item><item><title>🏗️ Terraform vs CloudFormation: Which AWS IaC Tool Should You Use? 🤔</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/</link><pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/</guid><description>&lt;h2 id="terraform記事紹介">Terraform記事紹介
-&lt;/h2>&lt;p>&lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://dev.to/yash_sonawane25/terraform-vs-cloudformation-which-aws-iac-tool-should-you-use-2h3i" target="_blank" rel="noopener"
->Dev.to&lt;/a>
-&lt;strong>著者&lt;/strong>: Yash Sonawane
-&lt;strong>作成日&lt;/strong>: 2025-07-31
-&lt;strong>統計&lt;/strong>: ❤️ 6 リアクション&lt;/p>
-&lt;h3 id="概要">概要
-&lt;/h3>&lt;p>&amp;ldquo;Two tools. Same goal. Totally different vibes.&amp;rdquo; If you&amp;rsquo;re diving into Infrastructure as Code&amp;hellip;&amp;hellip;&lt;/p>
-&lt;h3 id="この記事について">この記事について
-&lt;/h3>&lt;p>terraformに関する記事としてDev.toから収集されました。
-最新の技術動向や実践的な知識について学べる内容です。&lt;/p>
-&lt;hr>
-&lt;p>&lt;strong>🌐 Note&lt;/strong>: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p>
-&lt;p>&lt;strong>🔗 &lt;a class="link" href="https://dev.to/yash_sonawane25/terraform-vs-cloudformation-which-aws-iac-tool-should-you-use-2h3i" target="_blank" rel="noopener"
->元記事を読む&lt;/a>&lt;/strong>&lt;/p>
-&lt;p>&lt;strong>📅 収集日時&lt;/strong>: 2025-08-31T11:14:36.657839&lt;/p>
-&lt;h3 id="-関連技術の学習リソース">📚 関連技術の学習リソース
-&lt;/h3>&lt;p>terraformを学習する際に参考となるリソース：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメント&lt;/li>
-&lt;li>コミュニティブログ&lt;/li>
-&lt;li>ハンズオンチュートリアル&lt;/li>
-&lt;li>ベストプラクティス集&lt;/li>
-&lt;/ul></description></item><item><title>Docker入門：コンテナ技術の基礎から実践まで</title><link>https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/</link><pubDate>Sat, 11 Jan 2025 10:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/</guid><description>&lt;h2 id="dockerとは">Dockerとは
-&lt;/h2>&lt;p>Dockerは、アプリケーションをコンテナという単位でパッケージ化し、どの環境でも同じように動作させることができる技術です。&lt;/p>
-&lt;h2 id="なぜdockerが必要なのか">なぜDockerが必要なのか
-&lt;/h2>&lt;h3 id="1-環境依存の問題を解決">1. 環境依存の問題を解決
-&lt;/h3>&lt;p>「私の環境では動くのに&amp;hellip;」という問題を解決します。開発環境、テスト環境、本番環境で同じコンテナを使用することで、環境差異による問題を最小化できます。&lt;/p>
-&lt;h3 id="2-軽量で高速">2. 軽量で高速
-&lt;/h3>&lt;p>仮想マシンと比較して：&lt;/p>
-&lt;ul>
-&lt;li>起動が速い（数秒）&lt;/li>
-&lt;li>リソース消費が少ない&lt;/li>
-&lt;li>同じホストで多数のコンテナを実行可能&lt;/li>
-&lt;/ul>
-&lt;h2 id="基本的なdockerコマンド">基本的なDockerコマンド
-&lt;/h2>&lt;h3 id="イメージの操作">イメージの操作
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># イメージの検索&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker search nginx
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># イメージのダウンロード&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker pull nginx:latest
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ローカルのイメージ一覧&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker images
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="コンテナの操作">コンテナの操作
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># コンテナの起動&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker run -d -p 8080:80 --name my-nginx nginx
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 実行中のコンテナ確認&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker ps
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># コンテナの停止&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker stop my-nginx
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># コンテナの削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker rm my-nginx
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="dockerfileの基本">Dockerfileの基本
-&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-dockerfile" data-lang="dockerfile">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># ベースイメージの指定&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="s"> node:18-alpine&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># 作業ディレクトリの設定&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># 依存関係ファイルのコピー&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> package*.json ./&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># 依存関係のインストール&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> npm ci --only&lt;span class="o">=&lt;/span>production&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># アプリケーションファイルのコピー&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> . .&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># ポートの公開&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">EXPOSE&lt;/span>&lt;span class="s"> 3000&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># アプリケーションの起動&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">CMD&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;node&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;server.js&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="docker-composeで複数コンテナを管理">Docker Composeで複数コンテナを管理
-&lt;/h2>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;span class="lnt">18
-&lt;/span>&lt;span class="lnt">19
-&lt;/span>&lt;span class="lnt">20
-&lt;/span>&lt;span class="lnt">21
-&lt;/span>&lt;span class="lnt">22
-&lt;/span>&lt;span class="lnt">23
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">version&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="s1">&amp;#39;3.8&amp;#39;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">services&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">web&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">build&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">.&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">ports&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="s2">&amp;#34;3000:3000&amp;#34;&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">NODE_ENV=production&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">depends_on&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">db&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">db&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">image&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">postgres:14&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">environment&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">POSTGRES_DB=myapp&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">POSTGRES_USER=user&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">POSTGRES_PASSWORD=password&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="l">postgres_data:/var/lib/postgresql/data&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">volumes&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">postgres_data&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="ベストプラクティス">ベストプラクティス
-&lt;/h2>&lt;h3 id="1-マルチステージビルドの活用">1. マルチステージビルドの活用
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-dockerfile" data-lang="dockerfile">&lt;span class="line">&lt;span class="cl">&lt;span class="c"># ビルドステージ&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="s"> node:18-alpine AS builder&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> package*.json ./&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> npm ci&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> . .&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">RUN&lt;/span> npm run build&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="c"># 実行ステージ&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">FROM&lt;/span>&lt;span class="s"> node:18-alpine&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">WORKDIR&lt;/span>&lt;span class="s"> /app&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> --from&lt;span class="o">=&lt;/span>builder /app/dist ./dist&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">COPY&lt;/span> --from&lt;span class="o">=&lt;/span>builder /app/node_modules ./node_modules&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span>&lt;span class="k">CMD&lt;/span> &lt;span class="p">[&lt;/span>&lt;span class="s2">&amp;#34;node&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="s2">&amp;#34;dist/index.js&amp;#34;&lt;/span>&lt;span class="p">]&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="2-dockerignoreの活用">2. .dockerignoreの活用
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">node_modules
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">npm-debug.log
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">.git
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">.gitignore
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">README.md
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">.env
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">.vscode
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="トラブルシューティング">トラブルシューティング
-&lt;/h2>&lt;h3 id="ディスク容量の問題">ディスク容量の問題
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 未使用のリソースを一括削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker system prune -a
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 個別に削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker image prune
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker container prune
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker volume prune
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="ログの確認">ログの確認
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># コンテナログの確認&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker logs my-container
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># リアルタイムでログを追跡&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">docker logs -f my-container
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="まとめ">まとめ
-&lt;/h2>&lt;p>Dockerは現代のアプリケーション開発において欠かせないツールとなっています。基本的なコマンドから始めて、徐々に複雑な構成にチャレンジしていくことで、効率的な開発環境を構築できます。&lt;/p>
-&lt;p>次回は、Kubernetesを使ったコンテナオーケストレーションについて解説予定です。&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Devops on firebirdテクテクテクブログ</title>
+        <link>https://firebird-techtalktech.com/tags/devops/</link>
+        <description>Recent content in Devops on firebirdテクテクテクブログ</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>ja</language>
+        <copyright>トミー</copyright>
+        <lastBuildDate>Tue, 09 Sep 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/devops/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title>
+        <link>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</link>
+        <pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</guid>
+        <description>&lt;h2 id=&#34;はじめに&#34;&gt;はじめに
+&lt;/h2&gt;&lt;p&gt;Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？&lt;/p&gt;
+&lt;p&gt;今回は、そんな時に役立つ&lt;code&gt;git filter-branch&lt;/code&gt;という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。&lt;/p&gt;
+&lt;h2 id=&#34;git-filter-branchとは&#34;&gt;git filter-branchとは？
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git filter-branch&lt;/code&gt;は、Gitリポジトリの履歴を書き換えるためのコマンドです。単一のコミットだけでなく、&lt;strong&gt;全履歴を対象に一括で変更を適用&lt;/strong&gt;できるのが特徴です。&lt;/p&gt;
+&lt;h3 id=&#34;基本構文&#34;&gt;基本構文
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;--option&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;lt;command&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;revision-range&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;主なオプション：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--tree-filter&lt;/code&gt;: 各コミットのファイルツリーを直接編集&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--index-filter&lt;/code&gt;: インデックス（ステージング）を編集&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--env-filter&lt;/code&gt;: 環境変数（著者情報など）を編集&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--msg-filter&lt;/code&gt;: コミットメッセージを編集&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;実践例1機密情報の削除&#34;&gt;実践例1：機密情報の削除
+&lt;/h2&gt;&lt;p&gt;最も一般的な使用例は、誤ってコミットしてしまった機密情報の削除です。&lt;/p&gt;
+&lt;h3 id=&#34;パスワードファイルを全履歴から削除&#34;&gt;パスワードファイルを全履歴から削除
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# passwords.txtを全履歴から削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --force --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git rm --cached --ignore-unmatch passwords.txt&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  --prune-empty --tag-name-filter cat -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;envファイルを削除より安全な方法&#34;&gt;.envファイルを削除（より安全な方法）
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# バックアップを作成&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git branch backup-before-cleanup
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# .envファイルを全履歴から削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --force --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git rm --cached --ignore-unmatch .env&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  --prune-empty --tag-name-filter cat -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 削除を確認&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git log --all --full-history -- .env
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;実践例2著者情報の変更&#34;&gt;実践例2：著者情報の変更
+&lt;/h2&gt;&lt;p&gt;GitHubのユーザー名を変更した場合など、過去のコミットの著者名を変更したい場合があります。&lt;/p&gt;
+&lt;h3 id=&#34;特定の著者名を一括変更&#34;&gt;特定の著者名を一括変更
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;git filter-branch --env-filter &lt;span class=&#34;s1&#34;&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;OLD_EMAIL=&amp;#34;old@example.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;CORRECT_NAME=&amp;#34;新しい名前&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;CORRECT_EMAIL=&amp;#34;new@example.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_COMMITTER_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_AUTHOR_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt; --tag-name-filter cat -- --branches --tags
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;実際の使用例tmy-ss-310--tmy-310&#34;&gt;実際の使用例：tmy-ss-310 → tmy-310
+&lt;/h3&gt;&lt;p&gt;私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch -f --env-filter &lt;span class=&#34;s1&#34;&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_AUTHOR_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_NAME=&amp;#34;tmy-310&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_COMMITTER_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_NAME=&amp;#34;tmy-310&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt; -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;実践例3ディレクトリ構造の変更&#34;&gt;実践例3：ディレクトリ構造の変更
+&lt;/h2&gt;&lt;h3 id=&#34;サブディレクトリを新しいリポジトリとして切り出す&#34;&gt;サブディレクトリを新しいリポジトリとして切り出す
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# frontendディレクトリだけを抽出して新しいリポジトリに&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --subdirectory-filter frontend HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# これにより、frontendディレクトリがルートディレクトリになる&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;全ファイルをサブディレクトリに移動&#34;&gt;全ファイルをサブディレクトリに移動
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git ls-files -s | sed &amp;#34;s-\t\&amp;#34;*-&amp;amp;newsubdir/-&amp;#34; |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;   GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;   git update-index --index-info &amp;amp;&amp;amp;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;   mv &amp;#34;$GIT_INDEX_FILE.new&amp;#34; &amp;#34;$GIT_INDEX_FILE&amp;#34;&amp;#39;&lt;/span&gt; HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;実践例4大きなファイルの削除&#34;&gt;実践例4：大きなファイルの削除
+&lt;/h2&gt;&lt;p&gt;リポジトリサイズを削減するため、大きなファイルを履歴から削除します。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 100MB以上のファイルを検出&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git rev-list --objects --all &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  git cat-file --batch-check&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;%(objecttype) %(objectname) %(objectsize) %(rest)&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  sed -n &lt;span class=&#34;s1&#34;&gt;&amp;#39;s/^blob //p&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  sort --numeric-sort --key&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  tail -10
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 大きなファイル（例：huge-video.mp4）を削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --force --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git rm --cached --ignore-unmatch huge-video.mp4&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  --prune-empty --tag-name-filter cat -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;filter-branchの注意点&#34;&gt;filter-branchの注意点
+&lt;/h2&gt;&lt;h3 id=&#34;-破壊的操作&#34;&gt;⚠️ 破壊的操作
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;git filter-branch&lt;/code&gt;は履歴を完全に書き換えるため：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;必ずバックアップを作成&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git branch backup-&lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;date +%Y%m%d&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;strong&gt;強制プッシュが必要&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push --force origin main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;strong&gt;チームメンバーへの影響&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;他の開発者は再クローンが必要&lt;/li&gt;
+&lt;li&gt;進行中の作業がある場合は要調整&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;パフォーマンスの問題&#34;&gt;パフォーマンスの問題
+&lt;/h3&gt;&lt;p&gt;大規模なリポジトリでは処理に時間がかかります：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1000コミット: 数分&lt;/li&gt;
+&lt;li&gt;10000コミット: 30分以上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;代替ツールgit-filter-repo&#34;&gt;代替ツール：git filter-repo
+&lt;/h2&gt;&lt;p&gt;Git 2.24以降では、&lt;code&gt;git filter-repo&lt;/code&gt;が推奨されています：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# インストール&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;pip install git-filter-repo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 使用例：メールアドレスの変更&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-repo --email-callback &lt;span class=&#34;s1&#34;&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;  return email.replace(b&amp;#34;old@example.com&amp;#34;, b&amp;#34;new@example.com&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# パスの削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-repo --path passwords.txt --invert-paths
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;filter-repoの利点&#34;&gt;filter-repoの利点
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;高速&lt;/strong&gt;: filter-branchの10-720倍高速&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;安全&lt;/strong&gt;: デフォルトで新しいリポジトリに出力&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;使いやすい&lt;/strong&gt;: より直感的なオプション&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;実用的な使い分け&#34;&gt;実用的な使い分け
+&lt;/h2&gt;&lt;h3 id=&#34;git-filter-branchを使うべき場合&#34;&gt;git filter-branchを使うべき場合
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Gitの標準機能のみで完結したい&lt;/li&gt;
+&lt;li&gt;簡単な著者名変更や単一ファイル削除&lt;/li&gt;
+&lt;li&gt;追加ツールのインストールが困難な環境&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;git-rebaseやresetで十分な場合&#34;&gt;git rebaseやresetで十分な場合
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;最近のコミット（10個程度）の修正&lt;/li&gt;
+&lt;li&gt;個人プロジェクトで履歴の詳細が不要&lt;/li&gt;
+&lt;li&gt;クリーンな履歴を優先&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;git-filter-repoを使うべき場合&#34;&gt;git filter-repoを使うべき場合
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;大規模なリポジトリ&lt;/li&gt;
+&lt;li&gt;複雑なフィルタリング条件&lt;/li&gt;
+&lt;li&gt;パフォーマンスが重要&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;トラブルシューティング&#34;&gt;トラブルシューティング
+&lt;/h2&gt;&lt;h3 id=&#34;エラー-cannot-create-a-new-backup&#34;&gt;エラー: &amp;ldquo;Cannot create a new backup&amp;rdquo;
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 既存のバックアップを削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;rm -rf .git/refs/original/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;リモートとの同期問題&#34;&gt;リモートとの同期問題
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# ローカルの変更を強制的に反映&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push --force-with-lease origin main
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# より安全：新しいブランチにプッシュ&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push origin main:main-filtered
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;容量が減らない場合&#34;&gt;容量が減らない場合
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# ガベージコレクションを実行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git reflog expire --expire&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;now --all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git gc --prune&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;now --aggressive
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;まとめ&#34;&gt;まとめ
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git filter-branch&lt;/code&gt;は強力なツールですが、使用には注意が必要です：&lt;/p&gt;
+&lt;p&gt;✅ &lt;strong&gt;使うべき時&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;機密情報の緊急削除&lt;/li&gt;
+&lt;li&gt;著者情報の一括修正&lt;/li&gt;
+&lt;li&gt;リポジトリの大規模なリファクタリング&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;❌ &lt;strong&gt;避けるべき時&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公開済みの大規模プロジェクト&lt;/li&gt;
+&lt;li&gt;チーム開発中のアクティブなリポジトリ&lt;/li&gt;
+&lt;li&gt;簡単な修正で済む場合&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;適切に使えば、Gitの履歴をクリーンに保ち、セキュリティ問題を解決できる強力な味方になります。ただし、「大いなる力には大いなる責任が伴う」ことを忘れずに！&lt;/p&gt;
+&lt;h2 id=&#34;参考リンク&#34;&gt;参考リンク
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/docs/git-filter-branch&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git公式ドキュメント - git-filter-branch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GitHub - Removing sensitive data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/newren/git-filter-repo&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;git-filter-repo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;この記事が役に立ったら、ぜひシェアしてください！Gitの困った時の救世主として、多くの開発者の助けになれば幸いです。&lt;/em&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>🏗️ Building a Production-Ready Terraform Project with Multi-Environment Support on AWS</title>
+        <link>https://firebird-techtalktech.com/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/</link>
+        <pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/</guid>
+        <description>&lt;h2 id=&#34;terraform記事紹介&#34;&gt;Terraform記事紹介
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/tony_uketui_6cca68c7eba02/building-a-production-ready-terraform-project-with-multi-environment-support-on-aws-hia&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;
+&lt;strong&gt;著者&lt;/strong&gt;: Anthony Uketui
+&lt;strong&gt;作成日&lt;/strong&gt;: 2025-08-29
+&lt;strong&gt;統計&lt;/strong&gt;: ❤️ 5 リアクション&lt;/p&gt;
+&lt;h3 id=&#34;概要&#34;&gt;概要
+&lt;/h3&gt;&lt;p&gt;When I started this project, my goal was simple but ambitious. I wanted to build a production-ready&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;この記事について&#34;&gt;この記事について
+&lt;/h3&gt;&lt;p&gt;terraformに関する記事としてDev.toから収集されました。
+最新の技術動向や実践的な知識について学べる内容です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;🌐 Note&lt;/strong&gt;: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;🔗 &lt;a class=&#34;link&#34; href=&#34;https://dev.to/tony_uketui_6cca68c7eba02/building-a-production-ready-terraform-project-with-multi-environment-support-on-aws-hia&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;元記事を読む&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;📅 収集日時&lt;/strong&gt;: 2025-08-31T11:14:36.657847&lt;/p&gt;
+&lt;h3 id=&#34;-関連技術の学習リソース&#34;&gt;📚 関連技術の学習リソース
+&lt;/h3&gt;&lt;p&gt;terraformを学習する際に参考となるリソース：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメント&lt;/li&gt;
+&lt;li&gt;コミュニティブログ&lt;/li&gt;
+&lt;li&gt;ハンズオンチュートリアル&lt;/li&gt;
+&lt;li&gt;ベストプラクティス集&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>🏗️ Bye-Bye Credentials! Automate BTP &amp; Cloud Foundry Setup with Terraform using Github Actions and Github OIDC</title>
+        <link>https://firebird-techtalktech.com/post/%EF%B8%8F-bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-github-oidc/</link>
+        <pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%EF%B8%8F-bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-github-oidc/</guid>
+        <description>&lt;h2 id=&#34;terraform記事紹介&#34;&gt;Terraform記事紹介
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/vipinvkmenon/bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-3m07&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;
+&lt;strong&gt;著者&lt;/strong&gt;: Vipin Vijaykumar
+&lt;strong&gt;作成日&lt;/strong&gt;: 2025-07-24
+&lt;strong&gt;統計&lt;/strong&gt;: ❤️ 3 リアクション&lt;/p&gt;
+&lt;h3 id=&#34;概要&#34;&gt;概要
+&lt;/h3&gt;&lt;p&gt;Imagine this: You want to automate setting up SAP BTP Accounts and Cloud Foundry using Terraform, but&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;この記事について&#34;&gt;この記事について
+&lt;/h3&gt;&lt;p&gt;terraformに関する記事としてDev.toから収集されました。
+最新の技術動向や実践的な知識について学べる内容です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;🌐 Note&lt;/strong&gt;: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;🔗 &lt;a class=&#34;link&#34; href=&#34;https://dev.to/vipinvkmenon/bye-bye-credentials-automate-btp-cloud-foundry-setup-with-terraform-using-github-actions-and-3m07&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;元記事を読む&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;📅 収集日時&lt;/strong&gt;: 2025-08-31T11:14:36.657863&lt;/p&gt;
+&lt;h3 id=&#34;-関連技術の学習リソース&#34;&gt;📚 関連技術の学習リソース
+&lt;/h3&gt;&lt;p&gt;terraformを学習する際に参考となるリソース：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメント&lt;/li&gt;
+&lt;li&gt;コミュニティブログ&lt;/li&gt;
+&lt;li&gt;ハンズオンチュートリアル&lt;/li&gt;
+&lt;li&gt;ベストプラクティス集&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>🏗️ GitOps and IaC at Scale – ArgoCD and Open Tofu – Part 3 – Hardening and Manage users</title>
+        <link>https://firebird-techtalktech.com/post/%EF%B8%8F-gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users/</link>
+        <pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%EF%B8%8F-gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users/</guid>
+        <description>&lt;h2 id=&#34;terraform記事紹介&#34;&gt;Terraform記事紹介
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/aws-builders/gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users-5b9m&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;
+&lt;strong&gt;著者&lt;/strong&gt;: Alejandro Velez
+&lt;strong&gt;作成日&lt;/strong&gt;: 2025-07-19
+&lt;strong&gt;統計&lt;/strong&gt;: ❤️ 3 リアクション&lt;/p&gt;
+&lt;h3 id=&#34;概要&#34;&gt;概要
+&lt;/h3&gt;&lt;p&gt;Level 400  Earlier blogs covered scalable delivery, architecture patterns, and code samples. This&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;この記事について&#34;&gt;この記事について
+&lt;/h3&gt;&lt;p&gt;terraformに関する記事としてDev.toから収集されました。
+最新の技術動向や実践的な知識について学べる内容です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;🌐 Note&lt;/strong&gt;: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;🔗 &lt;a class=&#34;link&#34; href=&#34;https://dev.to/aws-builders/gitops-and-iac-at-scale-argocd-and-open-tofu-part-3-hardening-and-manage-users-5b9m&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;元記事を読む&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;📅 収集日時&lt;/strong&gt;: 2025-08-31T11:14:36.657855&lt;/p&gt;
+&lt;h3 id=&#34;-関連技術の学習リソース&#34;&gt;📚 関連技術の学習リソース
+&lt;/h3&gt;&lt;p&gt;terraformを学習する際に参考となるリソース：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメント&lt;/li&gt;
+&lt;li&gt;コミュニティブログ&lt;/li&gt;
+&lt;li&gt;ハンズオンチュートリアル&lt;/li&gt;
+&lt;li&gt;ベストプラクティス集&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>🏗️ Spring Boot Banking Application Deployment using DevSecOps on AWS EKS</title>
+        <link>https://firebird-techtalktech.com/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/</link>
+        <pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/</guid>
+        <description>&lt;h2 id=&#34;terraform記事紹介&#34;&gt;Terraform記事紹介
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/deepanshub09/spring-boot-banking-application-deployment-using-devsecops-on-aws-eks-27ff&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;
+&lt;strong&gt;著者&lt;/strong&gt;: Deepanshu
+&lt;strong&gt;作成日&lt;/strong&gt;: 2025-08-09
+&lt;strong&gt;統計&lt;/strong&gt;: ❤️ 5 リアクション&lt;/p&gt;
+&lt;h3 id=&#34;概要&#34;&gt;概要
+&lt;/h3&gt;&lt;p&gt;A comprehensive, secure banking web application built with Spring Boot, featuring modern web&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;この記事について&#34;&gt;この記事について
+&lt;/h3&gt;&lt;p&gt;terraformに関する記事としてDev.toから収集されました。
+最新の技術動向や実践的な知識について学べる内容です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;🌐 Note&lt;/strong&gt;: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;🔗 &lt;a class=&#34;link&#34; href=&#34;https://dev.to/deepanshub09/spring-boot-banking-application-deployment-using-devsecops-on-aws-eks-27ff&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;元記事を読む&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;📅 収集日時&lt;/strong&gt;: 2025-08-31T11:14:36.657843&lt;/p&gt;
+&lt;h3 id=&#34;-関連技術の学習リソース&#34;&gt;📚 関連技術の学習リソース
+&lt;/h3&gt;&lt;p&gt;terraformを学習する際に参考となるリソース：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメント&lt;/li&gt;
+&lt;li&gt;コミュニティブログ&lt;/li&gt;
+&lt;li&gt;ハンズオンチュートリアル&lt;/li&gt;
+&lt;li&gt;ベストプラクティス集&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>🏗️ Terraform Modules: Your Infrastructure&#39;s Building Blocks (The Complete Guide)</title>
+        <link>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-modules-your-infrastructures-building-blocks-the-complete-guide/</link>
+        <pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-modules-your-infrastructures-building-blocks-the-complete-guide/</guid>
+        <description>&lt;h2 id=&#34;terraform記事紹介&#34;&gt;Terraform記事紹介
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/deepanshub09/terraform-modules-your-infrastructures-building-blocks-the-complete-guide-25c5&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;
+&lt;strong&gt;著者&lt;/strong&gt;: Deepanshu
+&lt;strong&gt;作成日&lt;/strong&gt;: 2025-07-30
+&lt;strong&gt;統計&lt;/strong&gt;: ❤️ 5 リアクション&lt;/p&gt;
+&lt;h3 id=&#34;概要&#34;&gt;概要
+&lt;/h3&gt;&lt;p&gt;Imagine if every time you wanted to build a house, you had to start from scratch - making your own&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;この記事について&#34;&gt;この記事について
+&lt;/h3&gt;&lt;p&gt;terraformに関する記事としてDev.toから収集されました。
+最新の技術動向や実践的な知識について学べる内容です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;🌐 Note&lt;/strong&gt;: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;🔗 &lt;a class=&#34;link&#34; href=&#34;https://dev.to/deepanshub09/terraform-modules-your-infrastructures-building-blocks-the-complete-guide-25c5&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;元記事を読む&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;📅 収集日時&lt;/strong&gt;: 2025-08-31T11:14:36.657851&lt;/p&gt;
+&lt;h3 id=&#34;-関連技術の学習リソース&#34;&gt;📚 関連技術の学習リソース
+&lt;/h3&gt;&lt;p&gt;terraformを学習する際に参考となるリソース：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメント&lt;/li&gt;
+&lt;li&gt;コミュニティブログ&lt;/li&gt;
+&lt;li&gt;ハンズオンチュートリアル&lt;/li&gt;
+&lt;li&gt;ベストプラクティス集&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>🏗️ Terraform vs CloudFormation: Which AWS IaC Tool Should You Use? 🤔</title>
+        <link>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/</link>
+        <pubDate>Sun, 31 Aug 2025 11:14:37 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/</guid>
+        <description>&lt;h2 id=&#34;terraform記事紹介&#34;&gt;Terraform記事紹介
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/yash_sonawane25/terraform-vs-cloudformation-which-aws-iac-tool-should-you-use-2h3i&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;
+&lt;strong&gt;著者&lt;/strong&gt;: Yash Sonawane
+&lt;strong&gt;作成日&lt;/strong&gt;: 2025-07-31
+&lt;strong&gt;統計&lt;/strong&gt;: ❤️ 6 リアクション&lt;/p&gt;
+&lt;h3 id=&#34;概要&#34;&gt;概要
+&lt;/h3&gt;&lt;p&gt;&amp;ldquo;Two tools. Same goal. Totally different vibes.&amp;rdquo;   If you&amp;rsquo;re diving into Infrastructure as Code&amp;hellip;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;この記事について&#34;&gt;この記事について
+&lt;/h3&gt;&lt;p&gt;terraformに関する記事としてDev.toから収集されました。
+最新の技術動向や実践的な知識について学べる内容です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;🌐 Note&lt;/strong&gt;: この記事はterraform学習・実践の参考としてDev.toから自動収集されました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;🔗 &lt;a class=&#34;link&#34; href=&#34;https://dev.to/yash_sonawane25/terraform-vs-cloudformation-which-aws-iac-tool-should-you-use-2h3i&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;元記事を読む&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;📅 収集日時&lt;/strong&gt;: 2025-08-31T11:14:36.657839&lt;/p&gt;
+&lt;h3 id=&#34;-関連技術の学習リソース&#34;&gt;📚 関連技術の学習リソース
+&lt;/h3&gt;&lt;p&gt;terraformを学習する際に参考となるリソース：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメント&lt;/li&gt;
+&lt;li&gt;コミュニティブログ&lt;/li&gt;
+&lt;li&gt;ハンズオンチュートリアル&lt;/li&gt;
+&lt;li&gt;ベストプラクティス集&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
+        <title>Docker入門：コンテナ技術の基礎から実践まで</title>
+        <link>https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/</link>
+        <pubDate>Sat, 11 Jan 2025 10:00:00 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/</guid>
+        <description>&lt;h2 id=&#34;dockerとは&#34;&gt;Dockerとは
+&lt;/h2&gt;&lt;p&gt;Dockerは、アプリケーションをコンテナという単位でパッケージ化し、どの環境でも同じように動作させることができる技術です。&lt;/p&gt;
+&lt;h2 id=&#34;なぜdockerが必要なのか&#34;&gt;なぜDockerが必要なのか
+&lt;/h2&gt;&lt;h3 id=&#34;1-環境依存の問題を解決&#34;&gt;1. 環境依存の問題を解決
+&lt;/h3&gt;&lt;p&gt;「私の環境では動くのに&amp;hellip;」という問題を解決します。開発環境、テスト環境、本番環境で同じコンテナを使用することで、環境差異による問題を最小化できます。&lt;/p&gt;
+&lt;h3 id=&#34;2-軽量で高速&#34;&gt;2. 軽量で高速
+&lt;/h3&gt;&lt;p&gt;仮想マシンと比較して：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;起動が速い（数秒）&lt;/li&gt;
+&lt;li&gt;リソース消費が少ない&lt;/li&gt;
+&lt;li&gt;同じホストで多数のコンテナを実行可能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;基本的なdockerコマンド&#34;&gt;基本的なDockerコマンド
+&lt;/h2&gt;&lt;h3 id=&#34;イメージの操作&#34;&gt;イメージの操作
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# イメージの検索&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker search nginx
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# イメージのダウンロード&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker pull nginx:latest
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# ローカルのイメージ一覧&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker images
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;コンテナの操作&#34;&gt;コンテナの操作
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# コンテナの起動&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker run -d -p 8080:80 --name my-nginx nginx
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 実行中のコンテナ確認&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker ps
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# コンテナの停止&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker stop my-nginx
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# コンテナの削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker rm my-nginx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;dockerfileの基本&#34;&gt;Dockerfileの基本
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-dockerfile&#34; data-lang=&#34;dockerfile&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c&#34;&gt;# ベースイメージの指定&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; node:18-alpine&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 作業ディレクトリの設定&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;WORKDIR&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; /app&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 依存関係ファイルのコピー&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;COPY&lt;/span&gt; package*.json ./&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 依存関係のインストール&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;RUN&lt;/span&gt; npm ci --only&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;production&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# アプリケーションファイルのコピー&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;COPY&lt;/span&gt; . .&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# ポートの公開&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;EXPOSE&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; 3000&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# アプリケーションの起動&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;CMD&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;node&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;server.js&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;docker-composeで複数コンテナを管理&#34;&gt;Docker Composeで複数コンテナを管理
+&lt;/h2&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;18
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;19
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;20
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;21
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;22
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;23
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-yaml&#34; data-lang=&#34;yaml&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nt&#34;&gt;version&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;3.8&amp;#39;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;services&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;web&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;build&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;ports&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;s2&#34;&gt;&amp;#34;3000:3000&amp;#34;&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;environment&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;NODE_ENV=production&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;depends_on&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;db&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;db&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;image&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt; &lt;/span&gt;&lt;span class=&#34;l&#34;&gt;postgres:14&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;environment&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;POSTGRES_DB=myapp&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;POSTGRES_USER=user&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;POSTGRES_PASSWORD=password&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;    &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;volumes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;      &lt;/span&gt;- &lt;span class=&#34;l&#34;&gt;postgres_data:/var/lib/postgresql/data&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;volumes&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;w&#34;&gt;  &lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;postgres_data&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt;&lt;span class=&#34;w&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;ベストプラクティス&#34;&gt;ベストプラクティス
+&lt;/h2&gt;&lt;h3 id=&#34;1-マルチステージビルドの活用&#34;&gt;1. マルチステージビルドの活用
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-dockerfile&#34; data-lang=&#34;dockerfile&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c&#34;&gt;# ビルドステージ&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; node:18-alpine AS builder&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;WORKDIR&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; /app&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;COPY&lt;/span&gt; package*.json ./&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;RUN&lt;/span&gt; npm ci&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;COPY&lt;/span&gt; . .&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;RUN&lt;/span&gt; npm run build&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;c&#34;&gt;# 実行ステージ&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;FROM&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; node:18-alpine&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;WORKDIR&lt;/span&gt;&lt;span class=&#34;s&#34;&gt; /app&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;COPY&lt;/span&gt; --from&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;builder /app/dist ./dist&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;COPY&lt;/span&gt; --from&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;builder /app/node_modules ./node_modules&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;&lt;span class=&#34;k&#34;&gt;CMD&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;[&lt;/span&gt;&lt;span class=&#34;s2&#34;&gt;&amp;#34;node&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;dist/index.js&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;]&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;2-dockerignoreの活用&#34;&gt;2. .dockerignoreの活用
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;node_modules
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;npm-debug.log
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.git
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.gitignore
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;README.md
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.env
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;.vscode
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;トラブルシューティング&#34;&gt;トラブルシューティング
+&lt;/h2&gt;&lt;h3 id=&#34;ディスク容量の問題&#34;&gt;ディスク容量の問題
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 未使用のリソースを一括削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker system prune -a
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 個別に削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker image prune
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker container prune
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker volume prune
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;ログの確認&#34;&gt;ログの確認
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# コンテナログの確認&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker logs my-container
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# リアルタイムでログを追跡&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;docker logs -f my-container
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;まとめ&#34;&gt;まとめ
+&lt;/h2&gt;&lt;p&gt;Dockerは現代のアプリケーション開発において欠かせないツールとなっています。基本的なコマンドから始めて、徐々に複雑な構成にチャレンジしていくことで、効率的な開発環境を構築できます。&lt;/p&gt;
+&lt;p&gt;次回は、Kubernetesを使ったコンテナオーケストレーションについて解説予定です。&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
