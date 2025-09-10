@@ -1,1015 +1,179 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="概要 GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\n">
-<title>🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</title>
-
-<link rel='canonical' href='https://firebird-techtalktech.com/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/'>
-
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy">
-<meta property='og:description' content="概要 GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\n">
-<meta property='og:url' content='https://firebird-techtalktech.com/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/'>
-<meta property='og:site_name' content='firebirdテクテクテクブログ'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='aws' /><meta property='article:tag' content='cloud' /><meta property='article:tag' content='gcp' /><meta property='article:tag' content='google' /><meta property='article:tag' content='network' /><meta property='article:tag' content='peering' /><meta property='article:tag' content='psc' /><meta property='article:tag' content='vpc' /><meta property='article:published_time' content='2025-09-09T00:30:00&#43;09:00'/><meta property='article:modified_time' content='2025-09-09T00:30:00&#43;09:00'/>
-<meta name="twitter:title" content="🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy">
-<meta name="twitter:description" content="概要 GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\n"><link rel="alternate" type="application/json" href="https://firebird-techtalktech.com/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/index.json">
-    <link rel="shortcut icon" href="/images/favicon.png" />
-
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script>
-      <script>
-        var doNotTrack = false;
-        if ( false ) {
-          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
-          var doNotTrack = (dnt == "1" || dnt == "yes");
-        }
-        if (!doNotTrack) {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-J8ND35KCZW');
-        }
-      </script>
-
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "firebirdテクテクテクブログ",
-  "url": "https:\/\/firebird-techtalktech.com\/",
-  "description": "技術ネタ、趣味や備忘録などを書いているブログです",
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy",
-  "description": "\u003ch2 id=\u0022概要\u0022\u003e概要\n\u003c\/h2\u003e\u003cp\u003eGCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\u003c\/p\u003e",
-  "author": {
-    "@type": "Person",
-    "name": "トミー"
-  },
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "datePublished": "2025-09-09T00:30:00\u002b09:00",
-  "dateModified": "2025-09-09T00:30:00\u002b09:00",
-  "url": "https:\/\/firebird-techtalktech.com\/post\/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy\/",
-  "wordCount": "1526",
-  "keywords": ["aws", "cloud", "gcp", "google", "network", "peering", "psc", "vpc"]
-}
-</script>
-
-
-
-
-<meta name="description" content="概要
-GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。">
-
-
-
-<meta property="og:site_name" content="firebirdテクテクテクブログ">
-
-<meta property="og:type" content="article">
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎯</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/firebird19245'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/categories/' >
-                
-                
-                
-                <span>カテゴリー</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/tags/' >
-                
-                
-                
-                <span>タグ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                <span>アーカイブ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                <span>このサイトについて</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                <span>検索</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>ダークモード</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                
-    <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">目次</h2>
-        
-        <div class="widget--toc">
-            <nav id="TableOfContents">
-  <ol>
-    <li><a href="#概要">概要</a></li>
-    <li><a href="#vpc間接続の3つの選択肢">VPC間接続の3つの選択肢</a>
-      <ol>
-        <li><a href="#1-vpc-peering---customer-vpc同士の接続">1. VPC Peering - Customer VPC同士の接続</a></li>
-        <li><a href="#2-pscprivate-service-connect---google-managed-service接続">2. PSC（Private Service Connect） - Google Managed Service接続</a></li>
-        <li><a href="#3-tcp-proxy---レガシー手法">3. TCP Proxy - レガシー手法</a></li>
-      </ol>
-    </li>
-    <li><a href="#設計判断フローチャート">設計判断フローチャート</a></li>
-    <li><a href="#実際の設計例">実際の設計例</a>
-      <ol>
-        <li><a href="#パターン1-開発本番環境分離">パターン1: 開発・本番環境分離</a></li>
-        <li><a href="#パターン2-データ基盤統合">パターン2: データ基盤統合</a></li>
-        <li><a href="#パターン3-マルチクラウド統合">パターン3: マルチクラウド統合</a></li>
-      </ol>
-    </li>
-    <li><a href="#セキュリティ考慮事項">セキュリティ考慮事項</a>
-      <ol>
-        <li><a href="#vpc-peering時のファイアウォール">VPC Peering時のファイアウォール</a></li>
-        <li><a href="#psc使用時の暗号化">PSC使用時の暗号化</a></li>
-      </ol>
-    </li>
-    <li><a href="#パフォーマンス比較">パフォーマンス比較</a></li>
-    <li><a href="#トラブルシューティング">トラブルシューティング</a>
-      <ol>
-        <li><a href="#よくある接続問題">よくある接続問題</a></li>
-      </ol>
-    </li>
-    <li><a href="#ベストプラクティス">ベストプラクティス</a>
-      <ol>
-        <li><a href="#1-設計原則">1. 設計原則</a></li>
-        <li><a href="#2-セキュリティ強化">2. セキュリティ強化</a></li>
-        <li><a href="#3-運用効率化">3. 運用効率化</a></li>
-      </ol>
-    </li>
-    <li><a href="#まとめ">まとめ</a></li>
-  </ol>
-</nav>
-        </div>
-    </section>
-
-            
-        
-    </aside>
-
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B/" >
-                技術記事
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/">🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</a>
-        </h2>
-    
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">2025年9月9日</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    読了時間: 4分
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h2 id="概要">概要
-</h2><p>GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。</p>
-<h2 id="vpc間接続の3つの選択肢">VPC間接続の3つの選択肢
-</h2><h3 id="1-vpc-peering---customer-vpc同士の接続">1. VPC Peering - Customer VPC同士の接続
-</h3><p><strong>適用場面:</strong></p>
-<ul>
-<li>両方のVPCを管理できる場合</li>
-<li>部署間、環境間の接続</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[Project A VPC] ⟷ VPC Peering ⟷ [Project B VPC]
-</span></span><span class="line"><span class="cl">  ユーザー管理                      ユーザー管理
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>設定例:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># VPC Peering作成</span>
-</span></span><span class="line"><span class="cl">gcloud compute networks peerings create dev-to-prod <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --network<span class="o">=</span>dev-vpc <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --peer-project<span class="o">=</span>prod-project <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --peer-network<span class="o">=</span>prod-vpc
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>メリット:</strong></p>
-<ul>
-<li>設定が簡単</li>
-<li>低遅延・高スループット</li>
-<li>追加コストなし</li>
-<li>直接的な通信</li>
-</ul>
-<p><strong>制約:</strong></p>
-<ul>
-<li>両方のVPCの管理権限が必要</li>
-<li>IPアドレス重複不可</li>
-<li>トランジティブ接続不可</li>
-</ul>
-<h3 id="2-pscprivate-service-connect---google-managed-service接続">2. PSC（Private Service Connect） - Google Managed Service接続
-</h3><p><strong>適用場面:</strong></p>
-<ul>
-<li>一方がGoogle管理サービスの場合</li>
-<li>Datastream、Cloud SQL等との接続</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[Datastream VPC] ⟷ PSC ⟷ [Customer VPC]
-</span></span><span class="line"><span class="cl">   Google管理                ユーザー管理
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>設定例:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># PSC接続作成</span>
-</span></span><span class="line"><span class="cl">gcloud compute addresses create psc-endpoint <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --subnet<span class="o">=</span>app-subnet <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --addresses<span class="o">=</span>10.0.2.100
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">gcloud compute forwarding-rules create datastream-psc <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --address<span class="o">=</span>psc-endpoint <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --target-service-attachment<span class="o">=</span>datastream-sa
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>メリット:</strong></p>
-<ul>
-<li>Google管理サービスとの最適接続</li>
-<li>高いセキュリティ</li>
-<li>管理負荷が低い</li>
-<li>新しい標準的手法</li>
-</ul>
-<p><strong>制約:</strong></p>
-<ul>
-<li>比較的新しい機能</li>
-<li>対応サービスが限定的</li>
-</ul>
-<h3 id="3-tcp-proxy---レガシー手法">3. TCP Proxy - レガシー手法
-</h3><p><strong>適用場面:</strong></p>
-<ul>
-<li>上記が利用できない制約環境</li>
-<li>既存システムとの互換性が必要</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[Source VPC] → [Proxy Instance] → [Target VPC]
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>設定例:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Proxy用インスタンス作成</span>
-</span></span><span class="line"><span class="cl">gcloud compute instances create tcp-proxy <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --zone<span class="o">=</span>asia-northeast1-a <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --machine-type<span class="o">=</span>e2-medium <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --subnet<span class="o">=</span>proxy-subnet
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>制約:</strong></p>
-<ul>
-<li>管理負荷が高い</li>
-<li>単一障害点（SPOF）</li>
-<li>性能制限あり</li>
-<li>セキュリティリスク</li>
-</ul>
-<h2 id="設計判断フローチャート">設計判断フローチャート
-</h2><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">VPC間接続の必要性
-</span></span><span class="line"><span class="cl">       ↓
-</span></span><span class="line"><span class="cl">同一VPC内配置可能？
-</span></span><span class="line"><span class="cl">    ↓ No
-</span></span><span class="line"><span class="cl">両方Customer VPC？
-</span></span><span class="line"><span class="cl">    ↓ Yes         ↓ No
-</span></span><span class="line"><span class="cl">VPC Peering    Google管理サービス？
-</span></span><span class="line"><span class="cl">                ↓ Yes      ↓ No  
-</span></span><span class="line"><span class="cl">             PSC Interface  TCP Proxy
-</span></span><span class="line"><span class="cl">                          (非推奨)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="実際の設計例">実際の設計例
-</h2><h3 id="パターン1-開発本番環境分離">パターン1: 開発・本番環境分離
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># 開発環境</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Project</span><span class="p">:</span><span class="w"> </span><span class="l">company-dev</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">dev-vpc (10.1.0.0/16)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 本番環境  </span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Project</span><span class="p">:</span><span class="w"> </span><span class="l">company-prod</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">prod-vpc (10.2.0.0/16)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 接続方式</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Connection</span><span class="p">:</span><span class="w"> </span><span class="l">VPC Peering</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">理由</span><span class="p">:</span><span class="w"> </span><span class="l">両方Customer VPC、管理権限あり</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="パターン2-データ基盤統合">パターン2: データ基盤統合
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># アプリケーション基盤</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">app-vpc (10.10.0.0/16)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># データ分析基盤</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Service</span><span class="p">:</span><span class="w"> </span><span class="l">Datastream (Google Managed)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Database</span><span class="p">:</span><span class="w"> </span><span class="l">AlloyDB (Google Managed)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 接続方式</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Connection</span><span class="p">:</span><span class="w"> </span><span class="l">PSC Interface</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">理由</span><span class="p">:</span><span class="w"> </span><span class="l">Google管理サービスとの接続</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="パターン3-マルチクラウド統合">パターン3: マルチクラウド統合
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># GCP環境</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">gcp-vpc (10.0.0.0/16)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># AWS環境（VPN経由）</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">aws-vpc (10.100.0.0/16)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c"># 接続方式</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Connection</span><span class="p">:</span><span class="w"> </span><span class="l">Cloud VPN + BGP</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">理由</span><span class="p">:</span><span class="w"> </span><span class="l">異なるクラウド間接続</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="セキュリティ考慮事項">セキュリティ考慮事項
-</h2><h3 id="vpc-peering時のファイアウォール">VPC Peering時のファイアウォール
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 最小権限接続</span>
-</span></span><span class="line"><span class="cl">gcloud compute firewall-rules create allow-db-access <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --source-ranges<span class="o">=</span>10.1.2.0/24 <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --target-tags<span class="o">=</span>database <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --allow<span class="o">=</span>tcp:5432
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="psc使用時の暗号化">PSC使用時の暗号化
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># SSL/TLS強制化</span>
-</span></span><span class="line"><span class="cl">gcloud sql instances patch my-instance <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --require-ssl
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="パフォーマンス比較">パフォーマンス比較
-</h2><div class="table-wrapper"><table>
-  <thead>
-      <tr>
-          <th>接続方式</th>
-          <th>遅延</th>
-          <th>スループット</th>
-          <th>可用性</th>
-          <th>管理負荷</th>
-      </tr>
-  </thead>
-  <tbody>
-      <tr>
-          <td>VPC Peering</td>
-          <td>最小</td>
-          <td>最高</td>
-          <td>高</td>
-          <td>低</td>
-      </tr>
-      <tr>
-          <td>PSC</td>
-          <td>小</td>
-          <td>高</td>
-          <td>高</td>
-          <td>低</td>
-      </tr>
-      <tr>
-          <td>TCP Proxy</td>
-          <td>中</td>
-          <td>中</td>
-          <td>中</td>
-          <td>高</td>
-      </tr>
-  </tbody>
-</table></div>
-<h2 id="トラブルシューティング">トラブルシューティング
-</h2><h3 id="よくある接続問題">よくある接続問題
-</h3><ol>
-<li><strong>IPアドレス重複</strong></li>
-</ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 重複チェック</span>
-</span></span><span class="line"><span class="cl">gcloud compute networks describe vpc-a --format<span class="o">=</span><span class="s2">&#34;value(IPv4Range)&#34;</span>
-</span></span><span class="line"><span class="cl">gcloud compute networks describe vpc-b --format<span class="o">=</span><span class="s2">&#34;value(IPv4Range)&#34;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><ol start="2">
-<li><strong>ファイアウォールルール不足</strong></li>
-</ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 接続テスト</span>
-</span></span><span class="line"><span class="cl">gcloud compute ssh test-instance --command<span class="o">=</span><span class="s2">&#34;nc -zv target-ip 5432&#34;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><ol start="3">
-<li><strong>DNS解決問題</strong></li>
-</ol>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># DNS設定確認</span>
-</span></span><span class="line"><span class="cl">gcloud compute instances describe instance-name <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --format<span class="o">=</span><span class="s2">&#34;value(networkInterfaces[0].accessConfigs[0].natIP)&#34;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="ベストプラクティス">ベストプラクティス
-</h2><h3 id="1-設計原則">1. 設計原則
-</h3><ul>
-<li>同一VPC内配置を最優先検討</li>
-<li>管理権限の有無で接続方式を決定</li>
-<li>将来の拡張性を考慮</li>
-</ul>
-<h3 id="2-セキュリティ強化">2. セキュリティ強化
-</h3><ul>
-<li>最小権限の原則を適用</li>
-<li>ネットワークレベル + アプリケーションレベルの暗号化</li>
-<li>定期的なアクセスログ監査</li>
-</ul>
-<h3 id="3-運用効率化">3. 運用効率化
-</h3><ul>
-<li>インフラストラクチャコードでの管理</li>
-<li>モニタリング・アラート設定</li>
-<li>文書化の徹底</li>
-</ul>
-<h2 id="まとめ">まとめ
-</h2><p>VPC間接続の選択は、管理権限とサービスタイプに基づいて決定します：</p>
-<ul>
-<li><strong>Customer VPC同士</strong> → VPC Peering</li>
-<li><strong>Google Managed Service</strong> → PSC Interface</li>
-<li><strong>制約環境</strong> → TCP Proxy（非推奨）</li>
-</ul>
-<p>適切な接続方式の選択により、セキュアで効率的なクラウドインフラストラクチャを構築できます。</p>
-<hr>
-<p>📅 <strong>作成日</strong>: 2025年09月09日</p>
-<p><strong>参考リンク:</strong></p>
-<ul>
-<li><a class="link" href="https://cloud.google.com/vpc/docs/vpc-peering"  target="_blank" rel="noopener"
-    >GCP VPC Peering公式ドキュメント</a></li>
-<li><a class="link" href="https://cloud.google.com/vpc/docs/private-service-connect"  target="_blank" rel="noopener"
-    >Private Service Connect概要</a></li>
-</ul>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/aws/">AWS</a>
-        
-            <a href="/tags/cloud/">Cloud</a>
-        
-            <a href="/tags/gcp/">Gcp</a>
-        
-            <a href="/tags/google/">Google</a>
-        
-            <a href="/tags/network/">Network</a>
-        
-            <a href="/tags/peering/">Peering</a>
-        
-            <a href="/tags/psc/">Psc</a>
-        
-            <a href="/tags/vpc/">Vpc</a>
-        
-    </section>
-
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-<aside class="related-content--wrapper">
-    <h2 class="section-title">関連するコンテンツ</h2>
-    <div class="related-content">
-        <div class="flex article-list--tile">
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-aws-s3-/-google-cloud-storage%E3%81%8B%E3%82%89%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%89%E3%83%AA%E3%83%96%E3%83%B3%E3%81%A7trocco%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8Bterraform-module%E4%BB%98%E3%81%8D/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ AWS S3 / Google Cloud Storageから、イベントドリブンでTROCCOを実行する（Terraform Module付き）</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ Building a Production-Ready Terraform Project with Multi-Environment Support on AWS</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ Spring Boot Banking Application Deployment using DevSecOps on AWS EKS</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ Terraform vs CloudFormation: Which AWS IaC Tool Should You Use? 🤔</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/aws-aws-weekly-roundup-amazon-ec2-amazon-q-developer-ipv6-updates-and-more-september-1-2025/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">📰 [AWS] AWS Weekly Roundup: Amazon EC2, Amazon Q Developer, IPv6 updates, and more (September 1, 2025)</h2>
-        </div>
-    </a>
-</article>
-
-            
-        </div>
-    </div>
-</aside>
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 トミー
-    </section>
-    
-    <section class="powerby">
-        
-            技術ネタ、趣味や備忘録などを書いているブログです <br/>
-        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
-        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="概要 GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\n"><title>🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</title><link rel=canonical href=https://firebird-techtalktech.com/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy"><meta property='og:description' content="概要 GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\n"><meta property='og:url' content='https://firebird-techtalktech.com/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/'><meta property='og:site_name' content='firebirdテクテクテクブログ'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='aws'><meta property='article:tag' content='cloud'><meta property='article:tag' content='gcp'><meta property='article:tag' content='google'><meta property='article:tag' content='network'><meta property='article:tag' content='peering'><meta property='article:tag' content='psc'><meta property='article:tag' content='vpc'><meta property='article:published_time' content='2025-09-09T00:30:00+09:00'><meta property='article:modified_time' content='2025-09-09T00:30:00+09:00'><meta name=twitter:title content="🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy"><meta name=twitter:description content="概要 GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\n"><link rel=alternate type=application/json href=https://firebird-techtalktech.com/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/index.json><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテクテクテクブログ","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy","description":"\u003ch2 id=\u0022概要\u0022\u003e概要\n\u003c\/h2\u003e\u003cp\u003eGCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。\u003c\/p\u003e","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-09T00:30:00\u002b09:00","dateModified":"2025-09-09T00:30:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy\/","wordCount":"1526","keywords":["aws","cloud","gcp","google","network","peering","psc","vpc"]}</script><meta name=description content="概要
+GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。"><meta property="og:site_name" content="firebirdテクテクテクブログ"><meta property="og:type" content="article"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_762f71fa991dd853.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎯</span></figure><div class=site-meta><h1 class=site-name><a href=/>firebirdテクテクテクブログ</a></h1><h2 class=site-description>技術ネタ、趣味や備忘録などを書いているブログです</h2></div></header><ol class=menu-social><li><a href=https://twitter.com/firebird19245 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/categories/><span>カテゴリー</span></a></li><li><a href=/tags/><span>タグ</span></a></li><li><a href=/archives/><span>アーカイブ</span></a></li><li><a href=/about/><span>このサイトについて</span></a></li><li><a href=/search/><span>検索</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目次</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#概要>概要</a></li><li><a href=#vpc間接続の3つの選択肢>VPC間接続の3つの選択肢</a><ol><li><a href=#1-vpc-peering---customer-vpc同士の接続>1. VPC Peering - Customer VPC同士の接続</a></li><li><a href=#2-pscprivate-service-connect---google-managed-service接続>2. PSC（Private Service Connect） - Google Managed Service接続</a></li><li><a href=#3-tcp-proxy---レガシー手法>3. TCP Proxy - レガシー手法</a></li></ol></li><li><a href=#設計判断フローチャート>設計判断フローチャート</a></li><li><a href=#実際の設計例>実際の設計例</a><ol><li><a href=#パターン1-開発本番環境分離>パターン1: 開発・本番環境分離</a></li><li><a href=#パターン2-データ基盤統合>パターン2: データ基盤統合</a></li><li><a href=#パターン3-マルチクラウド統合>パターン3: マルチクラウド統合</a></li></ol></li><li><a href=#セキュリティ考慮事項>セキュリティ考慮事項</a><ol><li><a href=#vpc-peering時のファイアウォール>VPC Peering時のファイアウォール</a></li><li><a href=#psc使用時の暗号化>PSC使用時の暗号化</a></li></ol></li><li><a href=#パフォーマンス比較>パフォーマンス比較</a></li><li><a href=#トラブルシューティング>トラブルシューティング</a><ol><li><a href=#よくある接続問題>よくある接続問題</a></li></ol></li><li><a href=#ベストプラクティス>ベストプラクティス</a><ol><li><a href=#1-設計原則>1. 設計原則</a></li><li><a href=#2-セキュリティ強化>2. セキュリティ強化</a></li><li><a href=#3-運用効率化>3. 運用効率化</a></li></ol></li><li><a href=#まとめ>まとめ</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B/>技術記事</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/>🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025年9月9日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 4分</time></div></footer></div></header><section class=article-content><h2 id=概要>概要</h2><p>GCPにおけるVPC間接続は、システム設計の重要な要素です。適切な接続方式を選択することで、セキュリティ、パフォーマンス、コストを最適化できます。本記事では、VPC Peering、PSC（Private Service Connect）、TCP Proxyの特徴と使い分けについて詳しく解説します。</p><h2 id=vpc間接続の3つの選択肢>VPC間接続の3つの選択肢</h2><h3 id=1-vpc-peering---customer-vpc同士の接続>1. VPC Peering - Customer VPC同士の接続</h3><p><strong>適用場面:</strong></p><ul><li>両方のVPCを管理できる場合</li><li>部署間、環境間の接続</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Project A VPC] ⟷ VPC Peering ⟷ [Project B VPC]
+</span></span><span class=line><span class=cl>  ユーザー管理                      ユーザー管理
+</span></span></code></pre></td></tr></table></div></div><p><strong>設定例:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># VPC Peering作成</span>
+</span></span><span class=line><span class=cl>gcloud compute networks peerings create dev-to-prod <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>dev-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-project<span class=o>=</span>prod-project <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-network<span class=o>=</span>prod-vpc
+</span></span></code></pre></td></tr></table></div></div><p><strong>メリット:</strong></p><ul><li>設定が簡単</li><li>低遅延・高スループット</li><li>追加コストなし</li><li>直接的な通信</li></ul><p><strong>制約:</strong></p><ul><li>両方のVPCの管理権限が必要</li><li>IPアドレス重複不可</li><li>トランジティブ接続不可</li></ul><h3 id=2-pscprivate-service-connect---google-managed-service接続>2. PSC（Private Service Connect） - Google Managed Service接続</h3><p><strong>適用場面:</strong></p><ul><li>一方がGoogle管理サービスの場合</li><li>Datastream、Cloud SQL等との接続</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Datastream VPC] ⟷ PSC ⟷ [Customer VPC]
+</span></span><span class=line><span class=cl>   Google管理                ユーザー管理
+</span></span></code></pre></td></tr></table></div></div><p><strong>設定例:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># PSC接続作成</span>
+</span></span><span class=line><span class=cl>gcloud compute addresses create psc-endpoint <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --subnet<span class=o>=</span>app-subnet <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --addresses<span class=o>=</span>10.0.2.100
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>gcloud compute forwarding-rules create datastream-psc <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --address<span class=o>=</span>psc-endpoint <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --target-service-attachment<span class=o>=</span>datastream-sa
+</span></span></code></pre></td></tr></table></div></div><p><strong>メリット:</strong></p><ul><li>Google管理サービスとの最適接続</li><li>高いセキュリティ</li><li>管理負荷が低い</li><li>新しい標準的手法</li></ul><p><strong>制約:</strong></p><ul><li>比較的新しい機能</li><li>対応サービスが限定的</li></ul><h3 id=3-tcp-proxy---レガシー手法>3. TCP Proxy - レガシー手法</h3><p><strong>適用場面:</strong></p><ul><li>上記が利用できない制約環境</li><li>既存システムとの互換性が必要</li></ul><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>[Source VPC] → [Proxy Instance] → [Target VPC]
+</span></span></code></pre></td></tr></table></div></div><p><strong>設定例:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Proxy用インスタンス作成</span>
+</span></span><span class=line><span class=cl>gcloud compute instances create tcp-proxy <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --zone<span class=o>=</span>asia-northeast1-a <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --machine-type<span class=o>=</span>e2-medium <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --subnet<span class=o>=</span>proxy-subnet
+</span></span></code></pre></td></tr></table></div></div><p><strong>制約:</strong></p><ul><li>管理負荷が高い</li><li>単一障害点（SPOF）</li><li>性能制限あり</li><li>セキュリティリスク</li></ul><h2 id=設計判断フローチャート>設計判断フローチャート</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>VPC間接続の必要性
+</span></span><span class=line><span class=cl>       ↓
+</span></span><span class=line><span class=cl>同一VPC内配置可能？
+</span></span><span class=line><span class=cl>    ↓ No
+</span></span><span class=line><span class=cl>両方Customer VPC？
+</span></span><span class=line><span class=cl>    ↓ Yes         ↓ No
+</span></span><span class=line><span class=cl>VPC Peering    Google管理サービス？
+</span></span><span class=line><span class=cl>                ↓ Yes      ↓ No  
+</span></span><span class=line><span class=cl>             PSC Interface  TCP Proxy
+</span></span><span class=line><span class=cl>                          (非推奨)
+</span></span></code></pre></td></tr></table></div></div><h2 id=実際の設計例>実際の設計例</h2><h3 id=パターン1-開発本番環境分離>パターン1: 開発・本番環境分離</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># 開発環境</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Project</span><span class=p>:</span><span class=w> </span><span class=l>company-dev</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>dev-vpc (10.1.0.0/16)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># 本番環境  </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Project</span><span class=p>:</span><span class=w> </span><span class=l>company-prod</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>prod-vpc (10.2.0.0/16)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># 接続方式</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Connection</span><span class=p>:</span><span class=w> </span><span class=l>VPC Peering</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>理由</span><span class=p>:</span><span class=w> </span><span class=l>両方Customer VPC、管理権限あり</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=パターン2-データ基盤統合>パターン2: データ基盤統合</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># アプリケーション基盤</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>app-vpc (10.10.0.0/16)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># データ分析基盤</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Service</span><span class=p>:</span><span class=w> </span><span class=l>Datastream (Google Managed)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Database</span><span class=p>:</span><span class=w> </span><span class=l>AlloyDB (Google Managed)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># 接続方式</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Connection</span><span class=p>:</span><span class=w> </span><span class=l>PSC Interface</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>理由</span><span class=p>:</span><span class=w> </span><span class=l>Google管理サービスとの接続</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=パターン3-マルチクラウド統合>パターン3: マルチクラウド統合</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># GCP環境</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>gcp-vpc (10.0.0.0/16)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># AWS環境（VPN経由）</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>aws-vpc (10.100.0.0/16)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=c># 接続方式</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Connection</span><span class=p>:</span><span class=w> </span><span class=l>Cloud VPN + BGP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>理由</span><span class=p>:</span><span class=w> </span><span class=l>異なるクラウド間接続</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=セキュリティ考慮事項>セキュリティ考慮事項</h2><h3 id=vpc-peering時のファイアウォール>VPC Peering時のファイアウォール</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 最小権限接続</span>
+</span></span><span class=line><span class=cl>gcloud compute firewall-rules create allow-db-access <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span>10.1.2.0/24 <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>database <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --allow<span class=o>=</span>tcp:5432
+</span></span></code></pre></td></tr></table></div></div><h3 id=psc使用時の暗号化>PSC使用時の暗号化</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># SSL/TLS強制化</span>
+</span></span><span class=line><span class=cl>gcloud sql instances patch my-instance <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --require-ssl
+</span></span></code></pre></td></tr></table></div></div><h2 id=パフォーマンス比較>パフォーマンス比較</h2><div class=table-wrapper><table><thead><tr><th>接続方式</th><th>遅延</th><th>スループット</th><th>可用性</th><th>管理負荷</th></tr></thead><tbody><tr><td>VPC Peering</td><td>最小</td><td>最高</td><td>高</td><td>低</td></tr><tr><td>PSC</td><td>小</td><td>高</td><td>高</td><td>低</td></tr><tr><td>TCP Proxy</td><td>中</td><td>中</td><td>中</td><td>高</td></tr></tbody></table></div><h2 id=トラブルシューティング>トラブルシューティング</h2><h3 id=よくある接続問題>よくある接続問題</h3><ol><li><strong>IPアドレス重複</strong></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 重複チェック</span>
+</span></span><span class=line><span class=cl>gcloud compute networks describe vpc-a --format<span class=o>=</span><span class=s2>&#34;value(IPv4Range)&#34;</span>
+</span></span><span class=line><span class=cl>gcloud compute networks describe vpc-b --format<span class=o>=</span><span class=s2>&#34;value(IPv4Range)&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=2><li><strong>ファイアウォールルール不足</strong></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 接続テスト</span>
+</span></span><span class=line><span class=cl>gcloud compute ssh test-instance --command<span class=o>=</span><span class=s2>&#34;nc -zv target-ip 5432&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><ol start=3><li><strong>DNS解決問題</strong></li></ol><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># DNS設定確認</span>
+</span></span><span class=line><span class=cl>gcloud compute instances describe instance-name <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --format<span class=o>=</span><span class=s2>&#34;value(networkInterfaces[0].accessConfigs[0].natIP)&#34;</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=ベストプラクティス>ベストプラクティス</h2><h3 id=1-設計原則>1. 設計原則</h3><ul><li>同一VPC内配置を最優先検討</li><li>管理権限の有無で接続方式を決定</li><li>将来の拡張性を考慮</li></ul><h3 id=2-セキュリティ強化>2. セキュリティ強化</h3><ul><li>最小権限の原則を適用</li><li>ネットワークレベル + アプリケーションレベルの暗号化</li><li>定期的なアクセスログ監査</li></ul><h3 id=3-運用効率化>3. 運用効率化</h3><ul><li>インフラストラクチャコードでの管理</li><li>モニタリング・アラート設定</li><li>文書化の徹底</li></ul><h2 id=まとめ>まとめ</h2><p>VPC間接続の選択は、管理権限とサービスタイプに基づいて決定します：</p><ul><li><strong>Customer VPC同士</strong> → VPC Peering</li><li><strong>Google Managed Service</strong> → PSC Interface</li><li><strong>制約環境</strong> → TCP Proxy（非推奨）</li></ul><p>適切な接続方式の選択により、セキュアで効率的なクラウドインフラストラクチャを構築できます。</p><hr><p>📅 <strong>作成日</strong>: 2025年09月09日</p><p><strong>参考リンク:</strong></p><ul><li><a class=link href=https://cloud.google.com/vpc/docs/vpc-peering target=_blank rel=noopener>GCP VPC Peering公式ドキュメント</a></li><li><a class=link href=https://cloud.google.com/vpc/docs/private-service-connect target=_blank rel=noopener>Private Service Connect概要</a></li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/aws/>AWS</a>
+<a href=/tags/cloud/>Cloud</a>
+<a href=/tags/gcp/>Gcp</a>
+<a href=/tags/google/>Google</a>
+<a href=/tags/network/>Network</a>
+<a href=/tags/peering/>Peering</a>
+<a href=/tags/psc/>Psc</a>
+<a href=/tags/vpc/>Vpc</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/%EF%B8%8F-aws-s3-/-google-cloud-storage%E3%81%8B%E3%82%89%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%89%E3%83%AA%E3%83%96%E3%83%B3%E3%81%A7trocco%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8Bterraform-module%E4%BB%98%E3%81%8D/><div class=article-details><h2 class=article-title>🏗️ AWS S3 / Google Cloud Storageから、イベントドリブンでTROCCOを実行する（Terraform Module付き）</h2></div></a></article><article><a href=/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/><div class=article-details><h2 class=article-title>🏗️ Building a Production-Ready Terraform Project with Multi-Environment Support on AWS</h2></div></a></article><article><a href=/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/><div class=article-details><h2 class=article-title>🏗️ Spring Boot Banking Application Deployment using DevSecOps on AWS EKS</h2></div></a></article><article><a href=/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/><div class=article-details><h2 class=article-title>🏗️ Terraform vs CloudFormation: Which AWS IaC Tool Should You Use? 🤔</h2></div></a></article><article><a href=/post/aws-aws-weekly-roundup-amazon-ec2-amazon-q-developer-ipv6-updates-and-more-september-1-2025/><div class=article-details><h2 class=article-title>📰 [AWS] AWS Weekly Roundup: Amazon EC2, Amazon Q Developer, IPv6 updates, and more (September 1, 2025)</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
