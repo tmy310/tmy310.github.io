@@ -1,808 +1,211 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。">
-<title>Docker入門：コンテナ技術の基礎から実践まで</title>
-
-<link rel='canonical' href='https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/'>
-
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Docker入門：コンテナ技術の基礎から実践まで">
-<meta property='og:description' content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。">
-<meta property='og:url' content='https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/'>
-<meta property='og:site_name' content='firebirdテクテクテクブログ'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='DevOps' /><meta property='article:tag' content='Docker' /><meta property='article:tag' content='docker' /><meta property='article:tag' content='git' /><meta property='article:tag' content='nginx' /><meta property='article:tag' content='postgresql' /><meta property='article:tag' content='vscode' /><meta property='article:tag' content='コンテナ' /><meta property='article:tag' content='仮想化' /><meta property='article:tag' content='入門' /><meta property='article:published_time' content='2025-01-11T10:00:00&#43;09:00'/><meta property='article:modified_time' content='2025-01-11T10:00:00&#43;09:00'/>
-<meta name="twitter:title" content="Docker入門：コンテナ技術の基礎から実践まで">
-<meta name="twitter:description" content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。"><link rel="alternate" type="application/json" href="https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/index.json">
-    <link rel="shortcut icon" href="/images/favicon.png" />
-
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script>
-      <script>
-        var doNotTrack = false;
-        if ( false ) {
-          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
-          var doNotTrack = (dnt == "1" || dnt == "yes");
-        }
-        if (!doNotTrack) {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-J8ND35KCZW');
-        }
-      </script>
-
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "firebirdテクテクテクブログ",
-  "url": "https:\/\/firebird-techtalktech.com\/",
-  "description": "技術ネタ、趣味や備忘録などを書いているブログです",
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Docker入門：コンテナ技術の基礎から実践まで",
-  "description": "Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。",
-  "author": {
-    "@type": "Person",
-    "name": "トミー"
-  },
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "datePublished": "2025-01-11T10:00:00\u002b09:00",
-  "dateModified": "2025-01-11T10:00:00\u002b09:00",
-  "url": "https:\/\/firebird-techtalktech.com\/post\/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7\/",
-  "wordCount": "930",
-  "keywords": ["DevOps", "Docker", "docker", "git", "nginx", "postgresql", "vscode", "コンテナ", "仮想化", "入門"]
-}
-</script>
-
-
-
-
-<meta name="description" content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。">
-
-
-
-<meta property="og:site_name" content="firebirdテクテクテクブログ">
-
-<meta property="og:type" content="article">
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎯</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/firebird19245'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/categories/' >
-                
-                
-                
-                <span>カテゴリー</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/tags/' >
-                
-                
-                
-                <span>タグ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                <span>アーカイブ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                <span>このサイトについて</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                <span>検索</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>ダークモード</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                
-    <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">目次</h2>
-        
-        <div class="widget--toc">
-            <nav id="TableOfContents">
-  <ol>
-    <li><a href="#dockerとは">Dockerとは</a></li>
-    <li><a href="#なぜdockerが必要なのか">なぜDockerが必要なのか</a>
-      <ol>
-        <li><a href="#1-環境依存の問題を解決">1. 環境依存の問題を解決</a></li>
-        <li><a href="#2-軽量で高速">2. 軽量で高速</a></li>
-      </ol>
-    </li>
-    <li><a href="#基本的なdockerコマンド">基本的なDockerコマンド</a>
-      <ol>
-        <li><a href="#イメージの操作">イメージの操作</a></li>
-        <li><a href="#コンテナの操作">コンテナの操作</a></li>
-      </ol>
-    </li>
-    <li><a href="#dockerfileの基本">Dockerfileの基本</a></li>
-    <li><a href="#docker-composeで複数コンテナを管理">Docker Composeで複数コンテナを管理</a></li>
-    <li><a href="#ベストプラクティス">ベストプラクティス</a>
-      <ol>
-        <li><a href="#1-マルチステージビルドの活用">1. マルチステージビルドの活用</a></li>
-        <li><a href="#2-dockerignoreの活用">2. .dockerignoreの活用</a></li>
-      </ol>
-    </li>
-    <li><a href="#トラブルシューティング">トラブルシューティング</a>
-      <ol>
-        <li><a href="#ディスク容量の問題">ディスク容量の問題</a></li>
-        <li><a href="#ログの確認">ログの確認</a></li>
-      </ol>
-    </li>
-    <li><a href="#まとめ">まとめ</a></li>
-  </ol>
-</nav>
-        </div>
-    </section>
-
-            
-        
-    </aside>
-
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/%E6%8A%80%E8%A1%93/" >
-                技術
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/">Docker入門：コンテナ技術の基礎から実践まで</a>
-        </h2>
-    
-        
-        <h3 class="article-subtitle">
-            Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。
-        </h3>
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">2025年1月11日</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    読了時間: 2分
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h2 id="dockerとは">Dockerとは
-</h2><p>Dockerは、アプリケーションをコンテナという単位でパッケージ化し、どの環境でも同じように動作させることができる技術です。</p>
-<h2 id="なぜdockerが必要なのか">なぜDockerが必要なのか
-</h2><h3 id="1-環境依存の問題を解決">1. 環境依存の問題を解決
-</h3><p>「私の環境では動くのに&hellip;」という問題を解決します。開発環境、テスト環境、本番環境で同じコンテナを使用することで、環境差異による問題を最小化できます。</p>
-<h3 id="2-軽量で高速">2. 軽量で高速
-</h3><p>仮想マシンと比較して：</p>
-<ul>
-<li>起動が速い（数秒）</li>
-<li>リソース消費が少ない</li>
-<li>同じホストで多数のコンテナを実行可能</li>
-</ul>
-<h2 id="基本的なdockerコマンド">基本的なDockerコマンド
-</h2><h3 id="イメージの操作">イメージの操作
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># イメージの検索</span>
-</span></span><span class="line"><span class="cl">docker search nginx
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># イメージのダウンロード</span>
-</span></span><span class="line"><span class="cl">docker pull nginx:latest
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># ローカルのイメージ一覧</span>
-</span></span><span class="line"><span class="cl">docker images
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="コンテナの操作">コンテナの操作
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># コンテナの起動</span>
-</span></span><span class="line"><span class="cl">docker run -d -p 8080:80 --name my-nginx nginx
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 実行中のコンテナ確認</span>
-</span></span><span class="line"><span class="cl">docker ps
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># コンテナの停止</span>
-</span></span><span class="line"><span class="cl">docker stop my-nginx
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># コンテナの削除</span>
-</span></span><span class="line"><span class="cl">docker rm my-nginx
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="dockerfileの基本">Dockerfileの基本
-</h2><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="c"># ベースイメージの指定</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> node:18-alpine</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 作業ディレクトリの設定</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /app</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 依存関係ファイルのコピー</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> package*.json ./<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 依存関係のインストール</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> npm ci --only<span class="o">=</span>production<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># アプリケーションファイルのコピー</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> . .<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># ポートの公開</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">EXPOSE</span><span class="s"> 3000</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># アプリケーションの起動</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;node&#34;</span><span class="p">,</span> <span class="s2">&#34;server.js&#34;</span><span class="p">]</span><span class="err">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="docker-composeで複数コンテナを管理">Docker Composeで複数コンテナを管理
-</h2><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="s1">&#39;3.8&#39;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">services</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">web</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="l">.</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="s2">&#34;3000:3000&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">NODE_ENV=production</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">depends_on</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">db</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">db</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">postgres:14</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">environment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">POSTGRES_DB=myapp</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">POSTGRES_USER=user</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">POSTGRES_PASSWORD=password</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">postgres_data:/var/lib/postgresql/data</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">volumes</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">postgres_data</span><span class="p">:</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="ベストプラクティス">ベストプラクティス
-</h2><h3 id="1-マルチステージビルドの活用">1. マルチステージビルドの活用
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-dockerfile" data-lang="dockerfile"><span class="line"><span class="cl"><span class="c"># ビルドステージ</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> node:18-alpine AS builder</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /app</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> package*.json ./<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> npm ci<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> . .<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">RUN</span> npm run build<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="c"># 実行ステージ</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">FROM</span><span class="s"> node:18-alpine</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">WORKDIR</span><span class="s"> /app</span><span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> --from<span class="o">=</span>builder /app/dist ./dist<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">COPY</span> --from<span class="o">=</span>builder /app/node_modules ./node_modules<span class="err">
-</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="k">CMD</span> <span class="p">[</span><span class="s2">&#34;node&#34;</span><span class="p">,</span> <span class="s2">&#34;dist/index.js&#34;</span><span class="p">]</span><span class="err">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="2-dockerignoreの活用">2. .dockerignoreの活用
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">node_modules
-</span></span><span class="line"><span class="cl">npm-debug.log
-</span></span><span class="line"><span class="cl">.git
-</span></span><span class="line"><span class="cl">.gitignore
-</span></span><span class="line"><span class="cl">README.md
-</span></span><span class="line"><span class="cl">.env
-</span></span><span class="line"><span class="cl">.vscode
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="トラブルシューティング">トラブルシューティング
-</h2><h3 id="ディスク容量の問題">ディスク容量の問題
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># 未使用のリソースを一括削除</span>
-</span></span><span class="line"><span class="cl">docker system prune -a
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 個別に削除</span>
-</span></span><span class="line"><span class="cl">docker image prune
-</span></span><span class="line"><span class="cl">docker container prune
-</span></span><span class="line"><span class="cl">docker volume prune
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="ログの確認">ログの確認
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># コンテナログの確認</span>
-</span></span><span class="line"><span class="cl">docker logs my-container
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># リアルタイムでログを追跡</span>
-</span></span><span class="line"><span class="cl">docker logs -f my-container
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="まとめ">まとめ
-</h2><p>Dockerは現代のアプリケーション開発において欠かせないツールとなっています。基本的なコマンドから始めて、徐々に複雑な構成にチャレンジしていくことで、効率的な開発環境を構築できます。</p>
-<p>次回は、Kubernetesを使ったコンテナオーケストレーションについて解説予定です。</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/devops/">Devops</a>
-        
-            <a href="/tags/docker/">Docker</a>
-        
-            <a href="/tags/git/">Git</a>
-        
-            <a href="/tags/nginx/">Nginx</a>
-        
-            <a href="/tags/postgresql/">Postgresql</a>
-        
-            <a href="/tags/vscode/">Vscode</a>
-        
-            <a href="/tags/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A/">コンテナ</a>
-        
-            <a href="/tags/%E4%BB%AE%E6%83%B3%E5%8C%96/">仮想化</a>
-        
-            <a href="/tags/%E5%85%A5%E9%96%80/">入門</a>
-        
-    </section>
-
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 トミー
-    </section>
-    
-    <section class="powerby">
-        
-            技術ネタ、趣味や備忘録などを書いているブログです <br/>
-        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
-        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。"><title>Docker入門：コンテナ技術の基礎から実践まで</title><link rel=canonical href=https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="Docker入門：コンテナ技術の基礎から実践まで"><meta property='og:description' content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/'><meta property='og:site_name' content='firebirdテクテクテクブログ'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='DevOps'><meta property='article:tag' content='Docker'><meta property='article:tag' content='docker'><meta property='article:tag' content='git'><meta property='article:tag' content='nginx'><meta property='article:tag' content='postgresql'><meta property='article:tag' content='vscode'><meta property='article:tag' content='コンテナ'><meta property='article:tag' content='仮想化'><meta property='article:tag' content='入門'><meta property='article:published_time' content='2025-01-11T10:00:00+09:00'><meta property='article:modified_time' content='2025-01-11T10:00:00+09:00'><meta name=twitter:title content="Docker入門：コンテナ技術の基礎から実践まで"><meta name=twitter:description content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。"><link rel=alternate type=application/json href=https://firebird-techtalktech.com/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/index.json><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテクテクテクブログ","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Docker入門：コンテナ技術の基礎から実践まで","description":"Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-01-11T10:00:00\u002b09:00","dateModified":"2025-01-11T10:00:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7\/","wordCount":"930","keywords":["DevOps","Docker","docker","git","nginx","postgresql","vscode","コンテナ","仮想化","入門"]}</script><meta name=description content="Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。"><meta property="og:site_name" content="firebirdテクテクテクブログ"><meta property="og:type" content="article"></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_762f71fa991dd853.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎯</span></figure><div class=site-meta><h1 class=site-name><a href=/>firebirdテクテクテクブログ</a></h1><h2 class=site-description>技術ネタ、趣味や備忘録などを書いているブログです</h2></div></header><ol class=menu-social><li><a href=https://twitter.com/firebird19245 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/categories/><span>カテゴリー</span></a></li><li><a href=/tags/><span>タグ</span></a></li><li><a href=/archives/><span>アーカイブ</span></a></li><li><a href=/about/><span>このサイトについて</span></a></li><li><a href=/search/><span>検索</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目次</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#dockerとは>Dockerとは</a></li><li><a href=#なぜdockerが必要なのか>なぜDockerが必要なのか</a><ol><li><a href=#1-環境依存の問題を解決>1. 環境依存の問題を解決</a></li><li><a href=#2-軽量で高速>2. 軽量で高速</a></li></ol></li><li><a href=#基本的なdockerコマンド>基本的なDockerコマンド</a><ol><li><a href=#イメージの操作>イメージの操作</a></li><li><a href=#コンテナの操作>コンテナの操作</a></li></ol></li><li><a href=#dockerfileの基本>Dockerfileの基本</a></li><li><a href=#docker-composeで複数コンテナを管理>Docker Composeで複数コンテナを管理</a></li><li><a href=#ベストプラクティス>ベストプラクティス</a><ol><li><a href=#1-マルチステージビルドの活用>1. マルチステージビルドの活用</a></li><li><a href=#2-dockerignoreの活用>2. .dockerignoreの活用</a></li></ol></li><li><a href=#トラブルシューティング>トラブルシューティング</a><ol><li><a href=#ディスク容量の問題>ディスク容量の問題</a></li><li><a href=#ログの確認>ログの確認</a></li></ol></li><li><a href=#まとめ>まとめ</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E8%A1%93/>技術</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/>Docker入門：コンテナ技術の基礎から実践まで</a></h2><h3 class=article-subtitle>Dockerの基本概念から実践的な使い方まで、初心者にもわかりやすく解説します。</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025年1月11日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 2分</time></div></footer></div></header><section class=article-content><h2 id=dockerとは>Dockerとは</h2><p>Dockerは、アプリケーションをコンテナという単位でパッケージ化し、どの環境でも同じように動作させることができる技術です。</p><h2 id=なぜdockerが必要なのか>なぜDockerが必要なのか</h2><h3 id=1-環境依存の問題を解決>1. 環境依存の問題を解決</h3><p>「私の環境では動くのに&mldr;」という問題を解決します。開発環境、テスト環境、本番環境で同じコンテナを使用することで、環境差異による問題を最小化できます。</p><h3 id=2-軽量で高速>2. 軽量で高速</h3><p>仮想マシンと比較して：</p><ul><li>起動が速い（数秒）</li><li>リソース消費が少ない</li><li>同じホストで多数のコンテナを実行可能</li></ul><h2 id=基本的なdockerコマンド>基本的なDockerコマンド</h2><h3 id=イメージの操作>イメージの操作</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># イメージの検索</span>
+</span></span><span class=line><span class=cl>docker search nginx
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># イメージのダウンロード</span>
+</span></span><span class=line><span class=cl>docker pull nginx:latest
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># ローカルのイメージ一覧</span>
+</span></span><span class=line><span class=cl>docker images
+</span></span></code></pre></td></tr></table></div></div><h3 id=コンテナの操作>コンテナの操作</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># コンテナの起動</span>
+</span></span><span class=line><span class=cl>docker run -d -p 8080:80 --name my-nginx nginx
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 実行中のコンテナ確認</span>
+</span></span><span class=line><span class=cl>docker ps
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># コンテナの停止</span>
+</span></span><span class=line><span class=cl>docker stop my-nginx
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># コンテナの削除</span>
+</span></span><span class=line><span class=cl>docker rm my-nginx
+</span></span></code></pre></td></tr></table></div></div><h2 id=dockerfileの基本>Dockerfileの基本</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=c># ベースイメージの指定</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 作業ディレクトリの設定</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 依存関係ファイルのコピー</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> package*.json ./<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 依存関係のインストール</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm ci --only<span class=o>=</span>production<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># アプリケーションファイルのコピー</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> . .<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># ポートの公開</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>EXPOSE</span><span class=w> </span><span class=s>3000</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># アプリケーションの起動</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;node&#34;</span><span class=p>,</span> <span class=s2>&#34;server.js&#34;</span><span class=p>]</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=docker-composeで複数コンテナを管理>Docker Composeで複数コンテナを管理</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;3.8&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>web</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>build</span><span class=p>:</span><span class=w> </span><span class=l>.</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>ports</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=s2>&#34;3000:3000&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>environment</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>NODE_ENV=production</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>depends_on</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>db</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>db</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>image</span><span class=p>:</span><span class=w> </span><span class=l>postgres:14</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>environment</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>POSTGRES_DB=myapp</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>POSTGRES_USER=user</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>POSTGRES_PASSWORD=password</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>postgres_data:/var/lib/postgresql/data</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>postgres_data</span><span class=p>:</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=ベストプラクティス>ベストプラクティス</h2><h3 id=1-マルチステージビルドの活用>1. マルチステージビルドの活用</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=c># ビルドステージ</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>builder</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> package*.json ./<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm ci<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> . .<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm run build<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 実行ステージ</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>builder /app/dist ./dist<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>builder /app/node_modules ./node_modules<span class=err>
+</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;node&#34;</span><span class=p>,</span> <span class=s2>&#34;dist/index.js&#34;</span><span class=p>]</span><span class=err>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=2-dockerignoreの活用>2. .dockerignoreの活用</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>node_modules
+</span></span><span class=line><span class=cl>npm-debug.log
+</span></span><span class=line><span class=cl>.git
+</span></span><span class=line><span class=cl>.gitignore
+</span></span><span class=line><span class=cl>README.md
+</span></span><span class=line><span class=cl>.env
+</span></span><span class=line><span class=cl>.vscode
+</span></span></code></pre></td></tr></table></div></div><h2 id=トラブルシューティング>トラブルシューティング</h2><h3 id=ディスク容量の問題>ディスク容量の問題</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 未使用のリソースを一括削除</span>
+</span></span><span class=line><span class=cl>docker system prune -a
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 個別に削除</span>
+</span></span><span class=line><span class=cl>docker image prune
+</span></span><span class=line><span class=cl>docker container prune
+</span></span><span class=line><span class=cl>docker volume prune
+</span></span></code></pre></td></tr></table></div></div><h3 id=ログの確認>ログの確認</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># コンテナログの確認</span>
+</span></span><span class=line><span class=cl>docker logs my-container
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># リアルタイムでログを追跡</span>
+</span></span><span class=line><span class=cl>docker logs -f my-container
+</span></span></code></pre></td></tr></table></div></div><h2 id=まとめ>まとめ</h2><p>Dockerは現代のアプリケーション開発において欠かせないツールとなっています。基本的なコマンドから始めて、徐々に複雑な構成にチャレンジしていくことで、効率的な開発環境を構築できます。</p><p>次回は、Kubernetesを使ったコンテナオーケストレーションについて解説予定です。</p></section><footer class=article-footer><section class=article-tags><a href=/tags/devops/>Devops</a>
+<a href=/tags/docker/>Docker</a>
+<a href=/tags/git/>Git</a>
+<a href=/tags/nginx/>Nginx</a>
+<a href=/tags/postgresql/>Postgresql</a>
+<a href=/tags/vscode/>Vscode</a>
+<a href=/tags/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A/>コンテナ</a>
+<a href=/tags/%E4%BB%AE%E6%83%B3%E5%8C%96/>仮想化</a>
+<a href=/tags/%E5%85%A5%E9%96%80/>入門</a></section></footer></article><footer class=site-footer><section class=copyright>&copy;
+2025 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
