@@ -1,359 +1,379 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>コマンドライン on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/</link><description>Recent content in コマンドライン on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Tue, 09 Sep 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/index.xml" rel="self" type="application/rss+xml"/><item><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</link><pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</guid><description>&lt;h2 id="はじめに">はじめに
-&lt;/h2>&lt;p>Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？&lt;/p>
-&lt;p>今回は、そんな時に役立つ&lt;code>git filter-branch&lt;/code>という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。&lt;/p>
-&lt;h2 id="git-filter-branchとは">git filter-branchとは？
-&lt;/h2>&lt;p>&lt;code>git filter-branch&lt;/code>は、Gitリポジトリの履歴を書き換えるためのコマンドです。単一のコミットだけでなく、&lt;strong>全履歴を対象に一括で変更を適用&lt;/strong>できるのが特徴です。&lt;/p>
-&lt;h3 id="基本構文">基本構文
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git filter-branch &lt;span class="o">[&lt;/span>--option&lt;span class="o">]&lt;/span> &lt;span class="s1">&amp;#39;&amp;lt;command&amp;gt;&amp;#39;&lt;/span> &lt;span class="o">[&lt;/span>revision-range&lt;span class="o">]&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>主なオプション：&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>--tree-filter&lt;/code>: 各コミットのファイルツリーを直接編集&lt;/li>
-&lt;li>&lt;code>--index-filter&lt;/code>: インデックス（ステージング）を編集&lt;/li>
-&lt;li>&lt;code>--env-filter&lt;/code>: 環境変数（著者情報など）を編集&lt;/li>
-&lt;li>&lt;code>--msg-filter&lt;/code>: コミットメッセージを編集&lt;/li>
-&lt;/ul>
-&lt;h2 id="実践例1機密情報の削除">実践例1：機密情報の削除
-&lt;/h2>&lt;p>最も一般的な使用例は、誤ってコミットしてしまった機密情報の削除です。&lt;/p>
-&lt;h3 id="パスワードファイルを全履歴から削除">パスワードファイルを全履歴から削除
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># passwords.txtを全履歴から削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --force --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git rm --cached --ignore-unmatch passwords.txt&amp;#39;&lt;/span> &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --prune-empty --tag-name-filter cat -- --all
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="envファイルを削除より安全な方法">.envファイルを削除（より安全な方法）
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># バックアップを作成&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git branch backup-before-cleanup
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># .envファイルを全履歴から削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --force --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git rm --cached --ignore-unmatch .env&amp;#39;&lt;/span> &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --prune-empty --tag-name-filter cat -- --all
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 削除を確認&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git log --all --full-history -- .env
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="実践例2著者情報の変更">実践例2：著者情報の変更
-&lt;/h2>&lt;p>GitHubのユーザー名を変更した場合など、過去のコミットの著者名を変更したい場合があります。&lt;/p>
-&lt;h3 id="特定の著者名を一括変更">特定の著者名を一括変更
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;span class="lnt">12
-&lt;/span>&lt;span class="lnt">13
-&lt;/span>&lt;span class="lnt">14
-&lt;/span>&lt;span class="lnt">15
-&lt;/span>&lt;span class="lnt">16
-&lt;/span>&lt;span class="lnt">17
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="cp">#!/bin/bash
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="cp">&lt;/span>git filter-branch --env-filter &lt;span class="s1">&amp;#39;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">OLD_EMAIL=&amp;#34;old@example.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">CORRECT_NAME=&amp;#34;新しい名前&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">CORRECT_EMAIL=&amp;#34;new@example.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_COMMITTER_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_AUTHOR_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&lt;/span> --tag-name-filter cat -- --branches --tags
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="実際の使用例tmy-ss-310--tmy-310">実際の使用例：tmy-ss-310 → tmy-310
-&lt;/h3>&lt;p>私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git filter-branch -f --env-filter &lt;span class="s1">&amp;#39;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_AUTHOR_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_NAME=&amp;#34;tmy-310&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_AUTHOR_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">if [ &amp;#34;$GIT_COMMITTER_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_NAME=&amp;#34;tmy-310&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> export GIT_COMMITTER_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">fi
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&lt;/span> -- --all
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="実践例3ディレクトリ構造の変更">実践例3：ディレクトリ構造の変更
-&lt;/h2>&lt;h3 id="サブディレクトリを新しいリポジトリとして切り出す">サブディレクトリを新しいリポジトリとして切り出す
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># frontendディレクトリだけを抽出して新しいリポジトリに&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --subdirectory-filter frontend HEAD
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># これにより、frontendディレクトリがルートディレクトリになる&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="全ファイルをサブディレクトリに移動">全ファイルをサブディレクトリに移動
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git filter-branch --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git ls-files -s | sed &amp;#34;s-\t\&amp;#34;*-&amp;amp;newsubdir/-&amp;#34; |
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> git update-index --index-info &amp;amp;&amp;amp;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> mv &amp;#34;$GIT_INDEX_FILE.new&amp;#34; &amp;#34;$GIT_INDEX_FILE&amp;#34;&amp;#39;&lt;/span> HEAD
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="実践例4大きなファイルの削除">実践例4：大きなファイルの削除
-&lt;/h2>&lt;p>リポジトリサイズを削減するため、大きなファイルを履歴から削除します。&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;span class="lnt">11
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 100MB以上のファイルを検出&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git rev-list --objects --all &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> git cat-file --batch-check&lt;span class="o">=&lt;/span>&lt;span class="s1">&amp;#39;%(objecttype) %(objectname) %(objectsize) %(rest)&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sed -n &lt;span class="s1">&amp;#39;s/^blob //p&amp;#39;&lt;/span> &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> sort --numeric-sort --key&lt;span class="o">=&lt;/span>&lt;span class="m">2&lt;/span> &lt;span class="p">|&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> tail -10
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 大きなファイル（例：huge-video.mp4）を削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-branch --force --index-filter &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> &lt;span class="s1">&amp;#39;git rm --cached --ignore-unmatch huge-video.mp4&amp;#39;&lt;/span> &lt;span class="se">\
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="se">&lt;/span> --prune-empty --tag-name-filter cat -- --all
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="filter-branchの注意点">filter-branchの注意点
-&lt;/h2>&lt;h3 id="-破壊的操作">⚠️ 破壊的操作
-&lt;/h3>&lt;p>&lt;code>git filter-branch&lt;/code>は履歴を完全に書き換えるため：&lt;/p>
-&lt;ol>
-&lt;li>&lt;strong>必ずバックアップを作成&lt;/strong>&lt;/li>
-&lt;/ol>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git branch backup-&lt;span class="k">$(&lt;/span>date +%Y%m%d&lt;span class="k">)&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ol start="2">
-&lt;li>&lt;strong>強制プッシュが必要&lt;/strong>&lt;/li>
-&lt;/ol>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">git push --force origin main
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;ol start="3">
-&lt;li>&lt;strong>チームメンバーへの影響&lt;/strong>
-&lt;ul>
-&lt;li>他の開発者は再クローンが必要&lt;/li>
-&lt;li>進行中の作業がある場合は要調整&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ol>
-&lt;h3 id="パフォーマンスの問題">パフォーマンスの問題
-&lt;/h3>&lt;p>大規模なリポジトリでは処理に時間がかかります：&lt;/p>
-&lt;ul>
-&lt;li>1000コミット: 数分&lt;/li>
-&lt;li>10000コミット: 30分以上&lt;/li>
-&lt;/ul>
-&lt;h2 id="代替ツールgit-filter-repo">代替ツール：git filter-repo
-&lt;/h2>&lt;p>Git 2.24以降では、&lt;code>git filter-repo&lt;/code>が推奨されています：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt"> 1
-&lt;/span>&lt;span class="lnt"> 2
-&lt;/span>&lt;span class="lnt"> 3
-&lt;/span>&lt;span class="lnt"> 4
-&lt;/span>&lt;span class="lnt"> 5
-&lt;/span>&lt;span class="lnt"> 6
-&lt;/span>&lt;span class="lnt"> 7
-&lt;/span>&lt;span class="lnt"> 8
-&lt;/span>&lt;span class="lnt"> 9
-&lt;/span>&lt;span class="lnt">10
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># インストール&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">pip install git-filter-repo
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 使用例：メールアドレスの変更&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-repo --email-callback &lt;span class="s1">&amp;#39;
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1"> return email.replace(b&amp;#34;old@example.com&amp;#34;, b&amp;#34;new@example.com&amp;#34;)
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="s1">&amp;#39;&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># パスの削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git filter-repo --path passwords.txt --invert-paths
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="filter-repoの利点">filter-repoの利点
-&lt;/h3>&lt;ul>
-&lt;li>&lt;strong>高速&lt;/strong>: filter-branchの10-720倍高速&lt;/li>
-&lt;li>&lt;strong>安全&lt;/strong>: デフォルトで新しいリポジトリに出力&lt;/li>
-&lt;li>&lt;strong>使いやすい&lt;/strong>: より直感的なオプション&lt;/li>
-&lt;/ul>
-&lt;h2 id="実用的な使い分け">実用的な使い分け
-&lt;/h2>&lt;h3 id="git-filter-branchを使うべき場合">git filter-branchを使うべき場合
-&lt;/h3>&lt;ul>
-&lt;li>Gitの標準機能のみで完結したい&lt;/li>
-&lt;li>簡単な著者名変更や単一ファイル削除&lt;/li>
-&lt;li>追加ツールのインストールが困難な環境&lt;/li>
-&lt;/ul>
-&lt;h3 id="git-rebaseやresetで十分な場合">git rebaseやresetで十分な場合
-&lt;/h3>&lt;ul>
-&lt;li>最近のコミット（10個程度）の修正&lt;/li>
-&lt;li>個人プロジェクトで履歴の詳細が不要&lt;/li>
-&lt;li>クリーンな履歴を優先&lt;/li>
-&lt;/ul>
-&lt;h3 id="git-filter-repoを使うべき場合">git filter-repoを使うべき場合
-&lt;/h3>&lt;ul>
-&lt;li>大規模なリポジトリ&lt;/li>
-&lt;li>複雑なフィルタリング条件&lt;/li>
-&lt;li>パフォーマンスが重要&lt;/li>
-&lt;/ul>
-&lt;h2 id="トラブルシューティング">トラブルシューティング
-&lt;/h2>&lt;h3 id="エラー-cannot-create-a-new-backup">エラー: &amp;ldquo;Cannot create a new backup&amp;rdquo;
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># 既存のバックアップを削除&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">rm -rf .git/refs/original/
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="リモートとの同期問題">リモートとの同期問題
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ローカルの変更を強制的に反映&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git push --force-with-lease origin main
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># より安全：新しいブランチにプッシュ&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git push origin main:main-filtered
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h3 id="容量が減らない場合">容量が減らない場合
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-bash" data-lang="bash">&lt;span class="line">&lt;span class="cl">&lt;span class="c1"># ガベージコレクションを実行&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git reflog expire --expire&lt;span class="o">=&lt;/span>now --all
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">git gc --prune&lt;span class="o">=&lt;/span>now --aggressive
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="まとめ">まとめ
-&lt;/h2>&lt;p>&lt;code>git filter-branch&lt;/code>は強力なツールですが、使用には注意が必要です：&lt;/p>
-&lt;p>✅ &lt;strong>使うべき時&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>機密情報の緊急削除&lt;/li>
-&lt;li>著者情報の一括修正&lt;/li>
-&lt;li>リポジトリの大規模なリファクタリング&lt;/li>
-&lt;/ul>
-&lt;p>❌ &lt;strong>避けるべき時&lt;/strong>&lt;/p>
-&lt;ul>
-&lt;li>公開済みの大規模プロジェクト&lt;/li>
-&lt;li>チーム開発中のアクティブなリポジトリ&lt;/li>
-&lt;li>簡単な修正で済む場合&lt;/li>
-&lt;/ul>
-&lt;p>適切に使えば、Gitの履歴をクリーンに保ち、セキュリティ問題を解決できる強力な味方になります。ただし、「大いなる力には大いなる責任が伴う」ことを忘れずに！&lt;/p>
-&lt;h2 id="参考リンク">参考リンク
-&lt;/h2>&lt;ul>
-&lt;li>&lt;a class="link" href="https://git-scm.com/docs/git-filter-branch" target="_blank" rel="noopener"
->Git公式ドキュメント - git-filter-branch&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository" target="_blank" rel="noopener"
->GitHub - Removing sensitive data&lt;/a>&lt;/li>
-&lt;li>&lt;a class="link" href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener"
->git-filter-repo&lt;/a>&lt;/li>
-&lt;/ul>
-&lt;hr>
-&lt;p>&lt;em>この記事が役に立ったら、ぜひシェアしてください！Gitの困った時の救世主として、多くの開発者の助けになれば幸いです。&lt;/em>&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>コマンドライン on firebirdテクテクテクブログ</title>
+        <link>https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/</link>
+        <description>Recent content in コマンドライン on firebirdテクテクテクブログ</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>ja</language>
+        <copyright>トミー</copyright>
+        <lastBuildDate>Tue, 09 Sep 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title>
+        <link>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</link>
+        <pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/git-filter-branch%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89git%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E6%9B%B8%E3%81%8D%E6%8F%9B%E3%81%88%E3%82%8B%E5%BC%B7%E5%8A%9B%E3%81%AA%E3%83%84%E3%83%BC%E3%83%AB/</guid>
+        <description>&lt;h2 id=&#34;はじめに&#34;&gt;はじめに
+&lt;/h2&gt;&lt;p&gt;Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？&lt;/p&gt;
+&lt;p&gt;今回は、そんな時に役立つ&lt;code&gt;git filter-branch&lt;/code&gt;という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。&lt;/p&gt;
+&lt;h2 id=&#34;git-filter-branchとは&#34;&gt;git filter-branchとは？
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git filter-branch&lt;/code&gt;は、Gitリポジトリの履歴を書き換えるためのコマンドです。単一のコミットだけでなく、&lt;strong&gt;全履歴を対象に一括で変更を適用&lt;/strong&gt;できるのが特徴です。&lt;/p&gt;
+&lt;h3 id=&#34;基本構文&#34;&gt;基本構文
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;--option&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt; &lt;span class=&#34;s1&#34;&gt;&amp;#39;&amp;lt;command&amp;gt;&amp;#39;&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;[&lt;/span&gt;revision-range&lt;span class=&#34;o&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;主なオプション：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;--tree-filter&lt;/code&gt;: 各コミットのファイルツリーを直接編集&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--index-filter&lt;/code&gt;: インデックス（ステージング）を編集&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--env-filter&lt;/code&gt;: 環境変数（著者情報など）を編集&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;--msg-filter&lt;/code&gt;: コミットメッセージを編集&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;実践例1機密情報の削除&#34;&gt;実践例1：機密情報の削除
+&lt;/h2&gt;&lt;p&gt;最も一般的な使用例は、誤ってコミットしてしまった機密情報の削除です。&lt;/p&gt;
+&lt;h3 id=&#34;パスワードファイルを全履歴から削除&#34;&gt;パスワードファイルを全履歴から削除
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# passwords.txtを全履歴から削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --force --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git rm --cached --ignore-unmatch passwords.txt&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  --prune-empty --tag-name-filter cat -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;envファイルを削除より安全な方法&#34;&gt;.envファイルを削除（より安全な方法）
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# バックアップを作成&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git branch backup-before-cleanup
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# .envファイルを全履歴から削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --force --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git rm --cached --ignore-unmatch .env&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  --prune-empty --tag-name-filter cat -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 削除を確認&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git log --all --full-history -- .env
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;実践例2著者情報の変更&#34;&gt;実践例2：著者情報の変更
+&lt;/h2&gt;&lt;p&gt;GitHubのユーザー名を変更した場合など、過去のコミットの著者名を変更したい場合があります。&lt;/p&gt;
+&lt;h3 id=&#34;特定の著者名を一括変更&#34;&gt;特定の著者名を一括変更
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;12
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;13
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;14
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;15
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;16
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;#!/bin/bash
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;cp&#34;&gt;&lt;/span&gt;git filter-branch --env-filter &lt;span class=&#34;s1&#34;&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;OLD_EMAIL=&amp;#34;old@example.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;CORRECT_NAME=&amp;#34;新しい名前&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;CORRECT_EMAIL=&amp;#34;new@example.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_COMMITTER_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_AUTHOR_EMAIL&amp;#34; = &amp;#34;$OLD_EMAIL&amp;#34; ]
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_NAME=&amp;#34;$CORRECT_NAME&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_EMAIL=&amp;#34;$CORRECT_EMAIL&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt; --tag-name-filter cat -- --branches --tags
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;実際の使用例tmy-ss-310--tmy-310&#34;&gt;実際の使用例：tmy-ss-310 → tmy-310
+&lt;/h3&gt;&lt;p&gt;私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch -f --env-filter &lt;span class=&#34;s1&#34;&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_AUTHOR_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_NAME=&amp;#34;tmy-310&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_AUTHOR_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;if [ &amp;#34;$GIT_COMMITTER_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_NAME=&amp;#34;tmy-310&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;    export GIT_COMMITTER_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;fi
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt; -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;実践例3ディレクトリ構造の変更&#34;&gt;実践例3：ディレクトリ構造の変更
+&lt;/h2&gt;&lt;h3 id=&#34;サブディレクトリを新しいリポジトリとして切り出す&#34;&gt;サブディレクトリを新しいリポジトリとして切り出す
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# frontendディレクトリだけを抽出して新しいリポジトリに&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --subdirectory-filter frontend HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# これにより、frontendディレクトリがルートディレクトリになる&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;全ファイルをサブディレクトリに移動&#34;&gt;全ファイルをサブディレクトリに移動
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git ls-files -s | sed &amp;#34;s-\t\&amp;#34;*-&amp;amp;newsubdir/-&amp;#34; |
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;   GIT_INDEX_FILE=$GIT_INDEX_FILE.new \
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;   git update-index --index-info &amp;amp;&amp;amp;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;   mv &amp;#34;$GIT_INDEX_FILE.new&amp;#34; &amp;#34;$GIT_INDEX_FILE&amp;#34;&amp;#39;&lt;/span&gt; HEAD
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;実践例4大きなファイルの削除&#34;&gt;実践例4：大きなファイルの削除
+&lt;/h2&gt;&lt;p&gt;リポジトリサイズを削減するため、大きなファイルを履歴から削除します。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 100MB以上のファイルを検出&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git rev-list --objects --all &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  git cat-file --batch-check&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;%(objecttype) %(objectname) %(objectsize) %(rest)&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  sed -n &lt;span class=&#34;s1&#34;&gt;&amp;#39;s/^blob //p&amp;#39;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  sort --numeric-sort --key&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;&lt;span class=&#34;m&#34;&gt;2&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;|&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  tail -10
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 大きなファイル（例：huge-video.mp4）を削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-branch --force --index-filter &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;s1&#34;&gt;&amp;#39;git rm --cached --ignore-unmatch huge-video.mp4&amp;#39;&lt;/span&gt; &lt;span class=&#34;se&#34;&gt;\
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;se&#34;&gt;&lt;/span&gt;  --prune-empty --tag-name-filter cat -- --all
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;filter-branchの注意点&#34;&gt;filter-branchの注意点
+&lt;/h2&gt;&lt;h3 id=&#34;-破壊的操作&#34;&gt;⚠️ 破壊的操作
+&lt;/h3&gt;&lt;p&gt;&lt;code&gt;git filter-branch&lt;/code&gt;は履歴を完全に書き換えるため：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;必ずバックアップを作成&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git branch backup-&lt;span class=&#34;k&#34;&gt;$(&lt;/span&gt;date +%Y%m%d&lt;span class=&#34;k&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;&lt;strong&gt;強制プッシュが必要&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push --force origin main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ol start=&#34;3&#34;&gt;
+&lt;li&gt;&lt;strong&gt;チームメンバーへの影響&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;他の開発者は再クローンが必要&lt;/li&gt;
+&lt;li&gt;進行中の作業がある場合は要調整&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;パフォーマンスの問題&#34;&gt;パフォーマンスの問題
+&lt;/h3&gt;&lt;p&gt;大規模なリポジトリでは処理に時間がかかります：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;1000コミット: 数分&lt;/li&gt;
+&lt;li&gt;10000コミット: 30分以上&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;代替ツールgit-filter-repo&#34;&gt;代替ツール：git filter-repo
+&lt;/h2&gt;&lt;p&gt;Git 2.24以降では、&lt;code&gt;git filter-repo&lt;/code&gt;が推奨されています：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt; 1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 8
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt; 9
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# インストール&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;pip install git-filter-repo
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 使用例：メールアドレスの変更&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-repo --email-callback &lt;span class=&#34;s1&#34;&gt;&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;  return email.replace(b&amp;#34;old@example.com&amp;#34;, b&amp;#34;new@example.com&amp;#34;)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# パスの削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git filter-repo --path passwords.txt --invert-paths
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;filter-repoの利点&#34;&gt;filter-repoの利点
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;高速&lt;/strong&gt;: filter-branchの10-720倍高速&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;安全&lt;/strong&gt;: デフォルトで新しいリポジトリに出力&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;使いやすい&lt;/strong&gt;: より直感的なオプション&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;実用的な使い分け&#34;&gt;実用的な使い分け
+&lt;/h2&gt;&lt;h3 id=&#34;git-filter-branchを使うべき場合&#34;&gt;git filter-branchを使うべき場合
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;Gitの標準機能のみで完結したい&lt;/li&gt;
+&lt;li&gt;簡単な著者名変更や単一ファイル削除&lt;/li&gt;
+&lt;li&gt;追加ツールのインストールが困難な環境&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;git-rebaseやresetで十分な場合&#34;&gt;git rebaseやresetで十分な場合
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;最近のコミット（10個程度）の修正&lt;/li&gt;
+&lt;li&gt;個人プロジェクトで履歴の詳細が不要&lt;/li&gt;
+&lt;li&gt;クリーンな履歴を優先&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;git-filter-repoを使うべき場合&#34;&gt;git filter-repoを使うべき場合
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;大規模なリポジトリ&lt;/li&gt;
+&lt;li&gt;複雑なフィルタリング条件&lt;/li&gt;
+&lt;li&gt;パフォーマンスが重要&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;トラブルシューティング&#34;&gt;トラブルシューティング
+&lt;/h2&gt;&lt;h3 id=&#34;エラー-cannot-create-a-new-backup&#34;&gt;エラー: &amp;ldquo;Cannot create a new backup&amp;rdquo;
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# 既存のバックアップを削除&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;rm -rf .git/refs/original/
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;リモートとの同期問題&#34;&gt;リモートとの同期問題
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# ローカルの変更を強制的に反映&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push --force-with-lease origin main
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# より安全：新しいブランチにプッシュ&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git push origin main:main-filtered
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;容量が減らない場合&#34;&gt;容量が減らない場合
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;# ガベージコレクションを実行&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git reflog expire --expire&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;now --all
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;git gc --prune&lt;span class=&#34;o&#34;&gt;=&lt;/span&gt;now --aggressive
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;まとめ&#34;&gt;まとめ
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git filter-branch&lt;/code&gt;は強力なツールですが、使用には注意が必要です：&lt;/p&gt;
+&lt;p&gt;✅ &lt;strong&gt;使うべき時&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;機密情報の緊急削除&lt;/li&gt;
+&lt;li&gt;著者情報の一括修正&lt;/li&gt;
+&lt;li&gt;リポジトリの大規模なリファクタリング&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;❌ &lt;strong&gt;避けるべき時&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公開済みの大規模プロジェクト&lt;/li&gt;
+&lt;li&gt;チーム開発中のアクティブなリポジトリ&lt;/li&gt;
+&lt;li&gt;簡単な修正で済む場合&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;適切に使えば、Gitの履歴をクリーンに保ち、セキュリティ問題を解決できる強力な味方になります。ただし、「大いなる力には大いなる責任が伴う」ことを忘れずに！&lt;/p&gt;
+&lt;h2 id=&#34;参考リンク&#34;&gt;参考リンク
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/docs/git-filter-branch&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git公式ドキュメント - git-filter-branch&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;GitHub - Removing sensitive data&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/newren/git-filter-repo&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;git-filter-repo&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;この記事が役に立ったら、ぜひシェアしてください！Gitの困った時の救世主として、多くの開発者の助けになれば幸いです。&lt;/em&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
