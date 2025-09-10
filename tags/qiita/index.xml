@@ -1,477 +1,477 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qiita on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/qiita/</link><description>Recent content in Qiita on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Wed, 10 Sep 2025 02:35:03 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/qiita/index.xml" rel="self" type="application/rss+xml"/><item><title>🔥 [AI] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:109"&gt;
-&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment"&gt;&lt;/span&gt;&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 28 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [AWS] バケットポリシーの記述を誤りマネコンからS3バケットを操作できなくなりそうになった話</title><link>https://firebird-techtalktech.com/post/aws-%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%98%E8%BF%B0%E3%82%92%E8%AA%A4%E3%82%8A%E3%83%9E%E3%83%8D%E3%82%B3%E3%83%B3%E3%81%8B%E3%82%89s3%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%82%92%E6%93%8D%E4%BD%9C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8F%E3%81%AA%E3%82%8A%E3%81%9D%E3%81%86%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E8%A9%B1/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/aws-%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%98%E8%BF%B0%E3%82%92%E8%AA%A4%E3%82%8A%E3%83%9E%E3%83%8D%E3%82%B3%E3%83%B3%E3%81%8B%E3%82%89s3%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%82%92%E6%93%8D%E4%BD%9C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8F%E3%81%AA%E3%82%8A%E3%81%9D%E3%81%86%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E8%A9%B1/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="3:1-3:543"&gt;Amazon EC2（以下、EC2） から Amazon S3（以下、S3） にアクセスしたい場合、VPCエンドポイントを作成する必要があります。その動作を確認したくなり、個人利用のAWS環境で動作確認をしていました。適切...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 8 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/amarelo_n24/items/225456495d3a896c8004" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/amarelo_n24/items/225456495d3a896c8004" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CHATGPT] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:109"&gt;
-&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment"&gt;&lt;/span&gt;&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 28 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CLAUDE] Claude Codeをより便利・強力に使うためのツールまとめ</title><link>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="3:1-5:93"&gt;昨今のAIエージェント界隈の競争が激化していることは周知の事実だと思います。&lt;br&gt;
-先日リリースされた&lt;strong&gt;Codex CLI&lt;/strong&gt;により&lt;strong&gt;Claude Code&lt;/strong&gt;が押さ...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 275 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [COPILOT] Dataverse のインデックスが進化したため、Copilot Studio で再検証してみた</title><link>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="2:1-2:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="4:1-4:489"&gt;これまで、Copilot Studio に関する沢山の記事を書いてきました。ファイルをアップロードしたり、URL を指定するだけで生成 AI チャットボット (Copilot Studio 的にはエージェント) が作成でき...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 7 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [DOCKER] かんたんにDocker超高速化＠Windows！開発前にやるべきたった１つの工夫</title><link>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:100"&gt;WindowsでDockerを使って開発してる現場を見てると、大体みんな困ってます。&lt;/p&gt;
-&lt;ul data-sourcepos="2:1-5:0"&gt;
-&lt;li data-sourcepos="2:1-2:68"&gt;Docker使ってWordPress動かすと、すごーーーく遅い。&lt;/li&gt;
-&lt;li data-sourcepos="3:1-3:79"&gt;Docker使ってLaravelアプリを開発してるけど、Viteが遅すぎ。&lt;/li&gt;
-&lt;li data-sourcepos="4:1-5:0"&gt;Linux使えって言われても、会社のPCがWi...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 61 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [GEMINI] お盆休みに作ったAI議事録ツールのレシピをいろいろアレンジしたらこうなった</title><link>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:8"&gt;
-&lt;span id="概要" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E6%A6%82%E8%A6%81"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;概要&lt;/h1&gt;
-&lt;p data-sourcepos="3:1-4:113"&gt;お盆休みに作ったAI議事録ツールの記事が &lt;strong&gt;13万view・300いいね・250ストック&lt;/strong&gt; を突破しました！&lt;br&gt;
-想像以上の反響をいただき、多くの方に読んでいただけたことに感謝しています。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Qiita on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/qiita/</link><description>Recent content in Qiita on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Wed, 10 Sep 2025 02:22:37 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/qiita/index.xml" rel="self" type="application/rss+xml"/><item><title>🔥 [AI] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:109">
+&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment">&lt;/span>&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 19 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [AWS] バケットポリシーの記述を誤りマネコンからS3バケットを操作できなくなりそうになった話</title><link>https://firebird-techtalktech.com/post/aws-%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%98%E8%BF%B0%E3%82%92%E8%AA%A4%E3%82%8A%E3%83%9E%E3%83%8D%E3%82%B3%E3%83%B3%E3%81%8B%E3%82%89s3%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%82%92%E6%93%8D%E4%BD%9C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8F%E3%81%AA%E3%82%8A%E3%81%9D%E3%81%86%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E8%A9%B1/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/aws-%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%83%9D%E3%83%AA%E3%82%B7%E3%83%BC%E3%81%AE%E8%A8%98%E8%BF%B0%E3%82%92%E8%AA%A4%E3%82%8A%E3%83%9E%E3%83%8D%E3%82%B3%E3%83%B3%E3%81%8B%E3%82%89s3%E3%83%90%E3%82%B1%E3%83%83%E3%83%88%E3%82%92%E6%93%8D%E4%BD%9C%E3%81%A7%E3%81%8D%E3%81%AA%E3%81%8F%E3%81%AA%E3%82%8A%E3%81%9D%E3%81%86%E3%81%AB%E3%81%AA%E3%81%A3%E3%81%9F%E8%A9%B1/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="3:1-3:543">Amazon EC2（以下、EC2） から Amazon S3（以下、S3） にアクセスしたい場合、VPCエンドポイントを作成する必要があります。その動作を確認したくなり、個人利用のAWS環境で動作確認をしていました。適切...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 8 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/amarelo_n24/items/225456495d3a896c8004" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/amarelo_n24/items/225456495d3a896c8004" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CHATGPT] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:109">
+&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment">&lt;/span>&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 19 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CLAUDE] Claude Codeをより便利・強力に使うためのツールまとめ</title><link>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="3:1-5:93">昨今のAIエージェント界隈の競争が激化していることは周知の事実だと思います。&lt;br>
+先日リリースされた&lt;strong>Codex CLI&lt;/strong>により&lt;strong>Claude Code&lt;/strong>が押さ...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 275 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [COPILOT] Dataverse のインデックスが進化したため、Copilot Studio で再検証してみた</title><link>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="2:1-2:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="4:1-4:489">これまで、Copilot Studio に関する沢山の記事を書いてきました。ファイルをアップロードしたり、URL を指定するだけで生成 AI チャットボット (Copilot Studio 的にはエージェント) が作成でき...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 7 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [DOCKER] かんたんにDocker超高速化＠Windows！開発前にやるべきたった１つの工夫</title><link>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:100">WindowsでDockerを使って開発してる現場を見てると、大体みんな困ってます。&lt;/p>
+&lt;ul data-sourcepos="2:1-5:0">
+&lt;li data-sourcepos="2:1-2:68">Docker使ってWordPress動かすと、すごーーーく遅い。&lt;/li>
+&lt;li data-sourcepos="3:1-3:79">Docker使ってLaravelアプリを開発してるけど、Viteが遅すぎ。&lt;/li>
+&lt;li data-sourcepos="4:1-5:0">Linux使えって言われても、会社のPCがWi...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 61 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [GEMINI] お盆休みに作ったAI議事録ツールのレシピをいろいろアレンジしたらこうなった</title><link>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:8">
+&lt;span id="概要" class="fragment">&lt;/span>&lt;a href="#%E6%A6%82%E8%A6%81">&lt;i class="fa fa-link">&lt;/i>&lt;/a>概要&lt;/h1>
+&lt;p data-sourcepos="3:1-4:113">お盆休みに作ったAI議事録ツールの記事が &lt;strong>13万view・300いいね・250ストック&lt;/strong> を突破しました！&lt;br>
+想像以上の反響をいただき、多くの方に読んでいただけたことに感謝しています。&lt;/p>
 &lt;p data-sourcepos=...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 10 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [GO] Goに入門して、ついでにクリーンアーキテクチャに入門した　ーその3</title><link>https://firebird-techtalktech.com/post/go-go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/go-go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:97"&gt;前回はクリーンアーキテクチャで簡単なTODOアプリを実装してみました。&lt;/p&gt;
-&lt;p data-sourcepos="3:1-3:56"&gt;&lt;iframe id="qiita-embed-content__79a38b7adbf6b9f01ff0073be09cd6b6" src="https://qiita.com/embed-contents/link-card#qiita-embed-content__79a38b7adbf6b9f01ff0073be09cd6b6" data-content="https%3A%2F%2Fqiit...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 22 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/shimamoooon/items/cc2f34943eef9b3a33cc" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/shimamoooon/items/cc2f34943eef9b3a33cc" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [JAVASCRIPT] 【JavaScript】おおよその位置情報を取得できるようにしようという提案</title><link>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-2:243"&gt;現在、JavaScriptで&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation_API" rel="nofollow noopener" target="_blank"&gt;位置情報API&lt;/a&gt;を使用すると、周囲の環境や&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation/getCurrentPosition#enablehighaccuracy" rel="nofollow ...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 34 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [KUBERNETES] 「Dockerはわかるけど…」から卒業！AWSでコンテナを動かすための30日集中講座 - Day 11: ECSクラスターの設計：EC2とFargate、どちらを選ぶべき？</title><link>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:95"&gt;
-&lt;span id="day-11-ecsクラスターの設計ec2とfargateどちらを選ぶべき-️" class="fragment"&gt;&lt;/span&gt;&lt;a href="#day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D-%EF%B8%8F"...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 8 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [MIDJOURNEY] プロンプトエンジニアリング超入門 – プロンプトエンジニアリングは本当に死んだのか？</title><link>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="3:1-3:416"&gt;2025年現在、生成AIは高度な文脈理解を備え、簡潔なプロンプトでも適切な応答を生成できるようになっています。また、AIの自己学習機能が向上し、ユーザーが細かく指示を出さなくても、適切な応答を得られるケースが増えています。...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 126 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [OPENAI] OpenAI Codex CLI の使い方！ChatGPTサブスクで使えるAIコーディング入門</title><link>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:36"&gt;こんにちは、とまだです。&lt;/p&gt;
-&lt;p data-sourcepos="3:1-3:174"&gt;ChatGPTのサブスクリプション（Plus/Pro）を契約しているけど、チャット機能しか使ってないという方も多いのではないでしょうか？&lt;/p&gt;
-&lt;p data-sourcepos="5:1-5:127"&gt;そのサブスクで &lt;strong&gt;追加料金なしで使えるAIコーディングツール「Codex」&lt;/strong&gt; はご存知でしょうか。&lt;/p&gt;
-&lt;p data-sourcepos="7:1-7:40"&gt;&lt;iframe id="qiita-embed...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 7 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [PYTHON] いつの間にかPythonが軟派な言語ではなくなっていた～ロバストPython：依存関係～</title><link>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:17"&gt;
-&lt;span id="ごあいさつ" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%94%E3%81%82%E3%81%84%E3%81%95%E3%81%A4"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;ごあいさつ&lt;/h1&gt;
-&lt;p data-sourcepos="3:1-5:152"&gt;こんにちはNSS江口です。&lt;br&gt;
-少し前にロバストPythonの記事を書かせていただきましたが、今回はその中から依存関係について記事を書かせていただきます。&lt;br&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 10 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [GO] Goに入門して、ついでにクリーンアーキテクチャに入門した　ーその3</title><link>https://firebird-techtalktech.com/post/go-go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/go-go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:97">前回はクリーンアーキテクチャで簡単なTODOアプリを実装してみました。&lt;/p>
+&lt;p data-sourcepos="3:1-3:56">&lt;iframe id="qiita-embed-content__79a38b7adbf6b9f01ff0073be09cd6b6" src="https://qiita.com/embed-contents/link-card#qiita-embed-content__79a38b7adbf6b9f01ff0073be09cd6b6" data-content="https%3A%2F%2Fqiit...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 22 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/shimamoooon/items/cc2f34943eef9b3a33cc" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/shimamoooon/items/cc2f34943eef9b3a33cc" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [JAVASCRIPT] 【JavaScript】おおよその位置情報を取得できるようにしようという提案</title><link>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-2:243">現在、JavaScriptで&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation_API" rel="nofollow noopener" target="_blank">位置情報API&lt;/a>を使用すると、周囲の環境や&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation/getCurrentPosition#enablehighaccuracy" rel="nofollow ...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 34 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [KUBERNETES] 「Dockerはわかるけど…」から卒業！AWSでコンテナを動かすための30日集中講座 - Day 11: ECSクラスターの設計：EC2とFargate、どちらを選ぶべき？</title><link>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:95">
+&lt;span id="day-11-ecsクラスターの設計ec2とfargateどちらを選ぶべき-️" class="fragment">&lt;/span>&lt;a href="#day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D-%EF%B8%8F"...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 8 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [MIDJOURNEY] プロンプトエンジニアリング超入門 – プロンプトエンジニアリングは本当に死んだのか？</title><link>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="3:1-3:416">2025年現在、生成AIは高度な文脈理解を備え、簡潔なプロンプトでも適切な応答を生成できるようになっています。また、AIの自己学習機能が向上し、ユーザーが細かく指示を出さなくても、適切な応答を得られるケースが増えています。...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 126 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [OPENAI] OpenAI Codex CLI の使い方！ChatGPTサブスクで使えるAIコーディング入門</title><link>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:36">こんにちは、とまだです。&lt;/p>
+&lt;p data-sourcepos="3:1-3:174">ChatGPTのサブスクリプション（Plus/Pro）を契約しているけど、チャット機能しか使ってないという方も多いのではないでしょうか？&lt;/p>
+&lt;p data-sourcepos="5:1-5:127">そのサブスクで &lt;strong>追加料金なしで使えるAIコーディングツール「Codex」&lt;/strong> はご存知でしょうか。&lt;/p>
+&lt;p data-sourcepos="7:1-7:40">&lt;iframe id="qiita-embed...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 7 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [PYTHON] いつの間にかPythonが軟派な言語ではなくなっていた～ロバストPython：依存関係～</title><link>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:17">
+&lt;span id="ごあいさつ" class="fragment">&lt;/span>&lt;a href="#%E3%81%94%E3%81%82%E3%81%84%E3%81%95%E3%81%A4">&lt;i class="fa fa-link">&lt;/i>&lt;/a>ごあいさつ&lt;/h1>
+&lt;p data-sourcepos="3:1-5:152">こんにちはNSS江口です。&lt;br>
+少し前にロバストPythonの記事を書かせていただきましたが、今回はその中から依存関係について記事を書かせていただきます。&lt;br>
 &lt;a href="https:/...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 35 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [TERRAFORM] 【IaC超入門】30日でAWS CloudFormationとTerraformをマスターするロードマップ</title><link>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</link><pubDate>Wed, 10 Sep 2025 02:35:03 +0900</pubDate><guid>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-2:339"&gt;これらのタイトルは、IaCの基礎から実践、そして応用まで、段階的に学習できるように構成しています。また、AWS CloudFormationとTerraformの両方をバランス良く理解できるように整理していくことを目指しま...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 13 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月10日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [AI] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:109"&gt;
-&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment"&gt;&lt;/span&gt;&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 15 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CHATGPT] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:109"&gt;
-&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment"&gt;&lt;/span&gt;&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 15 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CLAUDE] Claude Codeをより便利・強力に使うためのツールまとめ</title><link>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="3:1-5:93"&gt;昨今のAIエージェント界隈の競争が激化していることは周知の事実だと思います。&lt;br&gt;
-先日リリースされた&lt;strong&gt;Codex CLI&lt;/strong&gt;により&lt;strong&gt;Claude Code&lt;/strong&gt;が押さ...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 264 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [COPILOT] Dataverse のインデックスが進化したため、Copilot Studio で再検証してみた</title><link>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="2:1-2:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="4:1-4:489"&gt;これまで、Copilot Studio に関する沢山の記事を書いてきました。ファイルをアップロードしたり、URL を指定するだけで生成 AI チャットボット (Copilot Studio 的にはエージェント) が作成でき...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 7 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [GEMINI] お盆休みに作ったAI議事録ツールのレシピをいろいろアレンジしたらこうなった</title><link>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:8"&gt;
-&lt;span id="概要" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E6%A6%82%E8%A6%81"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;概要&lt;/h1&gt;
-&lt;p data-sourcepos="3:1-4:113"&gt;お盆休みに作ったAI議事録ツールの記事が &lt;strong&gt;13万view・300いいね・250ストック&lt;/strong&gt; を突破しました！&lt;br&gt;
-想像以上の反響をいただき、多くの方に読んでいただけたことに感謝しています。&lt;/p&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 35 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [TERRAFORM] 【IaC超入門】30日でAWS CloudFormationとTerraformをマスターするロードマップ</title><link>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</link><pubDate>Wed, 10 Sep 2025 02:22:37 +0900</pubDate><guid>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-2:339">これらのタイトルは、IaCの基礎から実践、そして応用まで、段階的に学習できるように構成しています。また、AWS CloudFormationとTerraformの両方をバランス良く理解できるように整理していくことを目指しま...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 13 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月10日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [AI] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:109">
+&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment">&lt;/span>&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 15 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CHATGPT] Vibe Coding から、Drive Coding (欲動のコーディング)へ</title><link>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-vibe-coding-%E3%81%8B%E3%82%89drive-coding-%E6%AC%B2%E5%8B%95%E3%81%AE%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E3%81%B8/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:109">
+&lt;span id="aiはコードを書けるそれでもプロダクトが完成しないたった一つの理由" class="fragment">&lt;/span>&lt;a href="#ai%E3%81%AF%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%91%E3%82%8B%E3%81%9D%E3%82%8C%E3%81%A7%E3%82%82%E3%83%97%E3%83%AD%E3%83%80%E3%82%AF%E3%83%88%E3%81%8C%E5%AE%8C%E6%88%90%E3%81%...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 15 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/eba767a0a95bbc7b25b3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CLAUDE] Claude Codeをより便利・強力に使うためのツールまとめ</title><link>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/claude-claude-code%E3%82%92%E3%82%88%E3%82%8A%E4%BE%BF%E5%88%A9%E5%BC%B7%E5%8A%9B%E3%81%AB%E4%BD%BF%E3%81%86%E3%81%9F%E3%82%81%E3%81%AE%E3%83%84%E3%83%BC%E3%83%AB%E3%81%BE%E3%81%A8%E3%82%81/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="3:1-5:93">昨今のAIエージェント界隈の競争が激化していることは周知の事実だと思います。&lt;br>
+先日リリースされた&lt;strong>Codex CLI&lt;/strong>により&lt;strong>Claude Code&lt;/strong>が押さ...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 264 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/flowernotfound/items/649711de6fe8caf1eac2" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [COPILOT] Dataverse のインデックスが進化したため、Copilot Studio で再検証してみた</title><link>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/copilot-dataverse-%E3%81%AE%E3%82%A4%E3%83%B3%E3%83%87%E3%83%83%E3%82%AF%E3%82%B9%E3%81%8C%E9%80%B2%E5%8C%96%E3%81%97%E3%81%9F%E3%81%9F%E3%82%81copilot-studio-%E3%81%A7%E5%86%8D%E6%A4%9C%E8%A8%BC%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="2:1-2:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="4:1-4:489">これまで、Copilot Studio に関する沢山の記事を書いてきました。ファイルをアップロードしたり、URL を指定するだけで生成 AI チャットボット (Copilot Studio 的にはエージェント) が作成でき...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 7 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/Takashi_Masumori/items/87533fdf96e02379bef2" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [GEMINI] お盆休みに作ったAI議事録ツールのレシピをいろいろアレンジしたらこうなった</title><link>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/gemini-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:8">
+&lt;span id="概要" class="fragment">&lt;/span>&lt;a href="#%E6%A6%82%E8%A6%81">&lt;i class="fa fa-link">&lt;/i>&lt;/a>概要&lt;/h1>
+&lt;p data-sourcepos="3:1-4:113">お盆休みに作ったAI議事録ツールの記事が &lt;strong>13万view・300いいね・250ストック&lt;/strong> を突破しました！&lt;br>
+想像以上の反響をいただき、多くの方に読んでいただけたことに感謝しています。&lt;/p>
 &lt;p data-sourcepos=...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 9 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [JAVASCRIPT] 【JavaScript】おおよその位置情報を取得できるようにしようという提案</title><link>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-2:243"&gt;現在、JavaScriptで&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation_API" rel="nofollow noopener" target="_blank"&gt;位置情報API&lt;/a&gt;を使用すると、周囲の環境や&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation/getCurrentPosition#enablehighaccuracy" rel="nofollow ...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 23 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [MIDJOURNEY] プロンプトエンジニアリング超入門 – プロンプトエンジニアリングは本当に死んだのか？</title><link>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="3:1-3:416"&gt;2025年現在、生成AIは高度な文脈理解を備え、簡潔なプロンプトでも適切な応答を生成できるようになっています。また、AIの自己学習機能が向上し、ユーザーが細かく指示を出さなくても、適切な応答を得られるケースが増えています。...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 126 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [OPENAI] OpenAI Codex CLI の使い方！ChatGPTサブスクで使えるAIコーディング入門</title><link>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:36"&gt;こんにちは、とまだです。&lt;/p&gt;
-&lt;p data-sourcepos="3:1-3:174"&gt;ChatGPTのサブスクリプション（Plus/Pro）を契約しているけど、チャット機能しか使ってないという方も多いのではないでしょうか？&lt;/p&gt;
-&lt;p data-sourcepos="5:1-5:127"&gt;そのサブスクで &lt;strong&gt;追加料金なしで使えるAIコーディングツール「Codex」&lt;/strong&gt; はご存知でしょうか。&lt;/p&gt;
-&lt;p data-sourcepos="7:1-7:40"&gt;&lt;iframe id="qiita-embed...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 6 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CHATGPT] お盆休みに作ったAI議事録ツールのレシピをいろいろアレンジしたらこうなった</title><link>https://firebird-techtalktech.com/post/chatgpt-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</link><pubDate>Tue, 09 Sep 2025 09:55:10 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:8"&gt;
-&lt;span id="概要" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E6%A6%82%E8%A6%81"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;概要&lt;/h1&gt;
-&lt;p data-sourcepos="3:1-4:113"&gt;お盆休みに作ったAI議事録ツールの記事が &lt;strong&gt;13万view・300いいね・250ストック&lt;/strong&gt; を突破しました！&lt;br&gt;
-想像以上の反響をいただき、多くの方に読んでいただけたことに感謝しています。&lt;/p&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 9 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [JAVASCRIPT] 【JavaScript】おおよその位置情報を取得できるようにしようという提案</title><link>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%8A%E3%81%8A%E3%82%88%E3%81%9D%E3%81%AE%E4%BD%8D%E7%BD%AE%E6%83%85%E5%A0%B1%E3%82%92%E5%8F%96%E5%BE%97%E3%81%A7%E3%81%8D%E3%82%8B%E3%82%88%E3%81%86%E3%81%AB%E3%81%97%E3%82%88%E3%81%86%E3%81%A8%E3%81%84%E3%81%86%E6%8F%90%E6%A1%88/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-2:243">現在、JavaScriptで&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation_API" rel="nofollow noopener" target="_blank">位置情報API&lt;/a>を使用すると、周囲の環境や&lt;a href="https://developer.mozilla.org/ja/docs/Web/API/Geolocation/getCurrentPosition#enablehighaccuracy" rel="nofollow ...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 23 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/rana_kualu/items/9e6304b90f9532e9bf9e" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [MIDJOURNEY] プロンプトエンジニアリング超入門 – プロンプトエンジニアリングは本当に死んだのか？</title><link>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/midjourney-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E8%B6%85%E5%85%A5%E9%96%80-%E3%83%97%E3%83%AD%E3%83%B3%E3%83%97%E3%83%88%E3%82%A8%E3%83%B3%E3%82%B8%E3%83%8B%E3%82%A2%E3%83%AA%E3%83%B3%E3%82%B0%E3%81%AF%E6%9C%AC%E5%BD%93%E3%81%AB%E6%AD%BB%E3%82%93%E3%81%A0%E3%81%AE%E3%81%8B/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="3:1-3:416">2025年現在、生成AIは高度な文脈理解を備え、簡潔なプロンプトでも適切な応答を生成できるようになっています。また、AIの自己学習機能が向上し、ユーザーが細かく指示を出さなくても、適切な応答を得られるケースが増えています。...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 126 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/tamura__246/items/bd5d62b1213610618f20" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [OPENAI] OpenAI Codex CLI の使い方！ChatGPTサブスクで使えるAIコーディング入門</title><link>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</link><pubDate>Tue, 09 Sep 2025 17:08:55 +0900</pubDate><guid>https://firebird-techtalktech.com/post/openai-openai-codex-cli-%E3%81%AE%E4%BD%BF%E3%81%84%E6%96%B9chatgpt%E3%82%B5%E3%83%96%E3%82%B9%E3%82%AF%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8Bai%E3%82%B3%E3%83%BC%E3%83%87%E3%82%A3%E3%83%B3%E3%82%B0%E5%85%A5%E9%96%80/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:36">こんにちは、とまだです。&lt;/p>
+&lt;p data-sourcepos="3:1-3:174">ChatGPTのサブスクリプション（Plus/Pro）を契約しているけど、チャット機能しか使ってないという方も多いのではないでしょうか？&lt;/p>
+&lt;p data-sourcepos="5:1-5:127">そのサブスクで &lt;strong>追加料金なしで使えるAIコーディングツール「Codex」&lt;/strong> はご存知でしょうか。&lt;/p>
+&lt;p data-sourcepos="7:1-7:40">&lt;iframe id="qiita-embed...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 6 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/tomada/items/bcd0aef846c641ccbb9b" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CHATGPT] お盆休みに作ったAI議事録ツールのレシピをいろいろアレンジしたらこうなった</title><link>https://firebird-techtalktech.com/post/chatgpt-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</link><pubDate>Tue, 09 Sep 2025 09:55:10 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-%E3%81%8A%E7%9B%86%E4%BC%91%E3%81%BF%E3%81%AB%E4%BD%9C%E3%81%A3%E3%81%9Fai%E8%AD%B0%E4%BA%8B%E9%8C%B2%E3%83%84%E3%83%BC%E3%83%AB%E3%81%AE%E3%83%AC%E3%82%B7%E3%83%94%E3%82%92%E3%81%84%E3%82%8D%E3%81%84%E3%82%8D%E3%82%A2%E3%83%AC%E3%83%B3%E3%82%B8%E3%81%97%E3%81%9F%E3%82%89%E3%81%93%E3%81%86%E3%81%AA%E3%81%A3%E3%81%9F/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:8">
+&lt;span id="概要" class="fragment">&lt;/span>&lt;a href="#%E6%A6%82%E8%A6%81">&lt;i class="fa fa-link">&lt;/i>&lt;/a>概要&lt;/h1>
+&lt;p data-sourcepos="3:1-4:113">お盆休みに作ったAI議事録ツールの記事が &lt;strong>13万view・300いいね・250ストック&lt;/strong> を突破しました！&lt;br>
+想像以上の反響をいただき、多くの方に読んでいただけたことに感謝しています。&lt;/p>
 &lt;p data-sourcepos=...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 8 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [OPENAI] ローカルLLMの歴史を学んで可能性を考える</title><link>https://firebird-techtalktech.com/post/openai-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%ABllm%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E5%AD%A6%E3%82%93%E3%81%A7%E5%8F%AF%E8%83%BD%E6%80%A7%E3%82%92%E8%80%83%E3%81%88%E3%82%8B/</link><pubDate>Tue, 09 Sep 2025 09:55:10 +0900</pubDate><guid>https://firebird-techtalktech.com/post/openai-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%ABllm%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E5%AD%A6%E3%82%93%E3%81%A7%E5%8F%AF%E8%83%BD%E6%80%A7%E3%82%92%E8%80%83%E3%81%88%E3%82%8B/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-2:356"&gt;私はもともと「ローカルで動くLLM」に強い関心があり、これまでにもいくつか記事を書いてきました。クラウドに頼らず、自分のPCやオンプレ環境で大規模モデルを動かすという試みは、技術的な挑戦であると同時に大きな可能性を秘めてい...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 15 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/yo_arai/items/f10fc552200f4abfe9d5" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/yo_arai/items/f10fc552200f4abfe9d5" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [AI] なぜあなたの指示はAIに「響かない」のか？ Context Is All You Need</title><link>https://firebird-techtalktech.com/post/ai-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p&gt;この記事は、AIとの知的生産における「文脈工学（Context Engineering）」の重要性を論じています。AIの指示に「響かない」原因とその解決策について詳しく解説されています。&lt;/p&gt;
-&lt;h3 id="主要なポイント"&gt;主要なポイント
-&lt;/h3&gt;&lt;h4 id="1-aiの知識の本質"&gt;1. AIの知識の本質
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;AIは「意味」を理解するのではなく、データから学習したパターンを確率的に模倣している&lt;/li&gt;
-&lt;li&gt;「現実」を本質的に理解する能力が欠如している&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id="2-コンテキストの質による違い"&gt;2. コンテキストの質による違い
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;薄いコンテキスト&lt;/strong&gt;: 単なる情報の羅列&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;濃いコンテキスト&lt;/strong&gt;: 意図的に構造化された意味の集合体&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id="3-文脈工学の三位一体のアプローチ"&gt;3. 文脈工学の三位一体のアプローチ
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;The Plan&lt;/strong&gt;: 意志の提示&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;The Design&lt;/strong&gt;: 意味の設計&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;The Edit&lt;/strong&gt;: 認知の編集&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="記事の核心"&gt;記事の核心
-&lt;/h3&gt;&lt;blockquote&gt;
-&lt;p&gt;&amp;ldquo;AIの出力は、我々が与える入力の質を越えられない&amp;rdquo;&lt;/p&gt;&lt;/blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&amp;ldquo;文脈工学は、AIの思考空間そのものを能動的に構築し、知的創造の主導権を人間が取り戻すためのガイド&amp;rdquo;&lt;/p&gt;&lt;/blockquote&gt;
-&lt;p&gt;AIとの知的生産において、単なる指示ではなく、深い文脈設計が重要であり、これが質の高い成果を生み出す鍵となることが詳しく説明されています。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 73 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [AWS] 3日で作ったサービスが、公開1日で1000人の阪大生に届いた話</title><link>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="2:1-2:98"&gt;成績発表の時期になると、阪大生の間で必ず出てくる話題があります。&lt;/p&gt;
-&lt;blockquote data-sourcepos="4:1-4:88"&gt;
-&lt;p data-sourcepos="4:3-4:88"&gt;「自分のGPA...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 19 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CHATGPT] なぜあなたの指示はAIに「響かない」のか？ Context Is All You Need</title><link>https://firebird-techtalktech.com/post/chatgpt-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p&gt;この記事は、AIとの知的生産における「文脈工学（Context Engineering）」の重要性を論じています。ChatGPTなどのAI に対する指示が「響かない」原因とその解決策について詳しく解説されています。&lt;/p&gt;
-&lt;h3 id="主要なポイント"&gt;主要なポイント
-&lt;/h3&gt;&lt;h4 id="1-aiの知識の本質"&gt;1. AIの知識の本質
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;AIは「意味」を理解するのではなく、データから学習したパターンを確率的に模倣している&lt;/li&gt;
-&lt;li&gt;「現実」を本質的に理解する能力が欠如している&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id="2-コンテキストの質による違い"&gt;2. コンテキストの質による違い
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;薄いコンテキスト&lt;/strong&gt;: 単なる情報の羅列&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;濃いコンテキスト&lt;/strong&gt;: 意図的に構造化された意味の集合体&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h4 id="3-文脈工学の三位一体のアプローチ"&gt;3. 文脈工学の三位一体のアプローチ
-&lt;/h4&gt;&lt;ul&gt;
-&lt;li&gt;&lt;strong&gt;The Plan&lt;/strong&gt;: 意志の提示&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;The Design&lt;/strong&gt;: 意味の設計&lt;/li&gt;
-&lt;li&gt;&lt;strong&gt;The Edit&lt;/strong&gt;: 認知の編集&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id="記事の核心"&gt;記事の核心
-&lt;/h3&gt;&lt;blockquote&gt;
-&lt;p&gt;&amp;ldquo;AIの出力は、我々が与える入力の質を越えられない&amp;rdquo;&lt;/p&gt;&lt;/blockquote&gt;
-&lt;blockquote&gt;
-&lt;p&gt;&amp;ldquo;文脈工学は、AIの思考空間そのものを能動的に構築し、知的創造の主導権を人間が取り戻すためのガイド&amp;rdquo;&lt;/p&gt;&lt;/blockquote&gt;
-&lt;p&gt;ChatGPTとの知的生産において、単なる指示ではなく、深い文脈設計が重要であり、これが質の高い成果を生み出す鍵となることが詳しく説明されています。&lt;/p&gt;
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 73 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [DOCKER] かんたんにDocker超高速化＠Windows！開発前にやるべきたった１つの工夫</title><link>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:100"&gt;WindowsでDockerを使って開発してる現場を見てると、大体みんな困ってます。&lt;/p&gt;
-&lt;ul data-sourcepos="2:1-5:0"&gt;
-&lt;li data-sourcepos="2:1-2:68"&gt;Docker使ってWordPress動かすと、すごーーーく遅い。&lt;/li&gt;
-&lt;li data-sourcepos="3:1-3:79"&gt;Docker使ってLaravelアプリを開発してるけど、Viteが遅すぎ。&lt;/li&gt;
-&lt;li data-sourcepos="4:1-5:0"&gt;Linux使えって言われても、会社のPCがWi...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 32 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [GO] 新しい言語を学習する時、何から手を付けるか（Python,PHP,JavaScript,Go）</title><link>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-4:87"&gt;初めて触るプログラミング言語を学習する際、本を買うほどでも無い時に&lt;br&gt;
-どこから手を付けるか、というのは結構大事なことかなと個人的には思っています。&lt;br&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 8 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/R_28/items/97d9651143937abfec91" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [OPENAI] ローカルLLMの歴史を学んで可能性を考える</title><link>https://firebird-techtalktech.com/post/openai-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%ABllm%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E5%AD%A6%E3%82%93%E3%81%A7%E5%8F%AF%E8%83%BD%E6%80%A7%E3%82%92%E8%80%83%E3%81%88%E3%82%8B/</link><pubDate>Tue, 09 Sep 2025 09:55:10 +0900</pubDate><guid>https://firebird-techtalktech.com/post/openai-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%ABllm%E3%81%AE%E6%AD%B4%E5%8F%B2%E3%82%92%E5%AD%A6%E3%82%93%E3%81%A7%E5%8F%AF%E8%83%BD%E6%80%A7%E3%82%92%E8%80%83%E3%81%88%E3%82%8B/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-2:356">私はもともと「ローカルで動くLLM」に強い関心があり、これまでにもいくつか記事を書いてきました。クラウドに頼らず、自分のPCやオンプレ環境で大規模モデルを動かすという試みは、技術的な挑戦であると同時に大きな可能性を秘めてい...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 15 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/yo_arai/items/f10fc552200f4abfe9d5" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/yo_arai/items/f10fc552200f4abfe9d5" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [AI] なぜあなたの指示はAIに「響かない」のか？ Context Is All You Need</title><link>https://firebird-techtalktech.com/post/ai-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p>この記事は、AIとの知的生産における「文脈工学（Context Engineering）」の重要性を論じています。AIの指示に「響かない」原因とその解決策について詳しく解説されています。&lt;/p>
+&lt;h3 id="主要なポイント">主要なポイント
+&lt;/h3>&lt;h4 id="1-aiの知識の本質">1. AIの知識の本質
+&lt;/h4>&lt;ul>
+&lt;li>AIは「意味」を理解するのではなく、データから学習したパターンを確率的に模倣している&lt;/li>
+&lt;li>「現実」を本質的に理解する能力が欠如している&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-コンテキストの質による違い">2. コンテキストの質による違い
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>薄いコンテキスト&lt;/strong>: 単なる情報の羅列&lt;/li>
+&lt;li>&lt;strong>濃いコンテキスト&lt;/strong>: 意図的に構造化された意味の集合体&lt;/li>
+&lt;/ul>
+&lt;h4 id="3-文脈工学の三位一体のアプローチ">3. 文脈工学の三位一体のアプローチ
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>The Plan&lt;/strong>: 意志の提示&lt;/li>
+&lt;li>&lt;strong>The Design&lt;/strong>: 意味の設計&lt;/li>
+&lt;li>&lt;strong>The Edit&lt;/strong>: 認知の編集&lt;/li>
+&lt;/ul>
+&lt;h3 id="記事の核心">記事の核心
+&lt;/h3>&lt;blockquote>
+&lt;p>&amp;ldquo;AIの出力は、我々が与える入力の質を越えられない&amp;rdquo;&lt;/p>&lt;/blockquote>
+&lt;blockquote>
+&lt;p>&amp;ldquo;文脈工学は、AIの思考空間そのものを能動的に構築し、知的創造の主導権を人間が取り戻すためのガイド&amp;rdquo;&lt;/p>&lt;/blockquote>
+&lt;p>AIとの知的生産において、単なる指示ではなく、深い文脈設計が重要であり、これが質の高い成果を生み出す鍵となることが詳しく説明されています。&lt;/p>
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 73 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [AWS] 3日で作ったサービスが、公開1日で1000人の阪大生に届いた話</title><link>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="2:1-2:98">成績発表の時期になると、阪大生の間で必ず出てくる話題があります。&lt;/p>
+&lt;blockquote data-sourcepos="4:1-4:88">
+&lt;p data-sourcepos="4:3-4:88">「自分のGPA...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 19 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CHATGPT] なぜあなたの指示はAIに「響かない」のか？ Context Is All You Need</title><link>https://firebird-techtalktech.com/post/chatgpt-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-%E3%81%AA%E3%81%9C%E3%81%82%E3%81%AA%E3%81%9F%E3%81%AE%E6%8C%87%E7%A4%BA%E3%81%AFai%E3%81%AB%E9%9F%BF%E3%81%8B%E3%81%AA%E3%81%84%E3%81%AE%E3%81%8B-context-is-all-you-need/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p>この記事は、AIとの知的生産における「文脈工学（Context Engineering）」の重要性を論じています。ChatGPTなどのAI に対する指示が「響かない」原因とその解決策について詳しく解説されています。&lt;/p>
+&lt;h3 id="主要なポイント">主要なポイント
+&lt;/h3>&lt;h4 id="1-aiの知識の本質">1. AIの知識の本質
+&lt;/h4>&lt;ul>
+&lt;li>AIは「意味」を理解するのではなく、データから学習したパターンを確率的に模倣している&lt;/li>
+&lt;li>「現実」を本質的に理解する能力が欠如している&lt;/li>
+&lt;/ul>
+&lt;h4 id="2-コンテキストの質による違い">2. コンテキストの質による違い
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>薄いコンテキスト&lt;/strong>: 単なる情報の羅列&lt;/li>
+&lt;li>&lt;strong>濃いコンテキスト&lt;/strong>: 意図的に構造化された意味の集合体&lt;/li>
+&lt;/ul>
+&lt;h4 id="3-文脈工学の三位一体のアプローチ">3. 文脈工学の三位一体のアプローチ
+&lt;/h4>&lt;ul>
+&lt;li>&lt;strong>The Plan&lt;/strong>: 意志の提示&lt;/li>
+&lt;li>&lt;strong>The Design&lt;/strong>: 意味の設計&lt;/li>
+&lt;li>&lt;strong>The Edit&lt;/strong>: 認知の編集&lt;/li>
+&lt;/ul>
+&lt;h3 id="記事の核心">記事の核心
+&lt;/h3>&lt;blockquote>
+&lt;p>&amp;ldquo;AIの出力は、我々が与える入力の質を越えられない&amp;rdquo;&lt;/p>&lt;/blockquote>
+&lt;blockquote>
+&lt;p>&amp;ldquo;文脈工学は、AIの思考空間そのものを能動的に構築し、知的創造の主導権を人間が取り戻すためのガイド&amp;rdquo;&lt;/p>&lt;/blockquote>
+&lt;p>ChatGPTとの知的生産において、単なる指示ではなく、深い文脈設計が重要であり、これが質の高い成果を生み出す鍵となることが詳しく説明されています。&lt;/p>
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 73 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [DOCKER] かんたんにDocker超高速化＠Windows！開発前にやるべきたった１つの工夫</title><link>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker-%E3%81%8B%E3%82%93%E3%81%9F%E3%82%93%E3%81%ABdocker%E8%B6%85%E9%AB%98%E9%80%9F%E5%8C%96windows%E9%96%8B%E7%99%BA%E5%89%8D%E3%81%AB%E3%82%84%E3%82%8B%E3%81%B9%E3%81%8D%E3%81%9F%E3%81%A3%E3%81%9F%EF%BC%91%E3%81%A4%E3%81%AE%E5%B7%A5%E5%A4%AB/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:100">WindowsでDockerを使って開発してる現場を見てると、大体みんな困ってます。&lt;/p>
+&lt;ul data-sourcepos="2:1-5:0">
+&lt;li data-sourcepos="2:1-2:68">Docker使ってWordPress動かすと、すごーーーく遅い。&lt;/li>
+&lt;li data-sourcepos="3:1-3:79">Docker使ってLaravelアプリを開発してるけど、Viteが遅すぎ。&lt;/li>
+&lt;li data-sourcepos="4:1-5:0">Linux使えって言われても、会社のPCがWi...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 32 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/hitotch/items/1a2505496619c71c70ff" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [GO] 新しい言語を学習する時、何から手を付けるか（Python,PHP,JavaScript,Go）</title><link>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-4:87">初めて触るプログラミング言語を学習する際、本を買うほどでも無い時に&lt;br>
+どこから手を付けるか、というのは結構大事なことかなと個人的には思っています。&lt;br>
 今回はファーストステップ何から手を付けますか、というお話。&lt;/...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 11 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [JAVASCRIPT] 【雑記】フロントエンド/Web制作の実務・学習で参考にしているサイト4選</title><link>https://firebird-techtalktech.com/post/javascript-%E9%9B%91%E8%A8%98%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/web%E5%88%B6%E4%BD%9C%E3%81%AE%E5%AE%9F%E5%8B%99%E5%AD%A6%E7%BF%92%E3%81%A7%E5%8F%82%E8%80%83%E3%81%AB%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%82%B5%E3%82%A4%E3%83%884%E9%81%B8/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-%E9%9B%91%E8%A8%98%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/web%E5%88%B6%E4%BD%9C%E3%81%AE%E5%AE%9F%E5%8B%99%E5%AD%A6%E7%BF%92%E3%81%A7%E5%8F%82%E8%80%83%E3%81%AB%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%82%B5%E3%82%A4%E3%83%884%E9%81%B8/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-2:159"&gt;こんにちは。&lt;br&gt;
-普段はWebサイト制作やCMS構築を本業で行い、個人開発(JISOUのカリキュラム)でReactでのアプリ作成を行っている者です。&lt;/p&gt;
-&lt;p data-sourcepos="4:1-5:45"&gt;仕事と個人開発でコードを書いたりデザイン/UIを実装する上で、困った際や詰まった際に特に参考にしているサイトを4つほど紹介したいと思います。&lt;br&gt;
-皆さんの参考になれば幸いです。&lt;/p&gt;
-&lt;h2 data-sourcepos="7:1-7:18"&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 11 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [JAVASCRIPT] 【雑記】フロントエンド/Web制作の実務・学習で参考にしているサイト4選</title><link>https://firebird-techtalktech.com/post/javascript-%E9%9B%91%E8%A8%98%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/web%E5%88%B6%E4%BD%9C%E3%81%AE%E5%AE%9F%E5%8B%99%E5%AD%A6%E7%BF%92%E3%81%A7%E5%8F%82%E8%80%83%E3%81%AB%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%82%B5%E3%82%A4%E3%83%884%E9%81%B8/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-%E9%9B%91%E8%A8%98%E3%83%95%E3%83%AD%E3%83%B3%E3%83%88%E3%82%A8%E3%83%B3%E3%83%89/web%E5%88%B6%E4%BD%9C%E3%81%AE%E5%AE%9F%E5%8B%99%E5%AD%A6%E7%BF%92%E3%81%A7%E5%8F%82%E8%80%83%E3%81%AB%E3%81%97%E3%81%A6%E3%81%84%E3%82%8B%E3%82%B5%E3%82%A4%E3%83%884%E9%81%B8/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-2:159">こんにちは。&lt;br>
+普段はWebサイト制作やCMS構築を本業で行い、個人開発(JISOUのカリキュラム)でReactでのアプリ作成を行っている者です。&lt;/p>
+&lt;p data-sourcepos="4:1-5:45">仕事と個人開発でコードを書いたりデザイン/UIを実装する上で、困った際や詰まった際に特に参考にしているサイトを4つほど紹介したいと思います。&lt;br>
+皆さんの参考になれば幸いです。&lt;/p>
+&lt;h2 data-sourcepos="7:1-7:18">
 &lt;span id="1-mdn-web-docs" class="f...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 21 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/nagi-0106/items/21cab7eb7e0c3b5d6ee4" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/nagi-0106/items/21cab7eb7e0c3b5d6ee4" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [KUBERNETES] 「Dockerはわかるけど…」から卒業！AWSでコンテナを動かすための30日集中講座 - Day 11: ECSクラスターの設計：EC2とFargate、どちらを選ぶべき？</title><link>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:95"&gt;
-&lt;span id="day-11-ecsクラスターの設計ec2とfargateどちらを選ぶべき-️" class="fragment"&gt;&lt;/span&gt;&lt;a href="#day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D-%EF%B8%8F"...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 8 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [PYTHON] いつの間にかPythonが軟派な言語ではなくなっていた～ロバストPython：依存関係～</title><link>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:17"&gt;
-&lt;span id="ごあいさつ" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%94%E3%81%82%E3%81%84%E3%81%95%E3%81%A4"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;ごあいさつ&lt;/h1&gt;
-&lt;p data-sourcepos="3:1-5:152"&gt;こんにちはNSS江口です。&lt;br&gt;
-少し前にロバストPythonの記事を書かせていただきましたが、今回はその中から依存関係について記事を書かせていただきます。&lt;br&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 21 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/nagi-0106/items/21cab7eb7e0c3b5d6ee4" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/nagi-0106/items/21cab7eb7e0c3b5d6ee4" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [KUBERNETES] 「Dockerはわかるけど…」から卒業！AWSでコンテナを動かすための30日集中講座 - Day 11: ECSクラスターの設計：EC2とFargate、どちらを選ぶべき？</title><link>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:95">
+&lt;span id="day-11-ecsクラスターの設計ec2とfargateどちらを選ぶべき-️" class="fragment">&lt;/span>&lt;a href="#day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D-%EF%B8%8F"...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 8 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [PYTHON] いつの間にかPythonが軟派な言語ではなくなっていた～ロバストPython：依存関係～</title><link>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/python-%E3%81%84%E3%81%A4%E3%81%AE%E9%96%93%E3%81%AB%E3%81%8Bpython%E3%81%8C%E8%BB%9F%E6%B4%BE%E3%81%AA%E8%A8%80%E8%AA%9E%E3%81%A7%E3%81%AF%E3%81%AA%E3%81%8F%E3%81%AA%E3%81%A3%E3%81%A6%E3%81%84%E3%81%9F%E3%83%AD%E3%83%90%E3%82%B9%E3%83%88python%E4%BE%9D%E5%AD%98%E9%96%A2%E4%BF%82/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:17">
+&lt;span id="ごあいさつ" class="fragment">&lt;/span>&lt;a href="#%E3%81%94%E3%81%82%E3%81%84%E3%81%95%E3%81%A4">&lt;i class="fa fa-link">&lt;/i>&lt;/a>ごあいさつ&lt;/h1>
+&lt;p data-sourcepos="3:1-5:152">こんにちはNSS江口です。&lt;br>
+少し前にロバストPythonの記事を書かせていただきましたが、今回はその中から依存関係について記事を書かせていただきます。&lt;br>
 &lt;a href="https:/...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 8 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [TERRAFORM] 【IaC超入門】30日でAWS CloudFormationとTerraformをマスターするロードマップ</title><link>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-2:339"&gt;これらのタイトルは、IaCの基礎から実践、そして応用まで、段階的に学習できるように構成しています。また、AWS CloudFormationとTerraformの両方をバランス良く理解できるように整理していくことを目指しま...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 13 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月09日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [AI] Context Is All You Need</title><link>https://firebird-techtalktech.com/post/ai-context-is-all-you-need/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-context-is-all-you-need/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:55"&gt;&lt;iframe id="qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" src="https://qiita.com/embed-contents/link-card#qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" data-content="https%3A%2F%2Fja.wikipedia.org%2Fwiki%2FAttention_Is_All_You_Need" frameborder="0" scro...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 41 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [AWS] 3日で作ったサービスが、公開1日で1000人の阪大生に届いた話</title><link>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="2:1-2:98"&gt;成績発表の時期になると、阪大生の間で必ず出てくる話題があります。&lt;/p&gt;
-&lt;blockquote data-sourcepos="4:1-4:88"&gt;
-&lt;p data-sourcepos="4:3-4:88"&gt;「自分のGPA...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 19 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [CHATGPT] Context Is All You Need</title><link>https://firebird-techtalktech.com/post/chatgpt-context-is-all-you-need/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-context-is-all-you-need/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:55"&gt;&lt;iframe id="qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" src="https://qiita.com/embed-contents/link-card#qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" data-content="https%3A%2F%2Fja.wikipedia.org%2Fwiki%2FAttention_Is_All_You_Need" frameborder="0" scro...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 41 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [DOCKER] ローカル LLM 環境を構築する</title><link>https://firebird-techtalktech.com/post/docker-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB-llm-%E7%92%B0%E5%A2%83%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB-llm-%E7%92%B0%E5%A2%83%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;p data-sourcepos="1:1-1:65"&gt;以下のようなローカル LLM 環境を構築してみる。&lt;/p&gt;
-&lt;p data-sourcepos="3:1-3:122"&gt;&lt;a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F4140671%2F2982f705-eaca-4237-9b0e-af495555e44b.png?ixlib=rb-4.0.0&amp;amp;auto=format&amp;amp;gif-q=60...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 120 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/kkawaharanet/items/b80d7cde49364aa94963" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/kkawaharanet/items/b80d7cde49364aa94963" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [GO] 新しい言語を学習する時、何から手を付けるか（Python,PHP,JavaScript,Go）</title><link>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-4:87"&gt;初めて触るプログラミング言語を学習する際、本を買うほどでも無い時に&lt;br&gt;
-どこから手を付けるか、というのは結構大事なことかなと個人的には思っています。&lt;br&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 8 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/NSS_FS_ENG/items/1a7b7c48b36782145016" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [TERRAFORM] 【IaC超入門】30日でAWS CloudFormationとTerraformをマスターするロードマップ</title><link>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</link><pubDate>Tue, 09 Sep 2025 00:07:56 +0900</pubDate><guid>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-2:339">これらのタイトルは、IaCの基礎から実践、そして応用まで、段階的に学習できるように構成しています。また、AWS CloudFormationとTerraformの両方をバランス良く理解できるように整理していくことを目指しま...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 13 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月09日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [AI] Context Is All You Need</title><link>https://firebird-techtalktech.com/post/ai-context-is-all-you-need/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ai-context-is-all-you-need/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:55">&lt;iframe id="qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" src="https://qiita.com/embed-contents/link-card#qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" data-content="https%3A%2F%2Fja.wikipedia.org%2Fwiki%2FAttention_Is_All_You_Need" frameborder="0" scro...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 41 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [AWS] 3日で作ったサービスが、公開1日で1000人の阪大生に届いた話</title><link>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/aws-3%E6%97%A5%E3%81%A7%E4%BD%9C%E3%81%A3%E3%81%9F%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E3%81%8C%E5%85%AC%E9%96%8B1%E6%97%A5%E3%81%A71000%E4%BA%BA%E3%81%AE%E9%98%AA%E5%A4%A7%E7%94%9F%E3%81%AB%E5%B1%8A%E3%81%84%E3%81%9F%E8%A9%B1/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="2:1-2:98">成績発表の時期になると、阪大生の間で必ず出てくる話題があります。&lt;/p>
+&lt;blockquote data-sourcepos="4:1-4:88">
+&lt;p data-sourcepos="4:3-4:88">「自分のGPA...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 19 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/takasan1234/items/071d60e2a31dbb68602f" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [CHATGPT] Context Is All You Need</title><link>https://firebird-techtalktech.com/post/chatgpt-context-is-all-you-need/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/chatgpt-context-is-all-you-need/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:55">&lt;iframe id="qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" src="https://qiita.com/embed-contents/link-card#qiita-embed-content__9d06ac78b5b1031619731cc0d914a982" data-content="https%3A%2F%2Fja.wikipedia.org%2Fwiki%2FAttention_Is_All_You_Need" frameborder="0" scro...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 41 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/makotosaekit/items/2a08d945dd4cbf1b14ef" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [DOCKER] ローカル LLM 環境を構築する</title><link>https://firebird-techtalktech.com/post/docker-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB-llm-%E7%92%B0%E5%A2%83%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docker-%E3%83%AD%E3%83%BC%E3%82%AB%E3%83%AB-llm-%E7%92%B0%E5%A2%83%E3%82%92%E6%A7%8B%E7%AF%89%E3%81%99%E3%82%8B/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;p data-sourcepos="1:1-1:65">以下のようなローカル LLM 環境を構築してみる。&lt;/p>
+&lt;p data-sourcepos="3:1-3:122">&lt;a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F4140671%2F2982f705-eaca-4237-9b0e-af495555e44b.png?ixlib=rb-4.0.0&amp;amp;auto=format&amp;amp;gif-q=60...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 120 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/kkawaharanet/items/b80d7cde49364aa94963" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/kkawaharanet/items/b80d7cde49364aa94963" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [GO] 新しい言語を学習する時、何から手を付けるか（Python,PHP,JavaScript,Go）</title><link>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/go-%E6%96%B0%E3%81%97%E3%81%84%E8%A8%80%E8%AA%9E%E3%82%92%E5%AD%A6%E7%BF%92%E3%81%99%E3%82%8B%E6%99%82%E4%BD%95%E3%81%8B%E3%82%89%E6%89%8B%E3%82%92%E4%BB%98%E3%81%91%E3%82%8B%E3%81%8Bpythonphpjavascriptgo/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-4:87">初めて触るプログラミング言語を学習する際、本を買うほどでも無い時に&lt;br>
+どこから手を付けるか、というのは結構大事なことかなと個人的には思っています。&lt;br>
 今回はファーストステップ何から手を付けますか、というお話。&lt;/...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 11 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [JAVASCRIPT] JavaScriptで要素を複製・追加する主なメソッド</title><link>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%A7%E8%A6%81%E7%B4%A0%E3%82%92%E8%A4%87%E8%A3%BD%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B%E4%B8%BB%E3%81%AA%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%A7%E8%A6%81%E7%B4%A0%E3%82%92%E8%A4%87%E8%A3%BD%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B%E4%B8%BB%E3%81%AA%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-2:258"&gt;JavaScriptでのインデックス管理に慣れていなかったため、理解を深める目的で各メソッドを比較・整理しました。つまずいた点や、Vue.js・Reactで同様の処理を実装する際の例もまとめています。&lt;/p&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 11 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/tasekino/items/7afbb325ed7a11cab46e" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [JAVASCRIPT] JavaScriptで要素を複製・追加する主なメソッド</title><link>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%A7%E8%A6%81%E7%B4%A0%E3%82%92%E8%A4%87%E8%A3%BD%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B%E4%B8%BB%E3%81%AA%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/javascript-javascript%E3%81%A7%E8%A6%81%E7%B4%A0%E3%82%92%E8%A4%87%E8%A3%BD%E8%BF%BD%E5%8A%A0%E3%81%99%E3%82%8B%E4%B8%BB%E3%81%AA%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-2:258">JavaScriptでのインデックス管理に慣れていなかったため、理解を深める目的で各メソッドを比較・整理しました。つまずいた点や、Vue.js・Reactで同様の処理を実装する際の例もまとめています。&lt;/p>
 &lt;h1 da...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 14 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/k12da/items/c47effa3487a8e10b1bc" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/k12da/items/c47effa3487a8e10b1bc" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [KUBERNETES] 「Dockerはわかるけど…」から卒業！AWSでコンテナを動かすための30日集中講座 - Day 11: ECSクラスターの設計：EC2とFargate、どちらを選ぶべき？</title><link>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:95"&gt;
-&lt;span id="day-11-ecsクラスターの設計ec2とfargateどちらを選ぶべき-️" class="fragment"&gt;&lt;/span&gt;&lt;a href="#day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D-%EF%B8%8F"...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 8 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [PYTHON] 「今日夜ご飯いる？」をDXした</title><link>https://firebird-techtalktech.com/post/python-%E4%BB%8A%E6%97%A5%E5%A4%9C%E3%81%94%E9%A3%AF%E3%81%84%E3%82%8B%E3%82%92dx%E3%81%97%E3%81%9F/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/python-%E4%BB%8A%E6%97%A5%E5%A4%9C%E3%81%94%E9%A3%AF%E3%81%84%E3%82%8B%E3%82%92dx%E3%81%97%E3%81%9F/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h2 data-sourcepos="1:1-1:15"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
-&lt;p data-sourcepos="2:1-3:122"&gt;某私の家庭では毎朝このような会話が繰り広げられます。&lt;br&gt;
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 14 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/k12da/items/c47effa3487a8e10b1bc" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/k12da/items/c47effa3487a8e10b1bc" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [KUBERNETES] 「Dockerはわかるけど…」から卒業！AWSでコンテナを動かすための30日集中講座 - Day 11: ECSクラスターの設計：EC2とFargate、どちらを選ぶべき？</title><link>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/kubernetes-docker%E3%81%AF%E3%82%8F%E3%81%8B%E3%82%8B%E3%81%91%E3%81%A9%E3%81%8B%E3%82%89%E5%8D%92%E6%A5%ADaws%E3%81%A7%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E3%82%92%E5%8B%95%E3%81%8B%E3%81%99%E3%81%9F%E3%82%81%E3%81%AE30%E6%97%A5%E9%9B%86%E4%B8%AD%E8%AC%9B%E5%BA%A7-day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:95">
+&lt;span id="day-11-ecsクラスターの設計ec2とfargateどちらを選ぶべき-️" class="fragment">&lt;/span>&lt;a href="#day-11-ecs%E3%82%AF%E3%83%A9%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%AE%E8%A8%AD%E8%A8%88ec2%E3%81%A8fargate%E3%81%A9%E3%81%A1%E3%82%89%E3%82%92%E9%81%B8%E3%81%B6%E3%81%B9%E3%81%8D-%EF%B8%8F"...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 8 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/555hamano/items/0f7539fe94c0ae68cd83" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [PYTHON] 「今日夜ご飯いる？」をDXした</title><link>https://firebird-techtalktech.com/post/python-%E4%BB%8A%E6%97%A5%E5%A4%9C%E3%81%94%E9%A3%AF%E3%81%84%E3%82%8B%E3%82%92dx%E3%81%97%E3%81%9F/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/python-%E4%BB%8A%E6%97%A5%E5%A4%9C%E3%81%94%E9%A3%AF%E3%81%84%E3%82%8B%E3%82%92dx%E3%81%97%E3%81%9F/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h2 data-sourcepos="1:1-1:15">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h2>
+&lt;p data-sourcepos="2:1-3:122">某私の家庭では毎朝このような会話が繰り広げられます。&lt;br>
 &lt;a href="https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 125 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/yoshiddddd/items/d8b7cc72f77eefdbd993" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/yoshiddddd/items/d8b7cc72f77eefdbd993" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item><item><title>🔥 [TERRAFORM] 【IaC超入門】30日でAWS CloudFormationとTerraformをマスターするロードマップ</title><link>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</guid><description>&lt;h2 id="概要"&gt;概要
-&lt;/h2&gt;&lt;h1 data-sourcepos="1:1-1:14"&gt;
-&lt;span id="はじめに" class="fragment"&gt;&lt;/span&gt;&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB"&gt;&lt;i class="fa fa-link"&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h1&gt;
-&lt;p data-sourcepos="2:1-2:339"&gt;これらのタイトルは、IaCの基礎から実践、そして応用まで、段階的に学習できるように構成しています。また、AWS CloudFormationとTerraformの両方をバランス良く理解できるように整理していくことを目指しま...
-&lt;p&gt;&lt;strong&gt;人気度&lt;/strong&gt;: ⭐ 13 likes&lt;/p&gt;
-&lt;hr&gt;
-&lt;p&gt;📊 &lt;strong&gt;出典&lt;/strong&gt;: &lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
-&gt;Qiita&lt;/a&gt;&lt;br&gt;
-📅 &lt;strong&gt;収集日&lt;/strong&gt;: 2025年09月08日&lt;/p&gt;
-&lt;p&gt;&lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
-&gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;</description></item></channel></rss>
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 125 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/yoshiddddd/items/d8b7cc72f77eefdbd993" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/yoshiddddd/items/d8b7cc72f77eefdbd993" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item><item><title>🔥 [TERRAFORM] 【IaC超入門】30日でAWS CloudFormationとTerraformをマスターするロードマップ</title><link>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</link><pubDate>Mon, 08 Sep 2025 00:26:15 +0900</pubDate><guid>https://firebird-techtalktech.com/post/terraform-iac%E8%B6%85%E5%85%A5%E9%96%8030%E6%97%A5%E3%81%A7aws-cloudformation%E3%81%A8terraform%E3%82%92%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC%E3%81%99%E3%82%8B%E3%83%AD%E3%83%BC%E3%83%89%E3%83%9E%E3%83%83%E3%83%97/</guid><description>&lt;h2 id="概要">概要
+&lt;/h2>&lt;h1 data-sourcepos="1:1-1:14">
+&lt;span id="はじめに" class="fragment">&lt;/span>&lt;a href="#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB">&lt;i class="fa fa-link">&lt;/i>&lt;/a>はじめに&lt;/h1>
+&lt;p data-sourcepos="2:1-2:339">これらのタイトルは、IaCの基礎から実践、そして応用まで、段階的に学習できるように構成しています。また、AWS CloudFormationとTerraformの両方をバランス良く理解できるように整理していくことを目指しま...
+&lt;p>&lt;strong>人気度&lt;/strong>: ⭐ 13 likes&lt;/p>
+&lt;hr>
+&lt;p>📊 &lt;strong>出典&lt;/strong>: &lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
+>Qiita&lt;/a>&lt;br>
+📅 &lt;strong>収集日&lt;/strong>: 2025年09月08日&lt;/p>
+&lt;p>&lt;a class="link" href="https://qiita.com/555hamano/items/48a2cd5c4e3e6ca7ebe3" target="_blank" rel="noopener"
+>🔗 元記事を読む&lt;/a>&lt;/p></description></item></channel></rss>
