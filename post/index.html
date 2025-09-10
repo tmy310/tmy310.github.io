@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="⏺ 記事1: VPC Service ControlsでのGitHub Actions対応：エラーベース権限設定のベストプラクティス\nはじめに\nGoogle Cloud の VPC Service Controls（VPC-SC）を enforced mode で運用している環境で、GitHub Actions による Terraform 実行が突然失敗するようになった経験はありませんか？\n">
-<title></title>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="技術ネタ、趣味や備忘録などを書いているブログです">
+<title>Posts</title>
 
 <link rel='canonical' href='https://firebird-techtalktech.com/post/'>
 
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="">
-<meta property='og:description' content="⏺ 記事1: VPC Service ControlsでのGitHub Actions対応：エラーベース権限設定のベストプラクティス\nはじめに\nGoogle Cloud の VPC Service Controls（VPC-SC）を enforced mode で運用している環境で、GitHub Actions による Terraform 実行が突然失敗するようになった経験はありませんか？\n">
+<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="Posts">
+<meta property='og:description' content="技術ネタ、趣味や備忘録などを書いているブログです">
 <meta property='og:url' content='https://firebird-techtalktech.com/post/'>
 <meta property='og:site_name' content='firebirdテクテクテクブログ'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' />
-<meta name="twitter:title" content="">
-<meta name="twitter:description" content="⏺ 記事1: VPC Service ControlsでのGitHub Actions対応：エラーベース権限設定のベストプラクティス\nはじめに\nGoogle Cloud の VPC Service Controls（VPC-SC）を enforced mode で運用している環境で、GitHub Actions による Terraform 実行が突然失敗するようになった経験はありませんか？\n"><link rel="alternate" type="application/json" href="https://firebird-techtalktech.com/post/index.json">
+<meta property='og:type' content='website'><meta property='og:updated_time' content=' 2025-09-10T02:46:57&#43;09:00 '/>
+<meta name="twitter:title" content="Posts">
+<meta name="twitter:description" content="技術ネタ、趣味や備忘録などを書いているブログです"><link rel="alternate" type="application/rss&#43;xml" href="https://firebird-techtalktech.com/post/index.xml">
     <link rel="shortcut icon" href="/images/favicon.png" />
 
       <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script>
@@ -53,34 +53,10 @@
 </script>
 
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "",
-  "description": "\u003cp\u003eナレッジ項目：DeepDiff を用いたBigQueryスキーマ比較とPythonオブジェクトの扱い\n今回のやり取りでは、DeepDiff を使ってBigQueryスキーマ（google.cloud.bigquery.SchemaField オブジェクト）の差分を正確に検出する過程で、いくつかの重要なポイントが明らかになりました。\u003c\/p\u003e",
-  "author": {
-    "@type": "Person",
-    "name": "トミー"
-  },
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "datePublished": "0001-01-01T00:00:00Z",
-  "dateModified": "0001-01-01T00:00:00Z",
-  "url": "https:\/\/firebird-techtalktech.com\/post\/",
-  "wordCount": "7743",
-  "keywords": []
-}
-</script>
 
 
 
-
-<meta name="description" content="ナレッジ項目：DeepDiff を用いたBigQueryスキーマ比較とPythonオブジェクトの扱い
-今回のやり取りでは、DeepDiff を使ってBigQueryスキーマ（google.cloud.bigquery.SchemaField オブジェクト）の差分を正確に検出する過程で、いくつかの重要なポイントが明らかに …">
+<meta name="description" content="">
 
 
 
@@ -89,9 +65,7 @@
 <meta property="og:type" content="article">
 
     </head>
-    <body class="
-    article-page
-    ">
+    <body class="">
     <script>
         (function() {
             const colorSchemeKey = 'StackColorScheme';
@@ -251,118 +225,413 @@
     </ol>
 </aside>
 
-    
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/post/"></a>
-        </h2>
-    
+    <aside class="sidebar right-sidebar sticky">
         
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
+            
+                
+            
         
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            
+                <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-infinity" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
   <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
+  <path d="M9.828 9.172a4 4 0 1 0 0 5.656 a10 10 0 0 0 2.172 -2.828a10 10 0 0 1 2.172 -2.828 a4 4 0 1 1 0 5.656a10 10 0 0 1 -2.172 -2.828a10 10 0 0 0 -2.172 -2.828" />
 </svg>
 
 
 
-                <time class="article-time--reading">
-                    読了時間: 9分
-                </time>
-            </div>
+        </div>
+        <h2 class="widget-title section-title">アーカイブ</h2>
+
         
-    </footer>
-    
+        
+        
+        
+        
+        <div class="widget-archive--list">
+            <div class="archives-year">
+                    <a href="/archives/#2025">
+                        
+                            <span class="year">2025</span>
+                            <span class="count">104</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/archives/#2024">
+                        
+                            <span class="year">2024</span>
+                            <span class="count">3</span>
+                        
+                    </a> 
+                </div>
+            <div class="archives-year">
+                    <a href="/archives/#0001">
+                        
+                            <span class="year">0001</span>
+                            <span class="count">2</span>
+                        
+                    </a> 
+                </div>
+            
+        </div>
+    </section>
+            
+        
+            
+                <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
 
-    
-</div>
 
-</header>
 
-    <section class="article-content">
+    </div>
+    <h2 class="widget-title section-title">カテゴリ</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/categories/%E4%BA%BA%E6%B0%97%E8%A8%98%E4%BA%8B/" class="font_size_42">
+                人気記事
+            </a>
+        
+            <a href="/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/" class="font_size_29">
+                最新記事
+            </a>
+        
+            <a href="/categories/terraform/" class="font_size_17">
+                Terraform
+            </a>
+        
+            <a href="/categories/%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B/" class="font_size_8">
+                技術記事
+            </a>
+        
+            <a href="/categories/%E6%8A%80%E8%A1%93/" class="font_size_4">
+                技術
+            </a>
+        
+            <a href="/categories/%E6%97%85%E8%A1%8C%E8%A8%98/" class="font_size_4">
+                旅行記
+            </a>
+        
+            <a href="/categories/travel/" class="font_size_2">
+                Travel
+            </a>
+        
+            <a href="/categories/%E3%81%8A%E7%9F%A5%E3%82%89%E3%81%9B/" class="font_size_1">
+                お知らせ
+            </a>
+        
+            <a href="/categories/%E6%97%85%E8%A1%8C/" class="font_size_1">
+                旅行
+            </a>
+        
+    </div>
+</section>
+
+            
+        
+            
+                <section class="widget tagCloud">
+    <div class="widget-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-tag" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11 3L20 12a1.5 1.5 0 0 1 0 2L14 20a1.5 1.5 0 0 1 -2 0L3 11v-4a4 4 0 0 1 4 -4h4" />
+  <circle cx="9" cy="9" r="2" />
+</svg>
+
+
+
+    </div>
+    <h2 class="widget-title section-title">タグ</h2>
+
+    <div class="tagCloud-tags">
+        
+            <a href="/tags/qiita/" class="font_size_42">
+                Qiita
+            </a>
+        
+            <a href="/tags/aws/" class="font_size_25">
+                AWS
+            </a>
+        
+            <a href="/tags/terraform/" class="font_size_20">
+                Terraform
+            </a>
+        
+            <a href="/tags/iac/" class="font_size_17">
+                IaC
+            </a>
+        
+            <a href="/tags/infrastructure/" class="font_size_17">
+                Infrastructure
+            </a>
+        
+            <a href="/tags/ai/" class="font_size_11">
+                Ai
+            </a>
+        
+            <a href="/tags/kubernetes/" class="font_size_11">
+                Kubernetes
+            </a>
+        
+            <a href="/tags/openai/" class="font_size_11">
+                Openai
+            </a>
+        
+            <a href="/tags/github/" class="font_size_10">
+                Github
+            </a>
+        
+            <a href="/tags/devops/" class="font_size_8">
+                Devops
+            </a>
+        
+            <a href="/tags/gcp/" class="font_size_8">
+                Gcp
+            </a>
+        
+            <a href="/tags/network/" class="font_size_8">
+                Network
+            </a>
+        
+            <a href="/tags/python/" class="font_size_8">
+                Python
+            </a>
+        
+            <a href="/tags/google/" class="font_size_7">
+                Google
+            </a>
+        
+            <a href="/tags/javascript/" class="font_size_6">
+                Javascript
+            </a>
+        
+    </div>
+</section>
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <header>
+        <h3 class="section-title">
+            
+                セクション
+            
+        </h3>
+
+        <div class="section-card">
+            <div class="section-details">
+                <h3 class="section-count">109 ページ目</h3>
+                <h1 class="section-term">Posts</h1>
+                
+            </div>
+        </div>
+    </header>
     
+    <section class="article-list--compact">
+        
+            <article>
+    <a href="/post/aws-aws-weekly-roundup-aws-transform-amazon-neptune-and-more-september-8-2025/">
+        <div class="article-details">
+            <h2 class="article-title">📰 [AWS] AWS Weekly Roundup: AWS Transform, Amazon Neptune, and more (September 8, 2025)</h2>
+            <footer class="article-time">
+                <time datetime='2025-09-10T02:46:57&#43;09:00'>2025年9月10日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+        
+            <article>
+    <a href="/post/aws-now-open-aws-asia-pacific-new-zealand-region/">
+        <div class="article-details">
+            <h2 class="article-title">📰 [AWS] Now Open — AWS Asia Pacific (New Zealand) Region</h2>
+            <footer class="article-time">
+                <time datetime='2025-09-10T02:46:57&#43;09:00'>2025年9月10日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+        
+            <article>
+    <a href="/post/github-how-to-debug-a-web-app-with-playwright-mcp-and-github-copilot/">
+        <div class="article-details">
+            <h2 class="article-title">📰 [GitHub] How to debug a web app with Playwright MCP and GitHub Copilot</h2>
+            <footer class="article-time">
+                <time datetime='2025-09-10T02:46:57&#43;09:00'>2025年9月10日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+        
+            <article>
+    <a href="/post/github-how-to-use-the-github-and-jfrog-integration-for-secure-traceable-builds-from-commit-to-production/">
+        <div class="article-details">
+            <h2 class="article-title">📰 [GitHub] How to use the GitHub and JFrog integration for secure, traceable builds from commit to production</h2>
+            <footer class="article-time">
+                <time datetime='2025-09-10T02:46:57&#43;09:00'>2025年9月10日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+        
+            <article>
+    <a href="/post/kubernetes-kubernetes-v1.34-snapshottable-api-server-cache/">
+        <div class="article-details">
+            <h2 class="article-title">📰 [Kubernetes] Kubernetes v1.34: Snapshottable API server cache</h2>
+            <footer class="article-time">
+                <time datetime='2025-09-10T02:46:57&#43;09:00'>2025年9月10日</time>
+            </footer>
+        </div>
+    </a>
+</article>
+        
+    </section>
+    <nav class='pagination'>
+        
+        
+
+        
+            
+                <span class='page-link current'>1</span>
+                
+            
+            
+                    <a class='page-link' href='/post/page/2/'>2</a>
+                
+            
+            
+                    
+                        
+                        <span class='page-link dots'>&hellip;</span>
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    
+                
+            
+            
+                    <a class='page-link' href='/post/page/22/'>22</a>
+                
+            
+    </nav>
+
+<footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2025 トミー
+    </section>
     
-    <p>ナレッジ項目：DeepDiff を用いたBigQueryスキーマ比較とPythonオブジェクトの扱い
-今回のやり取りでは、DeepDiff を使ってBigQueryスキーマ（google.cloud.bigquery.SchemaField オブジェクト）の差分を正確に検出する過程で、いくつかの重要なポイントが明らかになりました。</p>
-<ol>
-<li>Pythonオブジェクトの「内部構造」とDeepDiffの比較対象
-Pythonの属性アクセスの特性: Pythonでは、アンダースコア（_）で始まる変数やメソッドは「プライベート」という慣習的な意味合いを持つだけであり、言語レベルでの強制的なアクセス制限（カプセル化）は存在しません。つまり、コード上はどこからでもアクセス可能です。
-DeepDiff の挙動: DeepDiff は、オブジェクトの深い（Deep）な差分を検出するため、単に公開されている属性 (obj.attr) だけでなく、オブジェクトが内部的にデータを保持している辞書 (obj.<strong>dict</strong> や SchemaField の _properties など）の内容も比較対象とします。これは、オブジェクトがどのような形でデータを保持していようと、Pythonの標準的なメカニズムで参照可能であれば、比較対象に含まれるためです。
-BigQuery SchemaField の具体例: SchemaField オブジェクトには、公開属性としての policy_tags と、内部的な _properties 辞書内の &lsquo;policyTags&rsquo; という2つの経路でポリシータグ情報が保持されています。DeepDiff はこれら両方を比較対象とするため、片方を除外しただけでは差分が残り得ます。</li>
-<li>DeepDiff のexclude_obj_callbackの適切な利用
-特定の属性を除外する要件: 「policy_tags の変更はスキーマの差分として検出したくない」というビジネス要件を満たすために、DeepDiff のカスタマイズ機能である exclude_obj_callback が非常に有効です。
-精密な除外ロジック: exclude_obj_callback は、比較対象から除外したい「値」に到達したときにのみ True を返すように、精密なロジックを組む必要があります。
-isinstance(obj, PolicyTagList): SchemaField.policy_tags のように、DeepDiff が比較対象の obj を PolicyTagList インスタンスそのものとして渡してきた場合に除外する条件。
-path.endswith(&quot;[&lsquo;policyTags&rsquo;]&quot;): _properties 辞書内の &lsquo;policyTags&rsquo; キーのように、obj が PolicyTagList インスタンスではない辞書型の一部として渡された場合でも、特定のパスに合致すれば除外する条件。
-冗長性の排除: if condition: return True else: return False というパターンは return condition に置き換えることで、コードをより簡潔（Pythonic）に記述できます（RuffのSIM103ルール）。</li>
-<li>コールバック関数の位置づけと命名
-ヘルパー関数の役割: _exclude_policy_tags_callback は、DeepDiff の特定機能 (exclude_obj_callback) を利用するための補助的な役割を果たすため、「ヘルパー関数」として位置づけられます。
-ビジネスロジックのサポート: このヘルパー関数は、「特定の差分（ポリシータグ）を無視する」という具体的なビジネス要件を実現するため、ビジネスロジックの一部をサポートしているとも言えます。
-クラスメソッドとしての適切性: もしスキーマ比較ロジック全体が特定のクラスの責務であるならば、このコールバック関数をそのクラスのプライベートメソッド（<em>exclude</em>&hellip;）として定義するのは、カプセル化とコードのまとまりの点で適切です。
-flatten_schema_fields との比較: flatten_schema_fields のような、特定のデータ構造を汎用的に変換する関数も、メインのビジネスロジックを簡素化する点で典型的な「ヘルパー関数」です。</li>
-<li>DeepDiff の出力の読み方と活用
-DeepDiff の出力は、values_changed, iterable_item_added, iterable_item_removed などのセクションに分かれ、変更されたパスと新旧の値が詳細に示されます。
-この出力は、プログラムでの自動解析に適した辞書形式であると同時に、DeepDiff オブジェクトの pretty() メソッドを使用することで、人間が視覚的に確認しやすい整形された形式で表示することも可能です。
-これらのナレッジ項目は、DeepDiff を BigQuery スキーマの比較に応用するだけでなく、他の複雑なPythonオブジェクトの差分検出や、特定の要件に基づいた比較ロジックを構築する際にも役立つでしょう。</li>
-</ol>
-<p>このナレッジ項目で、今回の学びが整理できたでしょうか？他に何か追加すべき点や、さらに深掘りしたい点があれば教えてください。</p>
-<p>pythonにおいてはDeepdiffでよいように思えました。typescript、java、php、rubyでも似たようなものがありますか？</p>
-<p>そういえば、noteなどdeepdiff以外にも聞いたことがあったかと思います。それもナレッジとして抽出してください。</p>
-<p>はい、承知いたしました。DeepDiff 以外にも、オブジェクトやデータの差分検出に関連して言及される可能性のある概念やツールをナレッジとして抽出します。これらは直接 DeepDiff の代替となるライブラリでなくても、似たような文脈で議論されるものです。</p>
-<p>ナレッジ項目：DeepDiff 以外の差分検出・比較に関連する概念とツール
-Pythonにおける DeepDiff はオブジェクトの構造的な差分検出に優れていますが、他にも様々なレベルや目的で差分を扱う概念やツールが存在します。</p>
-<ol>
-<li>バージョン管理システム (Git, SVNなど)
-目的: ファイルやコードベース全体の変更履歴を管理し、異なるバージョン間の差分（diff）を追跡します。
-特徴:
-通常、テキストベースの差分（行の追加、削除、変更）を検出します。
-コードレビュー、変更履歴の追跡、共同開発に不可欠です。
-バイナリファイルの変更も追跡できますが、中身の差分を表示することはできません。
-DeepDiff との関連: Git diff はファイル間の差分を検出しますが、DeepDiff はプログラム内のメモリ上にあるオブジェクト構造の差分を検出します。用途が異なります。</li>
-<li>テキスト差分ツール (diff, Beyond Compare, WinMerge, kdiff3など)
-目的: 2つのテキストファイルやディレクトリ間の差分を視覚的に表示し、マージを支援します。
-特徴:
-ラインベースの比較が基本です。
-プログラミングコード、設定ファイル、ドキュメントなどの比較によく使われます。
-高度なツールは、ディレクトリ比較、3者間マージ、構文ハイライトなどを提供します。
-DeepDiff との関連: これらはファイルの内容を文字列として比較するのに対し、DeepDiff はPythonオブジェクトの内部構造（辞書、リスト、カスタムクラスの属性など）をプログラム的に比較します。</li>
-<li>データ比較・検証ライブラリ（Python: pandas.testing, numpy.testingなど）
-目的: 特定のデータ構造（例: DataFrame, NumPy配列）における値の比較や、近似値の許容範囲での比較を行います。
-特徴:
-データサイエンスや数値計算の文脈で、計算結果の一致性検証やテストに利用されます。
-浮動小数点数の誤差を許容する比較などが可能です。
-DeepDiff との関連: DeepDiff は汎用的なオブジェクト構造の比較に重点を置くのに対し、これらは特定のデータ型に特化しており、多くの場合、より厳密な数値比較や統計的な比較機能を提供します。</li>
-<li>オブジェクトの等価性チェック（言語組み込み）
-目的: 2つのオブジェクトが「等しい」と見なせるかどうかを判断します。
-特徴:
-Pythonの == 演算子、Javaの .equals() メソッド、JavaScriptの === 演算子などが該当します。
-デフォルトでは、参照の等価性（同じメモリ上のオブジェクトか）や、クラスが定義する基本的な値の等価性をチェックします。
-「深い等価性」の概念: オブジェクトがネストされた構造を持つ場合、その内部の全要素が等しいかどうかを再帰的にチェックする「深い等価性」の概念が重要になります。DeepDiff はこの「深い等価性」が満たされない場合に、その理由（差分）を詳細に報告するツールと言えます。
-DeepDiff との関連: DeepDiff は、単に等しいか否かだけでなく、「どこが、どのように違うのか」を詳細に知りたい場合に利用されます。多くの言語の標準ライブラリには、DeepDiff のような詳細な差分報告機能は含まれていません。</li>
-<li>APIレスポンス比較ツール / スキーマ検証ツール
-目的: APIからのJSON/XMLレスポンスや、データ構造が期待されるスキーマ（例: JSON Schema）と一致するかを検証します。
-特徴:
-テスト自動化やAPI監視でよく利用されます。
-フィールドの存在、型、制約などをチェックします。
+    <section class="powerby">
+        
+            技術ネタ、趣味や備忘録などを書いているブログです <br/>
+        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
+        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
+    </section>
+</footer>
+
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
+などをチェックします。
 一部のツールは、レスポンス間の差分を検出する機能も持ちます。
 DeepDiff との関連: 今回のBigQueryスキーマ比較のように、PythonオブジェクトとしてAPIレスポンスを扱える場合、DeepDiff を用いてレスポンスオブジェクト間の詳細な差分を検出することは可能です。スキーマ検証は「型が合っているか」に主眼を置くのに対し、DeepDiff は「内容が一致するか」に主眼を置きます。
 これらのツールや概念は、それぞれ異なるレベルや目的でデータの「変更」や「違い」を扱います。DeepDiff は特に、プログラム内で扱う複雑なPythonオブジェクトの構造的な差分を、詳細かつプログラム的に検出・報告するというニッチで強力な役割を担っている、という位置づけになります。</li>
