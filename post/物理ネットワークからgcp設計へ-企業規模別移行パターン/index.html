@@ -1,1225 +1,404 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="概要 物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\n">
-<title>🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン</title>
-
-<link rel='canonical' href='https://firebird-techtalktech.com/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/'>
-
-<link rel="stylesheet" href="/scss/style.min.946cca6c6259ef94ac55abfae7c7bf3291ea3ed5eea17ef77500b257217c6710.css"><meta property='og:title' content="🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン">
-<meta property='og:description' content="概要 物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\n">
-<meta property='og:url' content='https://firebird-techtalktech.com/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/'>
-<meta property='og:site_name' content='firebirdテクテクテクブログ'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='cloud' /><meta property='article:tag' content='enterprise' /><meta property='article:tag' content='gcp' /><meta property='article:tag' content='google' /><meta property='article:tag' content='migration' /><meta property='article:tag' content='network' /><meta property='article:tag' content='vpc' /><meta property='article:published_time' content='2025-09-09T00:31:00&#43;09:00'/><meta property='article:modified_time' content='2025-09-09T00:31:00&#43;09:00'/>
-<meta name="twitter:title" content="🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン">
-<meta name="twitter:description" content="概要 物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\n"><link rel="alternate" type="application/json" href="https://firebird-techtalktech.com/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/index.json">
-    <link rel="shortcut icon" href="/images/favicon.ico" />
-
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script>
-      <script>
-        var doNotTrack = false;
-        if ( false ) {
-          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
-          var doNotTrack = (dnt == "1" || dnt == "yes");
-        }
-        if (!doNotTrack) {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-J8ND35KCZW');
-        }
-      </script>
-
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "firebirdテクテクテクブログ",
-  "url": "https:\/\/firebird-techtalktech.com\/",
-  "description": "技術ネタ、趣味や備忘録などを書いているブログです",
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン",
-  "description": "\u003ch2 id=\u0022概要\u0022\u003e概要\n\u003c\/h2\u003e\u003cp\u003e物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\u003c\/p\u003e",
-  "author": {
-    "@type": "Person",
-    "name": "トミー"
-  },
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "datePublished": "2025-09-09T00:31:00\u002b09:00",
-  "dateModified": "2025-09-09T00:31:00\u002b09:00",
-  "url": "https:\/\/firebird-techtalktech.com\/post\/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3\/",
-  "wordCount": "2339",
-  "keywords": ["cloud", "enterprise", "gcp", "google", "migration", "network", "vpc"]
-}
-</script>
-
-
-
-
-<meta name="description" content="概要
-物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。">
-
-
-
-<meta property="og:site_name" content="firebirdテクテクテクブログ">
-
-<meta property="og:type" content="article">
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎯</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/firebird19245'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/categories/' >
-                
-                
-                
-                <span>カテゴリー</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/tags/' >
-                
-                
-                
-                <span>タグ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                <span>アーカイブ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                <span>このサイトについて</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                <span>検索</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>ダークモード</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                
-    <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">目次</h2>
-        
-        <div class="widget--toc">
-            <nav id="TableOfContents">
-  <ol>
-    <li><a href="#概要">概要</a></li>
-    <li><a href="#企業規模別ネットワーク設計パターン">企業規模別ネットワーク設計パターン</a>
-      <ol>
-        <li><a href="#1-小規模企業50人以下--単一オフィス">1. 小規模企業（50人以下）- 単一オフィス</a>
-          <ol>
-            <li><a href="#物理ネットワーク構成">物理ネットワーク構成</a></li>
-            <li><a href="#gcp対応設計">GCP対応設計</a></li>
-          </ol>
-        </li>
-        <li><a href="#2-中小企業100-500人--部署別分離">2. 中小企業（100-500人）- 部署別分離</a>
-          <ol>
-            <li><a href="#物理ネットワーク構成layer3スイッチ使用">物理ネットワーク構成（Layer3スイッチ使用）</a></li>
-            <li><a href="#gcp対応設計マルチvpc推奨">GCP対応設計（マルチVPC推奨）</a></li>
-          </ol>
-        </li>
-        <li><a href="#3-大企業多拠点海外展開">3. 大企業（多拠点・海外展開）</a>
-          <ol>
-            <li><a href="#物理ネットワーク構成-1">物理ネットワーク構成</a></li>
-            <li><a href="#gcp対応設計マルチリージョン">GCP対応設計（マルチリージョン）</a></li>
-          </ol>
-        </li>
-      </ol>
-    </li>
-    <li><a href="#設計判断フローチャート">設計判断フローチャート</a></li>
-    <li><a href="#実践的な移行戦略">実践的な移行戦略</a>
-      <ol>
-        <li><a href="#phase-1-現状把握設計">Phase 1: 現状把握・設計</a></li>
-        <li><a href="#phase-2-並行運用ハイブリッド">Phase 2: 並行運用（ハイブリッド）</a></li>
-        <li><a href="#phase-3-完全移行最適化">Phase 3: 完全移行・最適化</a></li>
-      </ol>
-    </li>
-    <li><a href="#ipアドレス設計ベストプラクティス">IPアドレス設計ベストプラクティス</a>
-      <ol>
-        <li><a href="#重複回避設計">重複回避設計</a></li>
-        <li><a href="#gcpでの予約アドレス考慮">GCPでの予約アドレス考慮</a></li>
-      </ol>
-    </li>
-    <li><a href="#コスト最適化">コスト最適化</a>
-      <ol>
-        <li><a href="#物理-vs-gcp-コスト比較">物理 vs GCP コスト比較</a></li>
-      </ol>
-    </li>
-    <li><a href="#監視運用自動化">監視・運用自動化</a>
-      <ol>
-        <li><a href="#ネットワーク監視設定">ネットワーク監視設定</a></li>
-        <li><a href="#自動復旧設定">自動復旧設定</a></li>
-      </ol>
-    </li>
-    <li><a href="#まとめ">まとめ</a></li>
-  </ol>
-</nav>
-        </div>
-    </section>
-
-            
-        
-    </aside>
-
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B/" >
-                技術記事
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/">🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン</a>
-        </h2>
-    
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">2025年9月9日</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    読了時間: 5分
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h2 id="概要">概要
-</h2><p>物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。</p>
-<h2 id="企業規模別ネットワーク設計パターン">企業規模別ネットワーク設計パターン
-</h2><h3 id="1-小規模企業50人以下--単一オフィス">1. 小規模企業（50人以下）- 単一オフィス
-</h3><h4 id="物理ネットワーク構成">物理ネットワーク構成
-</h4><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">インターネット
-</span></span><span class="line"><span class="cl">    ↓
-</span></span><span class="line"><span class="cl">[ルーター] 192.168.1.1
-</span></span><span class="line"><span class="cl">    ↓
-</span></span><span class="line"><span class="cl">[L2スイッチ]
-</span></span><span class="line"><span class="cl"> ├─ 社員PC: 192.168.1.100-150
-</span></span><span class="line"><span class="cl"> ├─ サーバー: 192.168.1.10-20  
-</span></span><span class="line"><span class="cl"> └─ プリンター: 192.168.1.200-210
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>設計原則:</strong></p>
-<ul>
-<li>1つのセグメントで全て処理</li>
-<li>シンプル・低コスト重視</li>
-<li>管理負荷最小化</li>
-</ul>
-<h4 id="gcp対応設計">GCP対応設計
-</h4><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Project</span><span class="p">:</span><span class="w"> </span><span class="l">company-main</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">main-vpc (10.0.0.0/16)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Subnets</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">office-subnet</span><span class="p">:</span><span class="w"> </span><span class="m">10.0.1.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Resources</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">GCE</span><span class="p">:</span><span class="w"> </span><span class="m">10.0.1.10-50</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">GKE</span><span class="p">:</span><span class="w"> </span><span class="m">10.0.1.100-150</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">Cloud SQL</span><span class="p">:</span><span class="w"> </span><span class="m">10.0.1.200</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>移行メリット:</strong></p>
-<ul>
-<li>物理機器保守不要</li>
-<li>自動バックアップ・冗長化</li>
-<li>スケールアップ容易</li>
-</ul>
-<h3 id="2-中小企業100-500人--部署別分離">2. 中小企業（100-500人）- 部署別分離
-</h3><h4 id="物理ネットワーク構成layer3スイッチ使用">物理ネットワーク構成（Layer3スイッチ使用）
-</h4><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">インターネット
-</span></span><span class="line"><span class="cl">    ↓
-</span></span><span class="line"><span class="cl">[メインルーター]
-</span></span><span class="line"><span class="cl">    ↓
-</span></span><span class="line"><span class="cl">[Layer3スイッチ] (VLAN対応)
-</span></span><span class="line"><span class="cl"> ├─ VLAN10: 一般部門 (192.168.10.0/24)
-</span></span><span class="line"><span class="cl"> ├─ VLAN20: 経理部門 (192.168.20.0/24)
-</span></span><span class="line"><span class="cl"> ├─ VLAN30: 開発部門 (192.168.30.0/24)
-</span></span><span class="line"><span class="cl"> └─ VLAN99: サーバー (192.168.99.0/24)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>Layer3スイッチの進化意義:</strong>
-従来の「各部署にルーター+ハブ」→「1台で統合管理」</p>
-<ul>
-<li>コスト削減（複数ルーター → 単一機器）</li>
-<li>管理効率化（一元設定・監視）</li>
-<li>部署間通信の柔軟化</li>
-</ul>
-<h4 id="gcp対応設計マルチvpc推奨">GCP対応設計（マルチVPC推奨）
-</h4><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Project</span><span class="p">:</span><span class="w"> </span><span class="l">company-main</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPCs</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">general-vpc</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.10.0.0</span><span class="l">/16</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Subnets</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">general-subnet</span><span class="p">:</span><span class="w"> </span><span class="m">10.10.1.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">accounting-vpc</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.20.0.0</span><span class="l">/16</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Subnets</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">accounting-subnet</span><span class="p">:</span><span class="w"> </span><span class="m">10.20.1.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">dev-vpc</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.30.0.0</span><span class="l">/16</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Subnets</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">dev-subnet</span><span class="p">:</span><span class="w"> </span><span class="m">10.30.1.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">shared-vpc</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.99.0.0</span><span class="l">/16</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Subnets</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">shared-services</span><span class="p">:</span><span class="w"> </span><span class="m">10.99.1.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Connections</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">VPC Peering</span><span class="p">:</span><span class="w"> </span><span class="l">general-vpc ↔ shared-vpc</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">VPC Peering</span><span class="p">:</span><span class="w"> </span><span class="l">accounting-vpc ↔ shared-vpc</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">VPC Peering</span><span class="p">:</span><span class="w"> </span><span class="l">dev-vpc ↔ shared-vpc</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>セキュリティ境界:</strong></p>
-<ul>
-<li>IAM + VPC分離でデータ保護</li>
-<li>最小権限アクセス制御</li>
-<li>監査ログ完全記録</li>
-</ul>
-<h3 id="3-大企業多拠点海外展開">3. 大企業（多拠点・海外展開）
-</h3><h4 id="物理ネットワーク構成-1">物理ネットワーク構成
-</h4><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">本社（東京）              支社（大阪）
-</span></span><span class="line"><span class="cl">[本社ルーター]            [支社ルーター]  
-</span></span><span class="line"><span class="cl">192.168.1.0/24           192.168.2.0/24
-</span></span><span class="line"><span class="cl">    ↓                        ↓
-</span></span><span class="line"><span class="cl">専用線/VPN ⟷ インターネット ⟷ 専用線/VPN
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>従来の接続選択肢:</strong></p>
-<ul>
-<li><strong>専用線</strong>: 高コスト・高品質・低遅延</li>
-<li><strong>VPN</strong>: 低コスト・標準品質・遅延あり</li>
-<li><strong>MPLS</strong>: 中コスト・高品質・SLA保証</li>
-</ul>
-<h4 id="gcp対応設計マルチリージョン">GCP対応設計（マルチリージョン）
-</h4><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Global Architecture</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Project</span><span class="p">:</span><span class="w"> </span><span class="l">company-global</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">global-vpc (グローバル)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Subnets</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">tokyo-subnet</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Region</span><span class="p">:</span><span class="w"> </span><span class="l">asia-northeast1</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.1.0.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">osaka-subnet</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Region</span><span class="p">:</span><span class="w"> </span><span class="l">asia-northeast2  </span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.2.0.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">singapore-subnet</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">Region</span><span class="p">:</span><span class="w"> </span><span class="l">asia-southeast1</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">CIDR</span><span class="p">:</span><span class="w"> </span><span class="m">10.3.0.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Connections</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">Cloud Interconnect</span><span class="p">:</span><span class="w"> </span><span class="l">東京本社 ↔ GCP</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">Cloud VPN</span><span class="p">:</span><span class="w"> </span><span class="l">各拠点 ↔ GCP</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">Global Load Balancer</span><span class="p">:</span><span class="w"> </span><span class="l">世界的負荷分散</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>ハイブリッド接続例:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># Cloud Interconnect設定</span>
-</span></span><span class="line"><span class="cl">gcloud compute interconnects create tokyo-interconnect <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --customer-name<span class="o">=</span><span class="s2">&#34;Company Tokyo&#34;</span> <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --interconnect-type<span class="o">=</span>DEDICATED <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --location<span class="o">=</span>asia-northeast1-a
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="設計判断フローチャート">設計判断フローチャート
-</h2><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">flowchart TD
-</span></span><span class="line"><span class="cl">    A[要件分析] --&gt; B{組織規模}
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    B --&gt;|~50人| C[単一VPC設計]
-</span></span><span class="line"><span class="cl">    B --&gt;|50-500人| D[部署別分離必要?]
-</span></span><span class="line"><span class="cl">    B --&gt;|500人以上| E[マルチプロジェクト設計]
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    D --&gt;|Yes| F[マルチVPC + Peering]
-</span></span><span class="line"><span class="cl">    D --&gt;|No| C
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    A --&gt; G{地理的分散}
-</span></span><span class="line"><span class="cl">    G --&gt;|単一拠点| H[シングルリージョン]
-</span></span><span class="line"><span class="cl">    G --&gt;|複数拠点| I[マルチリージョン]
-</span></span><span class="line"><span class="cl">    
-</span></span><span class="line"><span class="cl">    A --&gt; J{セキュリティ要件}
-</span></span><span class="line"><span class="cl">    J --&gt;|高| K[厳密分離設計]
-</span></span><span class="line"><span class="cl">    J --&gt;|標準| L[標準分離設計]
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="実践的な移行戦略">実践的な移行戦略
-</h2><h3 id="phase-1-現状把握設計">Phase 1: 現状把握・設計
-</h3><p><strong>物理ネットワーク調査:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># ネットワーク構成調査</span>
-</span></span><span class="line"><span class="cl">ip route show table main
-</span></span><span class="line"><span class="cl">netstat -rn
-</span></span><span class="line"><span class="cl">nmap -sn 192.168.1.0/24
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>GCP設計方針決定:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Assessment</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Current_Network</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;192.168.1.0/24&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Departments</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;general&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;accounting&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;dev&#34;</span><span class="p">]</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Security_Requirements</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;medium&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Target_Design</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Architecture</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;Multi-VPC&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Primary_Region</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;asia-northeast1&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">DR_Region</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;asia-northeast2&#34;</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="phase-2-並行運用ハイブリッド">Phase 2: 並行運用（ハイブリッド）
-</h3><p><strong>Cloud VPN接続:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># VPN Gateway作成</span>
-</span></span><span class="line"><span class="cl">gcloud compute vpn-gateways create office-vpn-gw <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --network<span class="o">=</span>main-vpc <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --region<span class="o">=</span>asia-northeast1
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># トンネル作成</span>
-</span></span><span class="line"><span class="cl">gcloud compute vpn-tunnels create office-tunnel <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --peer-address<span class="o">=</span>office-public-ip <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --shared-secret<span class="o">=</span>secure-shared-secret <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --target-vpn-gateway<span class="o">=</span>office-vpn-gw
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>段階的移行:</strong></p>
-<ol>
-<li><strong>開発環境</strong> → GCP移行</li>
-<li><strong>非クリティカルシステム</strong> → 移行</li>
-<li><strong>コアシステム</strong> → 慎重に移行</li>
-</ol>
-<h3 id="phase-3-完全移行最適化">Phase 3: 完全移行・最適化
-</h3><p><strong>Cloud Native化:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Target_State</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Physical_Office</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;最小化（端末のみ）&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Core_Systems</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;GCP Managed Services&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">Backup</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;Cross-region replication&#34;</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Optimization</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">Cloud Load Balancing</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">Auto Scaling</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">Managed Database (Cloud SQL)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">Container Orchestration (GKE)</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="ipアドレス設計ベストプラクティス">IPアドレス設計ベストプラクティス
-</h2><h3 id="重複回避設計">重複回避設計
-</h3><p><strong>階層的アドレス体系:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">10.{リージョン}.{部署}.{ホスト}
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">例：
-</span></span><span class="line"><span class="cl">10.1.1.0/24: 東京・一般部門
-</span></span><span class="line"><span class="cl">10.1.2.0/24: 東京・経理部門  
-</span></span><span class="line"><span class="cl">10.2.1.0/24: 大阪・一般部門
-</span></span><span class="line"><span class="cl">10.2.2.0/24: 大阪・経理部門
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>RFC1918使い分け:</strong></p>
-<ul>
-<li><strong>10.0.0.0/8</strong>: 大企業・多拠点・将来拡張予定</li>
-<li><strong>172.16.0.0/12</strong>: 中規模企業・複数拠点予定</li>
-<li><strong>192.168.0.0/16</strong>: 小規模企業・単一拠点</li>
-</ul>
-<h3 id="gcpでの予約アドレス考慮">GCPでの予約アドレス考慮
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Subnet</span><span class="p">:</span><span class="w"> </span><span class="m">10.0.1.0</span><span class="l">/24</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Reserved_by_GCP</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">10.0.1.0</span><span class="p">:</span><span class="w"> </span><span class="l">ネットワークアドレス</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">10.0.1.1</span><span class="p">:</span><span class="w"> </span><span class="l">デフォルトゲートウェイ</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">10.0.1.2</span><span class="p">:</span><span class="w"> </span><span class="l">DNS (Google)  </span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">10.0.1.3</span><span class="p">:</span><span class="w"> </span><span class="l">将来の利用</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">10.0.1.255</span><span class="p">:</span><span class="w"> </span><span class="l">ブロードキャスト</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Available</span><span class="p">:</span><span class="w"> </span><span class="m">10.0.1.4</span><span class="w"> </span>- <span class="m">10.0.1.254</span><span class="w"> </span><span class="l">(251個)</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="コスト最適化">コスト最適化
-</h2><h3 id="物理-vs-gcp-コスト比較">物理 vs GCP コスト比較
-</h3><p><strong>物理ネットワーク年間コスト（中小企業例）:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">初期投資:
-</span></span><span class="line"><span class="cl">- Layer3スイッチ: ¥500,000
-</span></span><span class="line"><span class="cl">- サーバー機器: ¥2,000,000
-</span></span><span class="line"><span class="cl">- UPS・ラック: ¥300,000
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">運用コスト（年間）:
-</span></span><span class="line"><span class="cl">- 電気代: ¥200,000
-</span></span><span class="line"><span class="cl">- 保守契約: ¥300,000  
-</span></span><span class="line"><span class="cl">- 人件費: ¥1,200,000
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">Total: ¥4,500,000 / year
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p><strong>GCP年間コスト（同規模）:</strong></p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">Compute</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">GCE instances</span><span class="p">:</span><span class="w"> </span><span class="l">$800/month</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">Cloud SQL</span><span class="p">:</span><span class="w"> </span><span class="l">$300/month</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Network</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">VPC</span><span class="p">:</span><span class="w"> </span><span class="l">$0 (free)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">Load Balancing</span><span class="p">:</span><span class="w"> </span><span class="l">$50/month</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">VPN</span><span class="p">:</span><span class="w"> </span><span class="l">$40/month</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Total</span><span class="p">:</span><span class="w"> </span><span class="l">$1,190/month = $14,280/year (¥1,950,000)</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">Savings</span><span class="p">:</span><span class="w"> </span><span class="l">約57%削減 + 運用負荷削減</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="監視運用自動化">監視・運用自動化
-</h2><h3 id="ネットワーク監視設定">ネットワーク監視設定
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="c1"># VPC Flow Logs有効化</span>
-</span></span><span class="line"><span class="cl">gcloud compute networks subnets update main-subnet <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --enable-flow-logs <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    --logging-flow-sampling<span class="o">=</span>1.0
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># カスタムメトリクス設定  </span>
-</span></span><span class="line"><span class="cl">gcloud logging sinks create network-monitoring <span class="se">\
-</span></span></span><span class="line"><span class="cl"><span class="se"></span>    bigquery.googleapis.com/projects/project-id/datasets/network_logs
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="自動復旧設定">自動復旧設定
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># Cloud Functions自動復旧</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ConfigMap</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">network-automation</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">data</span><span class="p">:</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">auto_healing.py</span><span class="p">:</span><span class="w"> </span><span class="p">|</span><span class="sd">
-</span></span></span><span class="line"><span class="cl"><span class="sd">    def heal_network_issue(event, context):
-</span></span></span><span class="line"><span class="cl"><span class="sd">        # ネットワーク問題自動修復ロジック
-</span></span></span><span class="line"><span class="cl"><span class="sd">        pass</span><span class="w">
-</span></span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="まとめ">まとめ
-</h2><p>物理ネットワークからGCPへの移行は、企業規模と要件に応じた段階的アプローチが重要です：</p>
-<p><strong>設計原則:</strong></p>
-<ul>
-<li><strong>小規模</strong>: 単一VPC・シンプル設計</li>
-<li><strong>中規模</strong>: マルチVPC・部署分離</li>
-<li><strong>大規模</strong>: マルチプロジェクト・地理分散</li>
-</ul>
-<p><strong>移行メリット:</strong></p>
-<ul>
-<li>57%のコスト削減</li>
-<li>運用負荷大幅削減</li>
-<li>自動スケール・高可用性</li>
-<li>グローバル展開容易</li>
-</ul>
-<p>Layer3スイッチが「複数ルーター+ハブの統合」であったように、GCPは「データセンター全体の統合」として理解すると、移行設計がより直感的になります。</p>
-<hr>
-<p>📅 <strong>作成日</strong>: 2025年09月09日</p>
-<p><strong>参考リンク:</strong></p>
-<ul>
-<li><a class="link" href="https://cloud.google.com/vpc/docs/best-practices"  target="_blank" rel="noopener"
-    >GCP VPC設計ベストプラクティス</a></li>
-<li><a class="link" href="https://cloud.google.com/hybrid-connectivity"  target="_blank" rel="noopener"
-    >ハイブリッド接続オプション</a></li>
-</ul>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/cloud/">Cloud</a>
-        
-            <a href="/tags/enterprise/">Enterprise</a>
-        
-            <a href="/tags/gcp/">Gcp</a>
-        
-            <a href="/tags/google/">Google</a>
-        
-            <a href="/tags/migration/">Migration</a>
-        
-            <a href="/tags/network/">Network</a>
-        
-            <a href="/tags/vpc/">Vpc</a>
-        
-    </section>
-
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-<aside class="related-content--wrapper">
-    <h2 class="section-title">関連するコンテンツ</h2>
-    <div class="related-content">
-        <div class="flex article-list--tile">
-            
-                
-<article class="">
-    <a href="/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-aws-s3-/-google-cloud-storage%E3%81%8B%E3%82%89%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%89%E3%83%AA%E3%83%96%E3%83%B3%E3%81%A7trocco%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8Bterraform-module%E4%BB%98%E3%81%8D/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ AWS S3 / Google Cloud Storageから、イベントドリブンでTROCCOを実行する（Terraform Module付き）</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ Building a Production-Ready Terraform Project with Multi-Environment Support on AWS</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ Spring Boot Banking Application Deployment using DevSecOps on AWS EKS</h2>
-        </div>
-    </a>
-</article>
-
-            
-                
-<article class="">
-    <a href="/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/">
-        
-        
-
-        <div class="article-details">
-            <h2 class="article-title">🏗️ Terraform vs CloudFormation: Which AWS IaC Tool Should You Use? 🤔</h2>
-        </div>
-    </a>
-</article>
-
-            
-        </div>
-    </div>
-</aside>
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 トミー
-    </section>
-    
-    <section class="powerby">
-        
-            技術ネタ、趣味や備忘録などを書いているブログです <br/>
-        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
-        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="概要 物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\n"><title>🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン</title><link rel=canonical href=https://firebird-techtalktech.com/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/><link rel=stylesheet href=/scss/style.min.663803bebe609202d5b39d848f2d7c2dc8b598a2d879efa079fa88893d29c49c.css><meta property='og:title' content="🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン"><meta property='og:description' content="概要 物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\n"><meta property='og:url' content='https://firebird-techtalktech.com/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/'><meta property='og:site_name' content='firebirdテクテクテクブログ'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='cloud'><meta property='article:tag' content='enterprise'><meta property='article:tag' content='gcp'><meta property='article:tag' content='google'><meta property='article:tag' content='migration'><meta property='article:tag' content='network'><meta property='article:tag' content='vpc'><meta property='article:published_time' content='2025-09-09T00:31:00+09:00'><meta property='article:modified_time' content='2025-09-09T00:31:00+09:00'><meta name=twitter:title content="🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン"><meta name=twitter:description content="概要 物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。\n"><link rel=alternate type=application/json href=https://firebird-techtalktech.com/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/index.json><link rel="shortcut icon" href=/images/favicon.ico><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_762f71fa991dd853.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎯</span></figure><div class=site-meta><h1 class=site-name><a href=/>firebirdテクテクテクブログ</a></h1><h2 class=site-description>技術ネタ、趣味や備忘録などを書いているブログです</h2></div></header><ol class=menu-social><li><a href=https://twitter.com/firebird19245 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/categories/><span>カテゴリー</span></a></li><li><a href=/tags/><span>タグ</span></a></li><li><a href=/archives/><span>アーカイブ</span></a></li><li><a href=/about/><span>このサイトについて</span></a></li><li><a href=/search/><span>検索</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><aside class="sidebar right-sidebar sticky"><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目次</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#概要>概要</a></li><li><a href=#企業規模別ネットワーク設計パターン>企業規模別ネットワーク設計パターン</a><ol><li><a href=#1-小規模企業50人以下--単一オフィス>1. 小規模企業（50人以下）- 単一オフィス</a><ol><li><a href=#物理ネットワーク構成>物理ネットワーク構成</a></li><li><a href=#gcp対応設計>GCP対応設計</a></li></ol></li><li><a href=#2-中小企業100-500人--部署別分離>2. 中小企業（100-500人）- 部署別分離</a><ol><li><a href=#物理ネットワーク構成layer3スイッチ使用>物理ネットワーク構成（Layer3スイッチ使用）</a></li><li><a href=#gcp対応設計マルチvpc推奨>GCP対応設計（マルチVPC推奨）</a></li></ol></li><li><a href=#3-大企業多拠点海外展開>3. 大企業（多拠点・海外展開）</a><ol><li><a href=#物理ネットワーク構成-1>物理ネットワーク構成</a></li><li><a href=#gcp対応設計マルチリージョン>GCP対応設計（マルチリージョン）</a></li></ol></li></ol></li><li><a href=#設計判断フローチャート>設計判断フローチャート</a></li><li><a href=#実践的な移行戦略>実践的な移行戦略</a><ol><li><a href=#phase-1-現状把握設計>Phase 1: 現状把握・設計</a></li><li><a href=#phase-2-並行運用ハイブリッド>Phase 2: 並行運用（ハイブリッド）</a></li><li><a href=#phase-3-完全移行最適化>Phase 3: 完全移行・最適化</a></li></ol></li><li><a href=#ipアドレス設計ベストプラクティス>IPアドレス設計ベストプラクティス</a><ol><li><a href=#重複回避設計>重複回避設計</a></li><li><a href=#gcpでの予約アドレス考慮>GCPでの予約アドレス考慮</a></li></ol></li><li><a href=#コスト最適化>コスト最適化</a><ol><li><a href=#物理-vs-gcp-コスト比較>物理 vs GCP コスト比較</a></li></ol></li><li><a href=#監視運用自動化>監視・運用自動化</a><ol><li><a href=#ネットワーク監視設定>ネットワーク監視設定</a></li><li><a href=#自動復旧設定>自動復旧設定</a></li></ol></li><li><a href=#まとめ>まとめ</a></li></ol></nav></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B/>技術記事</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%81%8B%E3%82%89gcp%E8%A8%AD%E8%A8%88%E3%81%B8-%E4%BC%81%E6%A5%AD%E8%A6%8F%E6%A8%A1%E5%88%A5%E7%A7%BB%E8%A1%8C%E3%83%91%E3%82%BF%E3%83%BC%E3%83%B3/>🏢 物理ネットワークからGCP設計へ - 企業規模別移行パターン</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025年9月9日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 5分</time></div></footer></div></header><section class=article-content><h2 id=概要>概要</h2><p>物理オフィスのネットワーク設計原則をGCPクラウドに適用することで、直感的で運用しやすいインフラを構築できます。本記事では、企業規模別の物理ネットワークとGCP VPC設計の対応関係、移行戦略について詳しく解説します。</p><h2 id=企業規模別ネットワーク設計パターン>企業規模別ネットワーク設計パターン</h2><h3 id=1-小規模企業50人以下--単一オフィス>1. 小規模企業（50人以下）- 単一オフィス</h3><h4 id=物理ネットワーク構成>物理ネットワーク構成</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>インターネット
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>[ルーター] 192.168.1.1
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>[L2スイッチ]
+</span></span><span class=line><span class=cl> ├─ 社員PC: 192.168.1.100-150
+</span></span><span class=line><span class=cl> ├─ サーバー: 192.168.1.10-20  
+</span></span><span class=line><span class=cl> └─ プリンター: 192.168.1.200-210
+</span></span></code></pre></td></tr></table></div></div><p><strong>設計原則:</strong></p><ul><li>1つのセグメントで全て処理</li><li>シンプル・低コスト重視</li><li>管理負荷最小化</li></ul><h4 id=gcp対応設計>GCP対応設計</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Project</span><span class=p>:</span><span class=w> </span><span class=l>company-main</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>main-vpc (10.0.0.0/16)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>office-subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>GCE</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.10-50</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>GKE</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.100-150</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>Cloud SQL</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.200</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>移行メリット:</strong></p><ul><li>物理機器保守不要</li><li>自動バックアップ・冗長化</li><li>スケールアップ容易</li></ul><h3 id=2-中小企業100-500人--部署別分離>2. 中小企業（100-500人）- 部署別分離</h3><h4 id=物理ネットワーク構成layer3スイッチ使用>物理ネットワーク構成（Layer3スイッチ使用）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>インターネット
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>[メインルーター]
+</span></span><span class=line><span class=cl>    ↓
+</span></span><span class=line><span class=cl>[Layer3スイッチ] (VLAN対応)
+</span></span><span class=line><span class=cl> ├─ VLAN10: 一般部門 (192.168.10.0/24)
+</span></span><span class=line><span class=cl> ├─ VLAN20: 経理部門 (192.168.20.0/24)
+</span></span><span class=line><span class=cl> ├─ VLAN30: 開発部門 (192.168.30.0/24)
+</span></span><span class=line><span class=cl> └─ VLAN99: サーバー (192.168.99.0/24)
+</span></span></code></pre></td></tr></table></div></div><p><strong>Layer3スイッチの進化意義:</strong>
+従来の「各部署にルーター+ハブ」→「1台で統合管理」</p><ul><li>コスト削減（複数ルーター → 単一機器）</li><li>管理効率化（一元設定・監視）</li><li>部署間通信の柔軟化</li></ul><h4 id=gcp対応設計マルチvpc推奨>GCP対応設計（マルチVPC推奨）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Project</span><span class=p>:</span><span class=w> </span><span class=l>company-main</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPCs</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>general-vpc</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.10.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>general-subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.10.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>accounting-vpc</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.20.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>accounting-subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.20.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>dev-vpc</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.30.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>dev-subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.30.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>shared-vpc</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.99.0.0</span><span class=l>/16</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=nt>shared-services</span><span class=p>:</span><span class=w> </span><span class=m>10.99.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Connections</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>VPC Peering</span><span class=p>:</span><span class=w> </span><span class=l>general-vpc ↔ shared-vpc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>VPC Peering</span><span class=p>:</span><span class=w> </span><span class=l>accounting-vpc ↔ shared-vpc</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>VPC Peering</span><span class=p>:</span><span class=w> </span><span class=l>dev-vpc ↔ shared-vpc</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>セキュリティ境界:</strong></p><ul><li>IAM + VPC分離でデータ保護</li><li>最小権限アクセス制御</li><li>監査ログ完全記録</li></ul><h3 id=3-大企業多拠点海外展開>3. 大企業（多拠点・海外展開）</h3><h4 id=物理ネットワーク構成-1>物理ネットワーク構成</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>本社（東京）              支社（大阪）
+</span></span><span class=line><span class=cl>[本社ルーター]            [支社ルーター]  
+</span></span><span class=line><span class=cl>192.168.1.0/24           192.168.2.0/24
+</span></span><span class=line><span class=cl>    ↓                        ↓
+</span></span><span class=line><span class=cl>専用線/VPN ⟷ インターネット ⟷ 専用線/VPN
+</span></span></code></pre></td></tr></table></div></div><p><strong>従来の接続選択肢:</strong></p><ul><li><strong>専用線</strong>: 高コスト・高品質・低遅延</li><li><strong>VPN</strong>: 低コスト・標準品質・遅延あり</li><li><strong>MPLS</strong>: 中コスト・高品質・SLA保証</li></ul><h4 id=gcp対応設計マルチリージョン>GCP対応設計（マルチリージョン）</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Global Architecture</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Project</span><span class=p>:</span><span class=w> </span><span class=l>company-global</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>global-vpc (グローバル)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Subnets</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>tokyo-subnet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Region</span><span class=p>:</span><span class=w> </span><span class=l>asia-northeast1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.1.0.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>osaka-subnet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Region</span><span class=p>:</span><span class=w> </span><span class=l>asia-northeast2  </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.2.0.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>singapore-subnet</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Region</span><span class=p>:</span><span class=w> </span><span class=l>asia-southeast1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>CIDR</span><span class=p>:</span><span class=w> </span><span class=m>10.3.0.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Connections</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Cloud Interconnect</span><span class=p>:</span><span class=w> </span><span class=l>東京本社 ↔ GCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Cloud VPN</span><span class=p>:</span><span class=w> </span><span class=l>各拠点 ↔ GCP</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Global Load Balancer</span><span class=p>:</span><span class=w> </span><span class=l>世界的負荷分散</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>ハイブリッド接続例:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Cloud Interconnect設定</span>
+</span></span><span class=line><span class=cl>gcloud compute interconnects create tokyo-interconnect <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --customer-name<span class=o>=</span><span class=s2>&#34;Company Tokyo&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --interconnect-type<span class=o>=</span>DEDICATED <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --location<span class=o>=</span>asia-northeast1-a
+</span></span></code></pre></td></tr></table></div></div><h2 id=設計判断フローチャート>設計判断フローチャート</h2><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>flowchart TD
+</span></span><span class=line><span class=cl>    A[要件分析] --&gt; B{組織規模}
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    B --&gt;|~50人| C[単一VPC設計]
+</span></span><span class=line><span class=cl>    B --&gt;|50-500人| D[部署別分離必要?]
+</span></span><span class=line><span class=cl>    B --&gt;|500人以上| E[マルチプロジェクト設計]
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    D --&gt;|Yes| F[マルチVPC + Peering]
+</span></span><span class=line><span class=cl>    D --&gt;|No| C
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    A --&gt; G{地理的分散}
+</span></span><span class=line><span class=cl>    G --&gt;|単一拠点| H[シングルリージョン]
+</span></span><span class=line><span class=cl>    G --&gt;|複数拠点| I[マルチリージョン]
+</span></span><span class=line><span class=cl>    
+</span></span><span class=line><span class=cl>    A --&gt; J{セキュリティ要件}
+</span></span><span class=line><span class=cl>    J --&gt;|高| K[厳密分離設計]
+</span></span><span class=line><span class=cl>    J --&gt;|標準| L[標準分離設計]
+</span></span></code></pre></td></tr></table></div></div><h2 id=実践的な移行戦略>実践的な移行戦略</h2><h3 id=phase-1-現状把握設計>Phase 1: 現状把握・設計</h3><p><strong>物理ネットワーク調査:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># ネットワーク構成調査</span>
+</span></span><span class=line><span class=cl>ip route show table main
+</span></span><span class=line><span class=cl>netstat -rn
+</span></span><span class=line><span class=cl>nmap -sn 192.168.1.0/24
+</span></span></code></pre></td></tr></table></div></div><p><strong>GCP設計方針決定:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Assessment</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Current_Network</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;192.168.1.0/24&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Departments</span><span class=p>:</span><span class=w> </span><span class=p>[</span><span class=s2>&#34;general&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;accounting&#34;</span><span class=p>,</span><span class=w> </span><span class=s2>&#34;dev&#34;</span><span class=p>]</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Security_Requirements</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;medium&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Target_Design</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Architecture</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Multi-VPC&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Primary_Region</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;asia-northeast1&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>DR_Region</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;asia-northeast2&#34;</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h3 id=phase-2-並行運用ハイブリッド>Phase 2: 並行運用（ハイブリッド）</h3><p><strong>Cloud VPN接続:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># VPN Gateway作成</span>
+</span></span><span class=line><span class=cl>gcloud compute vpn-gateways create office-vpn-gw <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>main-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --region<span class=o>=</span>asia-northeast1
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># トンネル作成</span>
+</span></span><span class=line><span class=cl>gcloud compute vpn-tunnels create office-tunnel <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-address<span class=o>=</span>office-public-ip <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --shared-secret<span class=o>=</span>secure-shared-secret <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --target-vpn-gateway<span class=o>=</span>office-vpn-gw
+</span></span></code></pre></td></tr></table></div></div><p><strong>段階的移行:</strong></p><ol><li><strong>開発環境</strong> → GCP移行</li><li><strong>非クリティカルシステム</strong> → 移行</li><li><strong>コアシステム</strong> → 慎重に移行</li></ol><h3 id=phase-3-完全移行最適化>Phase 3: 完全移行・最適化</h3><p><strong>Cloud Native化:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Target_State</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Physical_Office</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;最小化（端末のみ）&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Core_Systems</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;GCP Managed Services&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>Backup</span><span class=p>:</span><span class=w> </span><span class=s2>&#34;Cross-region replication&#34;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Optimization</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Cloud Load Balancing</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Auto Scaling</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Managed Database (Cloud SQL)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>Container Orchestration (GKE)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=ipアドレス設計ベストプラクティス>IPアドレス設計ベストプラクティス</h2><h3 id=重複回避設計>重複回避設計</h3><p><strong>階層的アドレス体系:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>10.{リージョン}.{部署}.{ホスト}
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>例：
+</span></span><span class=line><span class=cl>10.1.1.0/24: 東京・一般部門
+</span></span><span class=line><span class=cl>10.1.2.0/24: 東京・経理部門  
+</span></span><span class=line><span class=cl>10.2.1.0/24: 大阪・一般部門
+</span></span><span class=line><span class=cl>10.2.2.0/24: 大阪・経理部門
+</span></span></code></pre></td></tr></table></div></div><p><strong>RFC1918使い分け:</strong></p><ul><li><strong>10.0.0.0/8</strong>: 大企業・多拠点・将来拡張予定</li><li><strong>172.16.0.0/12</strong>: 中規模企業・複数拠点予定</li><li><strong>192.168.0.0/16</strong>: 小規模企業・単一拠点</li></ul><h3 id=gcpでの予約アドレス考慮>GCPでの予約アドレス考慮</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Subnet</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.0</span><span class=l>/24</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Reserved_by_GCP</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.0</span><span class=p>:</span><span class=w> </span><span class=l>ネットワークアドレス</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.1</span><span class=p>:</span><span class=w> </span><span class=l>デフォルトゲートウェイ</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.2</span><span class=p>:</span><span class=w> </span><span class=l>DNS (Google)  </span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.3</span><span class=p>:</span><span class=w> </span><span class=l>将来の利用</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>10.0.1.255</span><span class=p>:</span><span class=w> </span><span class=l>ブロードキャスト</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Available</span><span class=p>:</span><span class=w> </span><span class=m>10.0.1.4</span><span class=w> </span>- <span class=m>10.0.1.254</span><span class=w> </span><span class=l>(251個)</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=コスト最適化>コスト最適化</h2><h3 id=物理-vs-gcp-コスト比較>物理 vs GCP コスト比較</h3><p><strong>物理ネットワーク年間コスト（中小企業例）:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>初期投資:
+</span></span><span class=line><span class=cl>- Layer3スイッチ: ¥500,000
+</span></span><span class=line><span class=cl>- サーバー機器: ¥2,000,000
+</span></span><span class=line><span class=cl>- UPS・ラック: ¥300,000
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>運用コスト（年間）:
+</span></span><span class=line><span class=cl>- 電気代: ¥200,000
+</span></span><span class=line><span class=cl>- 保守契約: ¥300,000  
+</span></span><span class=line><span class=cl>- 人件費: ¥1,200,000
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl>Total: ¥4,500,000 / year
+</span></span></code></pre></td></tr></table></div></div><p><strong>GCP年間コスト（同規模）:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=nt>Compute</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>GCE instances</span><span class=p>:</span><span class=w> </span><span class=l>$800/month</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Cloud SQL</span><span class=p>:</span><span class=w> </span><span class=l>$300/month</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Network</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>VPC</span><span class=p>:</span><span class=w> </span><span class=l>$0 (free)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>Load Balancing</span><span class=p>:</span><span class=w> </span><span class=l>$50/month</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=nt>VPN</span><span class=p>:</span><span class=w> </span><span class=l>$40/month</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Total</span><span class=p>:</span><span class=w> </span><span class=l>$1,190/month = $14,280/year (¥1,950,000)</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Savings</span><span class=p>:</span><span class=w> </span><span class=l>約57%削減 + 運用負荷削減</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=監視運用自動化>監視・運用自動化</h2><h3 id=ネットワーク監視設定>ネットワーク監視設定</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># VPC Flow Logs有効化</span>
+</span></span><span class=line><span class=cl>gcloud compute networks subnets update main-subnet <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --enable-flow-logs <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    --logging-flow-sampling<span class=o>=</span>1.0
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># カスタムメトリクス設定  </span>
+</span></span><span class=line><span class=cl>gcloud logging sinks create network-monitoring <span class=se>\
+</span></span></span><span class=line><span class=cl><span class=se></span>    bigquery.googleapis.com/projects/project-id/datasets/network_logs
+</span></span></code></pre></td></tr></table></div></div><h3 id=自動復旧設定>自動復旧設定</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># Cloud Functions自動復旧</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>ConfigMap</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>network-automation</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>data</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>auto_healing.py</span><span class=p>:</span><span class=w> </span><span class=p>|</span><span class=sd>
+</span></span></span><span class=line><span class=cl><span class=sd>    def heal_network_issue(event, context):
+</span></span></span><span class=line><span class=cl><span class=sd>        # ネットワーク問題自動修復ロジック
+</span></span></span><span class=line><span class=cl><span class=sd>        pass</span><span class=w>
+</span></span></span></code></pre></td></tr></table></div></div><h2 id=まとめ>まとめ</h2><p>物理ネットワークからGCPへの移行は、企業規模と要件に応じた段階的アプローチが重要です：</p><p><strong>設計原則:</strong></p><ul><li><strong>小規模</strong>: 単一VPC・シンプル設計</li><li><strong>中規模</strong>: マルチVPC・部署分離</li><li><strong>大規模</strong>: マルチプロジェクト・地理分散</li></ul><p><strong>移行メリット:</strong></p><ul><li>57%のコスト削減</li><li>運用負荷大幅削減</li><li>自動スケール・高可用性</li><li>グローバル展開容易</li></ul><p>Layer3スイッチが「複数ルーター+ハブの統合」であったように、GCPは「データセンター全体の統合」として理解すると、移行設計がより直感的になります。</p><hr><p>📅 <strong>作成日</strong>: 2025年09月09日</p><p><strong>参考リンク:</strong></p><ul><li><a class=link href=https://cloud.google.com/vpc/docs/best-practices target=_blank rel=noopener>GCP VPC設計ベストプラクティス</a></li><li><a class=link href=https://cloud.google.com/hybrid-connectivity target=_blank rel=noopener>ハイブリッド接続オプション</a></li></ul></section><footer class=article-footer><section class=article-tags><a href=/tags/cloud/>Cloud</a>
+<a href=/tags/enterprise/>Enterprise</a>
+<a href=/tags/gcp/>Gcp</a>
+<a href=/tags/google/>Google</a>
+<a href=/tags/migration/>Migration</a>
+<a href=/tags/network/>Network</a>
+<a href=/tags/vpc/>Vpc</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/vpc%E9%96%93%E6%8E%A5%E7%B6%9A%E6%96%B9%E5%BC%8F%E3%81%AE%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89-peering-vs-psc-vs-tcp-proxy/><div class=article-details><h2 class=article-title>🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</h2></div></a></article><article><a href=/post/%EF%B8%8F-aws-s3-/-google-cloud-storage%E3%81%8B%E3%82%89%E3%82%A4%E3%83%99%E3%83%B3%E3%83%88%E3%83%89%E3%83%AA%E3%83%96%E3%83%B3%E3%81%A7trocco%E3%82%92%E5%AE%9F%E8%A1%8C%E3%81%99%E3%82%8Bterraform-module%E4%BB%98%E3%81%8D/><div class=article-details><h2 class=article-title>🏗️ AWS S3 / Google Cloud Storageから、イベントドリブンでTROCCOを実行する（Terraform Module付き）</h2></div></a></article><article><a href=/post/%EF%B8%8F-building-a-production-ready-terraform-project-with-multi-environment-support-on-aws/><div class=article-details><h2 class=article-title>🏗️ Building a Production-Ready Terraform Project with Multi-Environment Support on AWS</h2></div></a></article><article><a href=/post/%EF%B8%8F-spring-boot-banking-application-deployment-using-devsecops-on-aws-eks/><div class=article-details><h2 class=article-title>🏗️ Spring Boot Banking Application Deployment using DevSecOps on AWS EKS</h2></div></a></article><article><a href=/post/%EF%B8%8F-terraform-vs-cloudformation-which-aws-iac-tool-should-you-use/><div class=article-details><h2 class=article-title>🏗️ Terraform vs CloudFormation: Which AWS IaC Tool Should You Use? 🤔</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
