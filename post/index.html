@@ -736,30 +736,173 @@
 
     </body>
 </html>
-��を指摘するツールです。Ruff はPythonの高速なリンターとして注目されています。
-役割:
-コーディング規約の統一: チーム内で一貫したコードスタイルを強制し、レビューの負担を減らします。
-バグの早期発見: 実行時エラーにつながる可能性のある記述や、一般的な落とし穴を指摘します。
-可読性・保守性の向上: Pythonicな書き方やベストプラクティスを推奨し、コード品質全体を向上させます。
-なぜ重要か: 開発効率を高め、品質の高いコードを維持するために不可欠なツールです。CI/CDパイプラインに組み込むことで、コード品質を自動的にチェックできます。</li>
-<li>Docstring（ドキュメンテーション文字列）の重要性
-概要: Pythonの関数、クラス、モジュールに記述される複数行の文字列で、そのコードブロックの目的、引数、戻り値、例外などを説明するために使用されます。
-役割:
-自己文書化: コードの動作を理解するための最も直接的な情報源となります。
-IDE/ツールとの連携: IDE（VS Code, PyCharmなど）がDocstringを解析し、関数の使い方や引数のヒントをポップアップ表示するなど、開発体験を向上させます。
-自動ドキュメント生成: Sphinxなどのツールを用いて、DocstringからAPIリファレンスドキュメントを自動生成できます。
-なぜ重要か: コードの可読性と保守性を飛躍的に向上させ、特にチーム開発や長期プロジェクトにおいて、新しいメンバーのオンボーディングや既存コードの理解を容易にします。Docstringのスタイル（Googleスタイル、NumPyスタイルなど）を統一することも重要です。</li>
-<li>カプセル化と内部構造の扱い
-概要: オブジェクト指向プログラミングの主要な原則の一つで、オブジェクトの内部状態や実装詳細を外部から隠蔽し、公開されたインターフェース（メソッドや公開属性）を通じてのみアクセスさせることです。
-Pythonにおける特性: Pythonでは、アンダースコア（_）で始まる属性は「内部的である」という慣習を示すものであり、他の言語のような厳密なアクセス制限はありません。これは「大人のプログラミング」と呼ばれます。
-DeepDiff との関連: DeepDiff は、このPythonの特性を活かして、_properties のような内部属性にもアクセスして比較します。これにより、意図せず変更された内部状態も検出できますが、逆に除外したい場合は明示的な設定（exclude_obj_callback など）が必要になります。
-なぜ重要か: コードの変更による影響範囲を限定し、保守性を高めます。しかし、DeepDiff のように内部に踏み込むツールを使う際は、そのツールの挙動とカプセル化の概念との兼ね合いを理解しておく必要があります。</li>
-<li>要件定義とテストの重要性（特に差分検出において）
-概要: 何を「差分」と見なすか、何を「無視」するかという要件を明確に定義し、それがテストで正しく検証されていることを確認するプロセス。
-今回のケース: policy_tags の変更は「無視する」という要件を明確にし、それが DeepDiff のコールバック関数で正しく機能しているかを実際のログで確認しました。
-なぜ重要か: 複雑なデータ構造の比較では、「何が重要で、何が無視できる変更なのか」というビジネスルールが曖昧になりがちです。これを明確にすることで、意図しない変更を検出し、必要な変更のみを適切に扱うことができます。テスト駆動開発（TDD）のアプローチも有効です。
-これらの概念は、個々のコード実装の技術的な詳細を超えて、より良いソフトウェアを開発し、チームとして効率的に働くための基盤となるものです。</li>
+viceaccount.com" >service-account@project.iam.gserviceaccount.com</a>&rdquo;
+}</p>
+<p>権限設計</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# データセット基本操作
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.update&rdquo;  # access変更に必要</p>
+<pre><code>  # IAM操作（dataset_access リソース用）
+  # 注意: BigQueryのIAM操作は特殊で、標準的なIAM権限ではなく
+  # BigQuery固有の権限で制御される
+}
+</code></pre>
+<p>}</p>
+<p>実践例3: テーブル作成を含むケース</p>
+<p>Terraformリソース</p>
+<p>resource &ldquo;google_bigquery_table&rdquo; &ldquo;user_events&rdquo; {
+dataset_id = google_bigquery_dataset.analytics.dataset_id
+table_id   = &ldquo;user_events&rdquo;</p>
+<pre><code>time_partitioning {
+  type  = &quot;DAY&quot;
+  field = &quot;event_timestamp&quot;
+}
+
+schema = jsonencode([
+  {
+    name = &quot;user_id&quot;
+    type = &quot;STRING&quot;
+    mode = &quot;REQUIRED&quot;
+  },
+  {
+    name = &quot;event_timestamp&quot;
+    type = &quot;TIMESTAMP&quot;
+    mode = &quot;REQUIRED&quot;
+  }
+])
+</code></pre>
+<p>}</p>
+<p>拡張された権限設計</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# データセット操作（依存関係で必要）
+permission = &ldquo;bigquery.datasets.get&rdquo;</p>
+<pre><code>  # テーブル操作
+  permission = &quot;bigquery.tables.get&quot;      # plan時の確認
+  permission = &quot;bigquery.tables.create&quot;   # 作成
+  permission = &quot;bigquery.tables.update&quot;   # スキーマ変更等
+  permission = &quot;bigquery.tables.list&quot;     # 依存関係確認
+}
+</code></pre>
+<p>}</p>
+<p>実践例4: ロギング設定を含む複合ケース</p>
+<p>Terraformリソース</p>
+<p>resource &ldquo;google_logging_project_sink&rdquo; &ldquo;bigquery_sink&rdquo; {
+name                   = &ldquo;bigquery-audit-sink&rdquo;
+destination           =
+&ldquo;bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.audit_logs.dataset_id}&rdquo;
+filter                = &ldquo;resource.type=bigquery_resource&rdquo;
+unique_writer_identity = true
+}</p>
+<p>resource &ldquo;google_bigquery_dataset&rdquo; &ldquo;audit_logs&rdquo; {
+dataset_id = &ldquo;audit_logs&rdquo;
+location   = &ldquo;US&rdquo;</p>
+<pre><code># Sink からの書き込み用アクセス
+access {
+  role          = &quot;WRITER&quot;
+  user_by_email = google_logging_project_sink.bigquery_sink.writer_identity
+}
+</code></pre>
+<p>}</p>
+<p>マルチサービス権限設計</p>
+<h1 id="bigquery権限">BigQuery権限
+</h1><p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.create&rdquo;
+permission = &ldquo;bigquery.datasets.update&rdquo;
+}
+}</p>
+<h1 id="logging権限">Logging権限
+</h1><p>operations {
+service_name = &ldquo;logging.googleapis.com&rdquo;
+method_selectors {
+method = &ldquo;ConfigServiceV2.GetSink&rdquo;     # sink状態確認
+method = &ldquo;ConfigServiceV2.CreateSink&rdquo;  # sink作成
+method = &ldquo;ConfigServiceV2.UpdateSink&rdquo;  # sink更新
+}
+}</p>
+<p>権限設計のベストプラクティス</p>
+<ol>
+<li>段階的な権限付与戦略</li>
 </ol>
+<h1 id="phase-1-基本的な読み取り権限">Phase 1: 基本的な読み取り権限
+</h1><p>permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.tables.get&rdquo;</p>
+<h1 id="phase-2-作成権限初回apply時に追加">Phase 2: 作成権限（初回apply時に追加）
+</h1><p>permission = &ldquo;bigquery.datasets.create&rdquo;
+permission = &ldquo;bigquery.tables.create&rdquo;</p>
+<h1 id="phase-3-更新権限設定変更時に追加">Phase 3: 更新権限（設定変更時に追加）
+</h1><p>permission = &ldquo;bigquery.datasets.update&rdquo;
+permission = &ldquo;bigquery.tables.update&rdquo;</p>
+<ol start="2">
+<li>依存関係の理解</li>
+</ol>
+<h1 id="テーブル作成にはデータセット読み取り権限も必要">テーブル作成にはデータセット読み取り権限も必要
+</h1><p>resource &ldquo;google_bigquery_table&rdquo; &ldquo;example&rdquo; {
+dataset_id = google_bigquery_dataset.example.dataset_id  # この参照により必要
+table_id   = &ldquo;example_table&rdquo;
+}</p>
+<h1 id="必要権限">必要権限:
+</h1><h1 id="--bigquerydatasetsget-依存関係確認">- bigquery.datasets.get (依存関係確認)
+</h1><h1 id="--bigquerytablescreate-テーブル作成">- bigquery.tables.create (テーブル作成)
+</h1><ol start="3">
+<li>環境別の権限調整</li>
+</ol>
+<p>locals {
+# 開発環境：より多くの権限
+dev_permissions = [
+&ldquo;bigquery.datasets.get&rdquo;,
+&ldquo;bigquery.datasets.create&rdquo;,
+&ldquo;bigquery.datasets.update&rdquo;,
+&ldquo;bigquery.datasets.delete&rdquo;,  # 開発では削除も許可
+&ldquo;bigquery.tables.get&rdquo;,
+&ldquo;bigquery.tables.create&rdquo;,
+&ldquo;bigquery.tables.update&rdquo;,
+&ldquo;bigquery.tables.delete&rdquo;
+]</p>
+<pre><code># 本番環境：最小権限
+prod_permissions = [
+  &quot;bigquery.datasets.get&quot;,
+  &quot;bigquery.datasets.update&quot;,  # 設定変更のみ
+  &quot;bigquery.tables.get&quot;,
+  &quot;bigquery.tables.update&quot;     # スキーマ変更のみ
+]
+</code></pre>
+<p>}</p>
+<p>検証とモニタリング</p>
+<ol>
+<li>権限使用状況の確認</li>
+</ol>
+<h1 id="実際に使用された権限の確認">実際に使用された権限の確認
+</h1><p>gcloud logging read '
+protoPayload.serviceName=&ldquo;bigquery.googleapis.com&rdquo;
+AND protoPayload.authenticationInfo.principalEmail:&ldquo;terraform-service-account&rdquo;
+AND timestamp&gt;=TIMESTAMP_FROM_RFC3339(&ldquo;2024-01-01T00:00:00Z&rdquo;)
+&rsquo; &ndash;format=&ldquo;table(protoPayload.methodName, protoPayload.authorizationInfo.permission)&rdquo;</p>
+<ol start="2">
+<li>不要権限の特定</li>
+</ol>
+<h1 id="付与されているが使用されていない権限を特定">付与されているが使用されていない権限を特定
+</h1><p>gcloud projects get-iam-policy PROJECT_ID <br>
+&ndash;flatten=&ldquo;bindings[].members&rdquo; <br>
+&ndash;filter=&ldquo;bindings.members:terraform-service-account&rdquo; <br>
+&ndash;format=&ldquo;table(bindings.role)&rdquo;</p>
+<p>まとめ</p>
+<p>Terraform リソースから Google Cloud 権限を設計する際のポイント：</p>
+<ol>
+<li>リソース定義の詳細分析: 単純なリソースでも複数の権限が必要</li>
+<li>依存関係の考慮: 参照されるリソースの読み取り権限も必要</li>
+<li>段階的な権限付与: plan → apply → update の流れに沿って権限を追加</li>
+<li>環境別の調整: 開発と本番で異なる権限レベルを設定</li>
+<li>継続的な見直し: 実際の使用状況に基づく権限の最適化</li>
+</ol>
+<p>適切な権限設計により、セキュリティを保ちながら効率的な Terraform 運用が実現できます。</p>
 
 </section>
 
@@ -826,78 +969,6 @@ DeepDiff との関連: DeepDiff は、このPythonの特性を活かして、_pr
                 <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
 
                 <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
- <button class="pswp__button pswp__button--share" title="Share"></button>
 
                 <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
 
