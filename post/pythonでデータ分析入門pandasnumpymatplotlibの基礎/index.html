@@ -1,918 +1,270 @@
-<!DOCTYPE html>
-<html lang="ja" dir="ltr">
-    <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。">
-<title>Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎</title>
-
-<link rel='canonical' href='https://firebird-techtalktech.com/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/'>
-
-<link rel="stylesheet" href="/scss/style.min.35a329e3089f50f5123f8d07a09ea0bef36c2fef751cf1cb89de29996b5a4918.css"><meta property='og:title' content="Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎">
-<meta property='og:description' content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。">
-<meta property='og:url' content='https://firebird-techtalktech.com/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/'>
-<meta property='og:site_name' content='firebirdテクテクテクブログ'>
-<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Matplotlib' /><meta property='article:tag' content='NumPy' /><meta property='article:tag' content='Python' /><meta property='article:tag' content='pandas' /><meta property='article:tag' content='python' /><meta property='article:tag' content='データ分析' /><meta property='article:tag' content='機械学習' /><meta property='article:published_time' content='2025-01-09T09:00:00&#43;09:00'/><meta property='article:modified_time' content='2025-01-09T09:00:00&#43;09:00'/>
-<meta name="twitter:title" content="Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎">
-<meta name="twitter:description" content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。"><link rel="alternate" type="application/json" href="https://firebird-techtalktech.com/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/index.json">
-    <link rel="shortcut icon" href="/images/favicon.png" />
-
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script>
-      <script>
-        var doNotTrack = false;
-        if ( false ) {
-          var dnt = (navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack);
-          var doNotTrack = (dnt == "1" || dnt == "yes");
-        }
-        if (!doNotTrack) {
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-J8ND35KCZW');
-        }
-      </script>
-
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "firebirdテクテクテクブログ",
-  "url": "https:\/\/firebird-techtalktech.com\/",
-  "description": "技術ネタ、趣味や備忘録などを書いているブログです",
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "potentialAction": {
-    "@type": "SearchAction",
-    "target": "https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}",
-    "query-input": "required name=search_term_string"
-  }
-}
-</script>
-
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Article",
-  "headline": "Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎",
-  "description": "Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。",
-  "author": {
-    "@type": "Person",
-    "name": "トミー"
-  },
-  "publisher": {
-    "@type": "Person",
-    "name": "トミー",
-    "url": "https:\/\/firebird-techtalktech.com\/about/"
-  },
-  "datePublished": "2025-01-09T09:00:00\u002b09:00",
-  "dateModified": "2025-01-09T09:00:00\u002b09:00",
-  "url": "https:\/\/firebird-techtalktech.com\/post\/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E\/",
-  "wordCount": "2481",
-  "keywords": ["Matplotlib", "NumPy", "Python", "pandas", "python", "データ分析", "機械学習"]
-}
-</script>
-
-
-
-
-<meta name="description" content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。">
-
-
-
-<meta property="og:site_name" content="firebirdテクテクテクブログ">
-
-<meta property="og:type" content="article">
-
-    </head>
-    <body class="
-    article-page
-    ">
-    <script>
-        (function() {
-            const colorSchemeKey = 'StackColorScheme';
-            if(!localStorage.getItem(colorSchemeKey)){
-                localStorage.setItem(colorSchemeKey, "auto");
-            }
-        })();
-    </script><script>
-    (function() {
-        const colorSchemeKey = 'StackColorScheme';
-        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
-        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
-
-        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
-            
-
-            document.documentElement.dataset.scheme = 'dark';
-        } else {
-            document.documentElement.dataset.scheme = 'light';
-        }
-    })();
-</script>
-<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
-    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="メニューを開く・閉じる">
-        <span class="hamburger-box">
-            <span class="hamburger-inner"></span>
-        </span>
-    </button>
-
-    <header>
-        
-            
-            <figure class="site-avatar">
-                <a href="/">
-                
-                    
-                    
-                    
-                        
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
-                    
-                
-                </a>
-                
-                    <span class="emoji">🎯</span>
-                
-            </figure>
-            
-        
-        
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
-        </div>
-    </header><ol class="menu-social">
-            
-                <li>
-                    <a 
-                        href='https://twitter.com/firebird19245'
-                        target="_blank"
-                        title="Twitter"
-                        rel="me"
-                    >
-                        
-                        
-                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-  <path d="M22 4.01c-1 .49 -1.98 .689 -3 .99c-1.121 -1.265 -2.783 -1.335 -4.38 -.737s-2.643 2.06 -2.62 3.737v1c-3.245 .083 -6.135 -1.395 -8 -4c0 0 -4.182 7.433 4 11c-1.872 1.247 -3.739 2.088 -6 2c3.308 1.803 6.913 2.423 10.034 1.517c3.58 -1.04 6.522 -3.723 7.651 -7.742a13.84 13.84 0 0 0 .497 -3.753c-.002 -.249 1.51 -2.772 1.818 -4.013z" />
-</svg>
-
-
-
-                        
-                    </a>
-                </li>
-            
-        </ol><ol class="menu" id="main-menu">
-        
-        
-        
-        <li >
-            <a href='/categories/' >
-                
-                
-                
-                <span>カテゴリー</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/tags/' >
-                
-                
-                
-                <span>タグ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/archives/' >
-                
-                
-                
-                <span>アーカイブ</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/about/' >
-                
-                
-                
-                <span>このサイトについて</span>
-            </a>
-        </li>
-        
-        
-        <li >
-            <a href='/search/' >
-                
-                
-                
-                <span>検索</span>
-            </a>
-        </li>
-        
-        <li class="menu-bottom-section">
-            <ol class="menu">
-
-                
-                    <li id="dark-mode-toggle">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="8" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="16" cy="12" r="2" />
-  <rect x="2" y="6" width="20" height="12" rx="6" />
-</svg>
-
-
-
-                        <span>ダークモード</span>
-                    </li>
-                
-            </ol>
-        </li>
-    </ol>
-</aside>
-
-    <aside class="sidebar right-sidebar sticky">
-        
-            
-                
-    <section class="widget archives">
-        <div class="widget-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <line x1="5" y1="9" x2="19" y2="9" />
-  <line x1="5" y1="15" x2="19" y2="15" />
-  <line x1="11" y1="4" x2="7" y2="20" />
-  <line x1="17" y1="4" x2="13" y2="20" />
-</svg>
-
-
-
-        </div>
-        <h2 class="widget-title section-title">目次</h2>
-        
-        <div class="widget--toc">
-            <nav id="TableOfContents">
-  <ol>
-    <li><a href="#はじめに">はじめに</a></li>
-    <li><a href="#環境構築">環境構築</a>
-      <ol>
-        <li><a href="#必要なライブラリのインストール">必要なライブラリのインストール</a></li>
-        <li><a href="#jupyter-notebookの起動">Jupyter Notebookの起動</a></li>
-      </ol>
-    </li>
-    <li><a href="#numpy数値計算の基礎">NumPy：数値計算の基礎</a>
-      <ol>
-        <li><a href="#配列の作成と操作">配列の作成と操作</a></li>
-        <li><a href="#行列演算">行列演算</a></li>
-      </ol>
-    </li>
-    <li><a href="#pandasデータ操作の要">Pandas：データ操作の要</a>
-      <ol>
-        <li><a href="#dataframeの基本操作">DataFrameの基本操作</a></li>
-        <li><a href="#データのフィルタリングと集計">データのフィルタリングと集計</a></li>
-        <li><a href="#欠損値の処理">欠損値の処理</a></li>
-      </ol>
-    </li>
-    <li><a href="#matplotlibデータの可視化">Matplotlib：データの可視化</a>
-      <ol>
-        <li><a href="#基本的なグラフ">基本的なグラフ</a></li>
-        <li><a href="#複数のグラフを組み合わせる">複数のグラフを組み合わせる</a></li>
-      </ol>
-    </li>
-    <li><a href="#実践例売上データの分析">実践例：売上データの分析</a>
-      <ol>
-        <li><a href="#データの準備">データの準備</a></li>
-        <li><a href="#時系列分析">時系列分析</a></li>
-        <li><a href="#相関分析">相関分析</a></li>
-      </ol>
-    </li>
-    <li><a href="#データ分析のベストプラクティス">データ分析のベストプラクティス</a>
-      <ol>
-        <li><a href="#1-データの前処理は丁寧に">1. データの前処理は丁寧に</a></li>
-        <li><a href="#2-可視化は目的に応じて">2. 可視化は目的に応じて</a></li>
-        <li><a href="#3-再現性の確保">3. 再現性の確保</a></li>
-      </ol>
-    </li>
-    <li><a href="#まとめ">まとめ</a></li>
-  </ol>
-</nav>
-        </div>
-    </section>
-
-            
-        
-    </aside>
-
-
-            <main class="main full-width">
-    <article class="main-article">
-    <header class="article-header">
-
-    <div class="article-details">
-    
-    <header class="article-category">
-        
-            <a href="/categories/%E6%8A%80%E8%A1%93/" >
-                技術
-            </a>
-        
-    </header>
-    
-
-    <div class="article-title-wrapper">
-        <h2 class="article-title">
-            <a href="/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/">Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎</a>
-        </h2>
-    
-        
-        <h3 class="article-subtitle">
-            Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。
-        </h3>
-        
-    </div>
-
-    
-    
-    
-    
-    <footer class="article-time">
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
-  <circle cx="18" cy="18" r="4" />
-  <path d="M15 3v4" />
-  <path d="M7 3v4" />
-  <path d="M3 11h16" />
-  <path d="M18 16.496v1.504l1 1" />
-</svg>
-                <time class="article-time--published">2025年1月9日</time>
-            </div>
-        
-
-        
-            <div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-  <path stroke="none" d="M0 0h24v24H0z"/>
-  <circle cx="12" cy="12" r="9" />
-  <polyline points="12 7 12 12 15 15" />
-</svg>
-
-
-
-                <time class="article-time--reading">
-                    読了時間: 5分
-                </time>
-            </div>
-        
-    </footer>
-    
-
-    
-</div>
-
-</header>
-
-    <section class="article-content">
-    
-    
-    <h2 id="はじめに">はじめに
-</h2><p>データ分析は現代のビジネスにおいて必須スキルとなっています。PythonとそのライブラリであるPandas、NumPy、Matplotlibを使えば、効率的にデータ分析を行うことができます。</p>
-<h2 id="環境構築">環境構築
-</h2><h3 id="必要なライブラリのインストール">必要なライブラリのインストール
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">pip install pandas numpy matplotlib seaborn jupyter
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="jupyter-notebookの起動">Jupyter Notebookの起動
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">jupyter notebook
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="numpy数値計算の基礎">NumPy：数値計算の基礎
-</h2><h3 id="配列の作成と操作">配列の作成と操作
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 配列の作成</span>
-</span></span><span class="line"><span class="cl"><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="n">matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]])</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 統計量の計算</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;平均: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;標準偏差: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">std</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;最大値: </span><span class="si">{</span><span class="n">arr</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="行列演算">行列演算
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 行列の積</span>
-</span></span><span class="line"><span class="cl"><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
-</span></span><span class="line"><span class="cl"><span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 要素ごとの積</span>
-</span></span><span class="line"><span class="cl"><span class="n">element_wise</span> <span class="o">=</span> <span class="n">A</span> <span class="o">*</span> <span class="n">B</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 行列積</span>
-</span></span><span class="line"><span class="cl"><span class="n">matrix_product</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">B</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="pandasデータ操作の要">Pandas：データ操作の要
-</h2><h3 id="dataframeの基本操作">DataFrameの基本操作
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># CSVファイルの読み込み</span>
-</span></span><span class="line"><span class="cl"><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;sales_data.csv&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># データの概要確認</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">info</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">describe</span><span class="p">())</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="データのフィルタリングと集計">データのフィルタリングと集計
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 条件によるフィルタリング</span>
-</span></span><span class="line"><span class="cl"><span class="n">high_sales</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;売上&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">100000</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># グループ化と集計</span>
-</span></span><span class="line"><span class="cl"><span class="n">monthly_sales</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;月&#39;</span><span class="p">)[</span><span class="s1">&#39;売上&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">agg</span><span class="p">([</span><span class="s1">&#39;sum&#39;</span><span class="p">,</span> <span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="s1">&#39;count&#39;</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># ピボットテーブル</span>
-</span></span><span class="line"><span class="cl"><span class="n">pivot</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">pivot_table</span><span class="p">(</span>
-</span></span><span class="line"><span class="cl">    <span class="n">values</span><span class="o">=</span><span class="s1">&#39;売上&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">index</span><span class="o">=</span><span class="s1">&#39;商品カテゴリ&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">columns</span><span class="o">=</span><span class="s1">&#39;地域&#39;</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="n">aggfunc</span><span class="o">=</span><span class="s1">&#39;sum&#39;</span>
-</span></span><span class="line"><span class="cl"><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="欠損値の処理">欠損値の処理
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 欠損値の確認</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 欠損値の補完</span>
-</span></span><span class="line"><span class="cl"><span class="n">df</span><span class="p">[</span><span class="s1">&#39;価格&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;価格&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 欠損値を含む行の削除</span>
-</span></span><span class="line"><span class="cl"><span class="n">df_clean</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="matplotlibデータの可視化">Matplotlib：データの可視化
-</h2><h3 id="基本的なグラフ">基本的なグラフ
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 日本語フォントの設定</span>
-</span></span><span class="line"><span class="cl"><span class="n">mpl</span><span class="o">.</span><span class="n">font_manager</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">addfont</span><span class="p">(</span><span class="s1">&#39;/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;font.family&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Hiragino Sans&#39;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 折れ線グラフ</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;日付&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;売上&#39;</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;月別売上推移&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;月&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;売上（円）&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="複数のグラフを組み合わせる">複数のグラフを組み合わせる
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># ヒストグラム</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;価格&#39;</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;価格分布&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 散布図</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;広告費&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;売上&#39;</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;広告費 vs 売上&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 箱ひげ図</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">boxplot</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;地域&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;東京&#39;</span><span class="p">][</span><span class="s1">&#39;売上&#39;</span><span class="p">],</span>
-</span></span><span class="line"><span class="cl">                    <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;地域&#39;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;大阪&#39;</span><span class="p">][</span><span class="s1">&#39;売上&#39;</span><span class="p">]])</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s1">&#39;東京&#39;</span><span class="p">,</span> <span class="s1">&#39;大阪&#39;</span><span class="p">])</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;地域別売上分布&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 円グラフ</span>
-</span></span><span class="line"><span class="cl"><span class="n">category_sales</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">&#39;カテゴリ&#39;</span><span class="p">)[</span><span class="s1">&#39;売上&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span><span class="n">category_sales</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">category_sales</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">autopct</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%1.1f%%</span><span class="s1">&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;カテゴリ別売上構成&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="実践例売上データの分析">実践例：売上データの分析
-</h2><h3 id="データの準備">データの準備
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span><span class="lnt">7
-</span><span class="lnt">8
-</span><span class="lnt">9
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># サンプルデータの作成</span>
-</span></span><span class="line"><span class="cl"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">dates</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">date_range</span><span class="p">(</span><span class="s1">&#39;2024-01-01&#39;</span><span class="p">,</span> <span class="n">periods</span><span class="o">=</span><span class="mi">365</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">sales_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&#39;日付&#39;</span><span class="p">:</span> <span class="n">dates</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&#39;売上&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">100000</span><span class="p">,</span> <span class="mi">20000</span><span class="p">,</span> <span class="mi">365</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">365</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">365</span><span class="p">)</span> <span class="o">*</span> <span class="mi">30000</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&#39;広告費&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">365</span><span class="p">),</span>
-</span></span><span class="line"><span class="cl">    <span class="s1">&#39;気温&#39;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">365</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">})</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="時系列分析">時系列分析
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 移動平均の計算</span>
-</span></span><span class="line"><span class="cl"><span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上_7日移動平均&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上_30日移動平均&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">window</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># グラフ化</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;日付&#39;</span><span class="p">],</span> <span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上&#39;</span><span class="p">],</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;日次売上&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;日付&#39;</span><span class="p">],</span> <span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上_7日移動平均&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;7日移動平均&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;日付&#39;</span><span class="p">],</span> <span class="n">sales_data</span><span class="p">[</span><span class="s1">&#39;売上_30日移動平均&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;30日移動平均&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;売上推移と移動平均&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="相関分析">相関分析
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 相関係数の計算</span>
-</span></span><span class="line"><span class="cl"><span class="n">correlation_matrix</span> <span class="o">=</span> <span class="n">sales_data</span><span class="p">[[</span><span class="s1">&#39;売上&#39;</span><span class="p">,</span> <span class="s1">&#39;広告費&#39;</span><span class="p">,</span> <span class="s1">&#39;気温&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">corr</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># ヒートマップで可視化</span>
-</span></span><span class="line"><span class="cl"><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-</span></span><span class="line"><span class="cl"><span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">correlation_matrix</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;coolwarm&#39;</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;変数間の相関係数&#39;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="データ分析のベストプラクティス">データ分析のベストプラクティス
-</h2><h3 id="1-データの前処理は丁寧に">1. データの前処理は丁寧に
-</h3><ul>
-<li>欠損値の確認と処理</li>
-<li>外れ値の検出と対処</li>
-<li>データ型の確認と変換</li>
-</ul>
-<h3 id="2-可視化は目的に応じて">2. 可視化は目的に応じて
-</h3><ul>
-<li>分布を見る：ヒストグラム、箱ひげ図</li>
-<li>関係性を見る：散布図、相関行列</li>
-<li>推移を見る：折れ線グラフ</li>
-<li>構成を見る：円グラフ、積み上げ棒グラフ</li>
-</ul>
-<h3 id="3-再現性の確保">3. 再現性の確保
-</h3><div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-python" data-lang="python"><span class="line"><span class="cl"><span class="c1"># 乱数のシード固定</span>
-</span></span><span class="line"><span class="cl"><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># バージョン情報の記録</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;pandas: </span><span class="si">{</span><span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&#34;numpy: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&#34;</span><span class="p">)</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="まとめ">まとめ
-</h2><p>Pythonでのデータ分析は、pandas、NumPy、Matplotlibの3つのライブラリを使いこなすことから始まります。基本的な操作を習得したら、実際のデータセットで練習を重ねることが上達への近道です。</p>
-<p>次回は、scikit-learnを使った機械学習入門について解説予定です。</p>
-
-</section>
-
-
-    <footer class="article-footer">
-    
-    <section class="article-tags">
-        
-            <a href="/tags/matplotlib/">Matplotlib</a>
-        
-            <a href="/tags/numpy/">NumPy</a>
-        
-            <a href="/tags/pandas/">Pandas</a>
-        
-            <a href="/tags/python/">Python</a>
-        
-            <a href="/tags/%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90/">データ分析</a>
-        
-            <a href="/tags/%E6%A9%9F%E6%A2%B0%E5%AD%A6%E7%BF%92/">機械学習</a>
-        
-    </section>
-
-
-    </footer>
-
-
-    
-</article>
-
-    
-
-    
-
-     
-    
-        
-    
-
-    <footer class="site-footer">
-    <section class="copyright">
-        &copy; 
-        
-        2025 トミー
-    </section>
-    
-    <section class="powerby">
-        
-            技術ネタ、趣味や備忘録などを書いているブログです <br/>
-        <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> で構築されています。 <br />
-        テーマ <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.30.0">Stack</a></b> は <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a> によって設計されています。
-    </section>
-</footer>
-
-
-    
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-
-    
-    <div class="pswp__bg"></div>
-
-    
-    <div class="pswp__scroll-wrap">
-
-        
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-
-        
-        <div class="pswp__ui pswp__ui--hidden">
-
-            <div class="pswp__top-bar">
-
-                
-
-                <div class="pswp__counter"></div>
-
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-
-                
-                
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                        <div class="pswp__preloader__cut">
-                            <div class="pswp__preloader__donut"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-
-        </div>
-
-    </div>
-
-</div><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
-                defer
-                >
-            </script><script 
-                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
-                defer
-                >
-            </script><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
-            ><link 
-                rel="stylesheet" 
-                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
-            >
-
-            </main>
-        </div>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。"><title>Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎</title><link rel=canonical href=https://firebird-techtalktech.com/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/><link rel=stylesheet href=/scss/style.min.35a329e3089f50f5123f8d07a09ea0bef36c2fef751cf1cb89de29996b5a4918.css><meta property='og:title' content="Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎"><meta property='og:description' content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/'><meta property='og:site_name' content='firebirdテクテクテクブログ'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Matplotlib'><meta property='article:tag' content='NumPy'><meta property='article:tag' content='Python'><meta property='article:tag' content='pandas'><meta property='article:tag' content='python'><meta property='article:tag' content='データ分析'><meta property='article:tag' content='機械学習'><meta property='article:published_time' content='2025-01-09T09:00:00+09:00'><meta property='article:modified_time' content='2025-01-09T09:00:00+09:00'><meta name=twitter:title content="Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎"><meta name=twitter:description content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。"><link rel=alternate type=application/json href=https://firebird-techtalktech.com/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/index.json><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテクテクテクブログ","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎","description":"Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-01-09T09:00:00\u002b09:00","dateModified":"2025-01-09T09:00:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E\/","wordCount":"2481","keywords":["Matplotlib","NumPy","Python","pandas","python","データ分析","機械学習"]}</script><meta name=description content="Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。"><meta property="og:site_name" content="firebirdテクテクテクブログ"><meta property="og:type" content="article"></head><body><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><header><figure class=site-avatar><a href=/><img src=/img/avatar_hu_762f71fa991dd853.png width=300 height=300 class=site-logo loading=lazy alt=Avatar>
+</a><span class=emoji>🎯</span></figure><div class=site-meta><h1 class=site-name><a href=/>firebirdテクテクテクブログ</a></h1><h2 class=site-description>技術ネタ、趣味や備忘録などを書いているブログです</h2></div></header><ol class=menu-social><li><a href=https://twitter.com/firebird19245 target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></li></ol><ol class=menu id=main-menu><li><a href=/categories/><span>カテゴリー</span></a></li><li><a href=/tags/><span>タグ</span></a></li><li><a href=/archives/><span>アーカイブ</span></a></li><li><a href=/about/><span>このサイトについて</span></a></li><li><a href=/search/><span>検索</span></a></li><li class=menu-bottom-section><ol class=menu><li id=dark-mode-toggle><svg class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="8" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<svg class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="16" cy="12" r="2"/><rect x="2" y="6" width="20" height="12" rx="6"/></svg>
+<span>ダークモード</span></li></ol></li></ol></aside><main class="main full-width"><article><header class=article-header><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E6%8A%80%E8%A1%93/>技術</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/python%E3%81%A7%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90%E5%85%A5%E9%96%80pandasnumpymatplotlib%E3%81%AE%E5%9F%BA%E7%A4%8E/>Pythonでデータ分析入門：pandas、NumPy、Matplotlibの基礎</a></h2><h3 class=article-subtitle>Pythonを使ったデータ分析の基礎を、実践的なコード例とともに解説します。</h3></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2025年1月9日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 5分</time></div></footer></div></header></header><div class=article-content><section class=article-content><h2 id=はじめに>はじめに</h2><p>データ分析は現代のビジネスにおいて必須スキルとなっています。PythonとそのライブラリであるPandas、NumPy、Matplotlibを使えば、効率的にデータ分析を行うことができます。</p><h2 id=環境構築>環境構築</h2><h3 id=必要なライブラリのインストール>必要なライブラリのインストール</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>pip install pandas numpy matplotlib seaborn jupyter
+</span></span></code></pre></td></tr></table></div></div><h3 id=jupyter-notebookの起動>Jupyter Notebookの起動</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl>jupyter notebook
+</span></span></code></pre></td></tr></table></div></div><h2 id=numpy数値計算の基礎>NumPy：数値計算の基礎</h2><h3 id=配列の作成と操作>配列の作成と操作</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>numpy</span> <span class=k>as</span> <span class=nn>np</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 配列の作成</span>
+</span></span><span class=line><span class=cl><span class=n>arr</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>array</span><span class=p>([</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=n>matrix</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>array</span><span class=p>([[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=mi>3</span><span class=p>],</span> <span class=p>[</span><span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>6</span><span class=p>]])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 統計量の計算</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;平均: </span><span class=si>{</span><span class=n>arr</span><span class=o>.</span><span class=n>mean</span><span class=p>()</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;標準偏差: </span><span class=si>{</span><span class=n>arr</span><span class=o>.</span><span class=n>std</span><span class=p>()</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;最大値: </span><span class=si>{</span><span class=n>arr</span><span class=o>.</span><span class=n>max</span><span class=p>()</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=行列演算>行列演算</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 行列の積</span>
+</span></span><span class=line><span class=cl><span class=n>A</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>array</span><span class=p>([[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>2</span><span class=p>],</span> <span class=p>[</span><span class=mi>3</span><span class=p>,</span> <span class=mi>4</span><span class=p>]])</span>
+</span></span><span class=line><span class=cl><span class=n>B</span> <span class=o>=</span> <span class=n>np</span><span class=o>.</span><span class=n>array</span><span class=p>([[</span><span class=mi>5</span><span class=p>,</span> <span class=mi>6</span><span class=p>],</span> <span class=p>[</span><span class=mi>7</span><span class=p>,</span> <span class=mi>8</span><span class=p>]])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 要素ごとの積</span>
+</span></span><span class=line><span class=cl><span class=n>element_wise</span> <span class=o>=</span> <span class=n>A</span> <span class=o>*</span> <span class=n>B</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 行列積</span>
+</span></span><span class=line><span class=cl><span class=n>matrix_product</span> <span class=o>=</span> <span class=n>A</span> <span class=o>@</span> <span class=n>B</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=pandasデータ操作の要>Pandas：データ操作の要</h2><h3 id=dataframeの基本操作>DataFrameの基本操作</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>pandas</span> <span class=k>as</span> <span class=nn>pd</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># CSVファイルの読み込み</span>
+</span></span><span class=line><span class=cl><span class=n>df</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>read_csv</span><span class=p>(</span><span class=s1>&#39;sales_data.csv&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># データの概要確認</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>df</span><span class=o>.</span><span class=n>head</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>df</span><span class=o>.</span><span class=n>info</span><span class=p>())</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>df</span><span class=o>.</span><span class=n>describe</span><span class=p>())</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=データのフィルタリングと集計>データのフィルタリングと集計</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 条件によるフィルタリング</span>
+</span></span><span class=line><span class=cl><span class=n>high_sales</span> <span class=o>=</span> <span class=n>df</span><span class=p>[</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;売上&#39;</span><span class=p>]</span> <span class=o>&gt;</span> <span class=mi>100000</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># グループ化と集計</span>
+</span></span><span class=line><span class=cl><span class=n>monthly_sales</span> <span class=o>=</span> <span class=n>df</span><span class=o>.</span><span class=n>groupby</span><span class=p>(</span><span class=s1>&#39;月&#39;</span><span class=p>)[</span><span class=s1>&#39;売上&#39;</span><span class=p>]</span><span class=o>.</span><span class=n>agg</span><span class=p>([</span><span class=s1>&#39;sum&#39;</span><span class=p>,</span> <span class=s1>&#39;mean&#39;</span><span class=p>,</span> <span class=s1>&#39;count&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># ピボットテーブル</span>
+</span></span><span class=line><span class=cl><span class=n>pivot</span> <span class=o>=</span> <span class=n>df</span><span class=o>.</span><span class=n>pivot_table</span><span class=p>(</span>
+</span></span><span class=line><span class=cl>    <span class=n>values</span><span class=o>=</span><span class=s1>&#39;売上&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>index</span><span class=o>=</span><span class=s1>&#39;商品カテゴリ&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>columns</span><span class=o>=</span><span class=s1>&#39;地域&#39;</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=n>aggfunc</span><span class=o>=</span><span class=s1>&#39;sum&#39;</span>
+</span></span><span class=line><span class=cl><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=欠損値の処理>欠損値の処理</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 欠損値の確認</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=n>df</span><span class=o>.</span><span class=n>isnull</span><span class=p>()</span><span class=o>.</span><span class=n>sum</span><span class=p>())</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 欠損値の補完</span>
+</span></span><span class=line><span class=cl><span class=n>df</span><span class=p>[</span><span class=s1>&#39;価格&#39;</span><span class=p>]</span><span class=o>.</span><span class=n>fillna</span><span class=p>(</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;価格&#39;</span><span class=p>]</span><span class=o>.</span><span class=n>mean</span><span class=p>(),</span> <span class=n>inplace</span><span class=o>=</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 欠損値を含む行の削除</span>
+</span></span><span class=line><span class=cl><span class=n>df_clean</span> <span class=o>=</span> <span class=n>df</span><span class=o>.</span><span class=n>dropna</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=matplotlibデータの可視化>Matplotlib：データの可視化</h2><h3 id=基本的なグラフ>基本的なグラフ</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=kn>import</span> <span class=nn>matplotlib.pyplot</span> <span class=k>as</span> <span class=nn>plt</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>matplotlib</span> <span class=k>as</span> <span class=nn>mpl</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 日本語フォントの設定</span>
+</span></span><span class=line><span class=cl><span class=n>mpl</span><span class=o>.</span><span class=n>font_manager</span><span class=o>.</span><span class=n>fontManager</span><span class=o>.</span><span class=n>addfont</span><span class=p>(</span><span class=s1>&#39;/System/Library/Fonts/ヒラギノ角ゴシック W3.ttc&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>rcParams</span><span class=p>[</span><span class=s1>&#39;font.family&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=s1>&#39;Hiragino Sans&#39;</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 折れ線グラフ</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>figure</span><span class=p>(</span><span class=n>figsize</span><span class=o>=</span><span class=p>(</span><span class=mi>10</span><span class=p>,</span> <span class=mi>6</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;日付&#39;</span><span class=p>],</span> <span class=n>df</span><span class=p>[</span><span class=s1>&#39;売上&#39;</span><span class=p>],</span> <span class=n>marker</span><span class=o>=</span><span class=s1>&#39;o&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>title</span><span class=p>(</span><span class=s1>&#39;月別売上推移&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>xlabel</span><span class=p>(</span><span class=s1>&#39;月&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>ylabel</span><span class=p>(</span><span class=s1>&#39;売上（円）&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>grid</span><span class=p>(</span><span class=kc>True</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=複数のグラフを組み合わせる>複数のグラフを組み合わせる</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=n>fig</span><span class=p>,</span> <span class=n>axes</span> <span class=o>=</span> <span class=n>plt</span><span class=o>.</span><span class=n>subplots</span><span class=p>(</span><span class=mi>2</span><span class=p>,</span> <span class=mi>2</span><span class=p>,</span> <span class=n>figsize</span><span class=o>=</span><span class=p>(</span><span class=mi>12</span><span class=p>,</span> <span class=mi>10</span><span class=p>))</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># ヒストグラム</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>hist</span><span class=p>(</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;価格&#39;</span><span class=p>],</span> <span class=n>bins</span><span class=o>=</span><span class=mi>20</span><span class=p>,</span> <span class=n>edgecolor</span><span class=o>=</span><span class=s1>&#39;black&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>0</span><span class=p>,</span> <span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>set_title</span><span class=p>(</span><span class=s1>&#39;価格分布&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 散布図</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>0</span><span class=p>,</span> <span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>scatter</span><span class=p>(</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;広告費&#39;</span><span class=p>],</span> <span class=n>df</span><span class=p>[</span><span class=s1>&#39;売上&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>0</span><span class=p>,</span> <span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>set_title</span><span class=p>(</span><span class=s1>&#39;広告費 vs 売上&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 箱ひげ図</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>boxplot</span><span class=p>([</span><span class=n>df</span><span class=p>[</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;地域&#39;</span><span class=p>]</span><span class=o>==</span><span class=s1>&#39;東京&#39;</span><span class=p>][</span><span class=s1>&#39;売上&#39;</span><span class=p>],</span>
+</span></span><span class=line><span class=cl>                    <span class=n>df</span><span class=p>[</span><span class=n>df</span><span class=p>[</span><span class=s1>&#39;地域&#39;</span><span class=p>]</span><span class=o>==</span><span class=s1>&#39;大阪&#39;</span><span class=p>][</span><span class=s1>&#39;売上&#39;</span><span class=p>]])</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>set_xticklabels</span><span class=p>([</span><span class=s1>&#39;東京&#39;</span><span class=p>,</span> <span class=s1>&#39;大阪&#39;</span><span class=p>])</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>0</span><span class=p>]</span><span class=o>.</span><span class=n>set_title</span><span class=p>(</span><span class=s1>&#39;地域別売上分布&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 円グラフ</span>
+</span></span><span class=line><span class=cl><span class=n>category_sales</span> <span class=o>=</span> <span class=n>df</span><span class=o>.</span><span class=n>groupby</span><span class=p>(</span><span class=s1>&#39;カテゴリ&#39;</span><span class=p>)[</span><span class=s1>&#39;売上&#39;</span><span class=p>]</span><span class=o>.</span><span class=n>sum</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>pie</span><span class=p>(</span><span class=n>category_sales</span><span class=p>,</span> <span class=n>labels</span><span class=o>=</span><span class=n>category_sales</span><span class=o>.</span><span class=n>index</span><span class=p>,</span> <span class=n>autopct</span><span class=o>=</span><span class=s1>&#39;</span><span class=si>%1.1f%%</span><span class=s1>&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>axes</span><span class=p>[</span><span class=mi>1</span><span class=p>,</span> <span class=mi>1</span><span class=p>]</span><span class=o>.</span><span class=n>set_title</span><span class=p>(</span><span class=s1>&#39;カテゴリ別売上構成&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>tight_layout</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=実践例売上データの分析>実践例：売上データの分析</h2><h3 id=データの準備>データの準備</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># サンプルデータの作成</span>
+</span></span><span class=line><span class=cl><span class=n>np</span><span class=o>.</span><span class=n>random</span><span class=o>.</span><span class=n>seed</span><span class=p>(</span><span class=mi>42</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>dates</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>date_range</span><span class=p>(</span><span class=s1>&#39;2024-01-01&#39;</span><span class=p>,</span> <span class=n>periods</span><span class=o>=</span><span class=mi>365</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>sales_data</span> <span class=o>=</span> <span class=n>pd</span><span class=o>.</span><span class=n>DataFrame</span><span class=p>({</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;日付&#39;</span><span class=p>:</span> <span class=n>dates</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;売上&#39;</span><span class=p>:</span> <span class=n>np</span><span class=o>.</span><span class=n>random</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=mi>100000</span><span class=p>,</span> <span class=mi>20000</span><span class=p>,</span> <span class=mi>365</span><span class=p>)</span> <span class=o>+</span> <span class=n>np</span><span class=o>.</span><span class=n>sin</span><span class=p>(</span><span class=n>np</span><span class=o>.</span><span class=n>arange</span><span class=p>(</span><span class=mi>365</span><span class=p>)</span> <span class=o>*</span> <span class=mi>2</span> <span class=o>*</span> <span class=n>np</span><span class=o>.</span><span class=n>pi</span> <span class=o>/</span> <span class=mi>365</span><span class=p>)</span> <span class=o>*</span> <span class=mi>30000</span><span class=p>,</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;広告費&#39;</span><span class=p>:</span> <span class=n>np</span><span class=o>.</span><span class=n>random</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=mi>10000</span><span class=p>,</span> <span class=mi>2000</span><span class=p>,</span> <span class=mi>365</span><span class=p>),</span>
+</span></span><span class=line><span class=cl>    <span class=s1>&#39;気温&#39;</span><span class=p>:</span> <span class=n>np</span><span class=o>.</span><span class=n>random</span><span class=o>.</span><span class=n>normal</span><span class=p>(</span><span class=mi>20</span><span class=p>,</span> <span class=mi>10</span><span class=p>,</span> <span class=mi>365</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=p>})</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=時系列分析>時系列分析</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 移動平均の計算</span>
+</span></span><span class=line><span class=cl><span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上_7日移動平均&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上&#39;</span><span class=p>]</span><span class=o>.</span><span class=n>rolling</span><span class=p>(</span><span class=n>window</span><span class=o>=</span><span class=mi>7</span><span class=p>)</span><span class=o>.</span><span class=n>mean</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上_30日移動平均&#39;</span><span class=p>]</span> <span class=o>=</span> <span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上&#39;</span><span class=p>]</span><span class=o>.</span><span class=n>rolling</span><span class=p>(</span><span class=n>window</span><span class=o>=</span><span class=mi>30</span><span class=p>)</span><span class=o>.</span><span class=n>mean</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># グラフ化</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>figure</span><span class=p>(</span><span class=n>figsize</span><span class=o>=</span><span class=p>(</span><span class=mi>14</span><span class=p>,</span> <span class=mi>6</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;日付&#39;</span><span class=p>],</span> <span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上&#39;</span><span class=p>],</span> <span class=n>alpha</span><span class=o>=</span><span class=mf>0.3</span><span class=p>,</span> <span class=n>label</span><span class=o>=</span><span class=s1>&#39;日次売上&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;日付&#39;</span><span class=p>],</span> <span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上_7日移動平均&#39;</span><span class=p>],</span> <span class=n>label</span><span class=o>=</span><span class=s1>&#39;7日移動平均&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>plot</span><span class=p>(</span><span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;日付&#39;</span><span class=p>],</span> <span class=n>sales_data</span><span class=p>[</span><span class=s1>&#39;売上_30日移動平均&#39;</span><span class=p>],</span> <span class=n>label</span><span class=o>=</span><span class=s1>&#39;30日移動平均&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>legend</span><span class=p>()</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>title</span><span class=p>(</span><span class=s1>&#39;売上推移と移動平均&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=相関分析>相関分析</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 相関係数の計算</span>
+</span></span><span class=line><span class=cl><span class=n>correlation_matrix</span> <span class=o>=</span> <span class=n>sales_data</span><span class=p>[[</span><span class=s1>&#39;売上&#39;</span><span class=p>,</span> <span class=s1>&#39;広告費&#39;</span><span class=p>,</span> <span class=s1>&#39;気温&#39;</span><span class=p>]]</span><span class=o>.</span><span class=n>corr</span><span class=p>()</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># ヒートマップで可視化</span>
+</span></span><span class=line><span class=cl><span class=kn>import</span> <span class=nn>seaborn</span> <span class=k>as</span> <span class=nn>sns</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>figure</span><span class=p>(</span><span class=n>figsize</span><span class=o>=</span><span class=p>(</span><span class=mi>8</span><span class=p>,</span> <span class=mi>6</span><span class=p>))</span>
+</span></span><span class=line><span class=cl><span class=n>sns</span><span class=o>.</span><span class=n>heatmap</span><span class=p>(</span><span class=n>correlation_matrix</span><span class=p>,</span> <span class=n>annot</span><span class=o>=</span><span class=kc>True</span><span class=p>,</span> <span class=n>cmap</span><span class=o>=</span><span class=s1>&#39;coolwarm&#39;</span><span class=p>,</span> <span class=n>center</span><span class=o>=</span><span class=mi>0</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>title</span><span class=p>(</span><span class=s1>&#39;変数間の相関係数&#39;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=n>plt</span><span class=o>.</span><span class=n>show</span><span class=p>()</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=データ分析のベストプラクティス>データ分析のベストプラクティス</h2><h3 id=1-データの前処理は丁寧に>1. データの前処理は丁寧に</h3><ul><li>欠損値の確認と処理</li><li>外れ値の検出と対処</li><li>データ型の確認と変換</li></ul><h3 id=2-可視化は目的に応じて>2. 可視化は目的に応じて</h3><ul><li>分布を見る：ヒストグラム、箱ひげ図</li><li>関係性を見る：散布図、相関行列</li><li>推移を見る：折れ線グラフ</li><li>構成を見る：円グラフ、積み上げ棒グラフ</li></ul><h3 id=3-再現性の確保>3. 再現性の確保</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-python data-lang=python><span class=line><span class=cl><span class=c1># 乱数のシード固定</span>
+</span></span><span class=line><span class=cl><span class=n>np</span><span class=o>.</span><span class=n>random</span><span class=o>.</span><span class=n>seed</span><span class=p>(</span><span class=mi>42</span><span class=p>)</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># バージョン情報の記録</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;pandas: </span><span class=si>{</span><span class=n>pd</span><span class=o>.</span><span class=n>__version__</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span><span class=line><span class=cl><span class=nb>print</span><span class=p>(</span><span class=sa>f</span><span class=s2>&#34;numpy: </span><span class=si>{</span><span class=n>np</span><span class=o>.</span><span class=n>__version__</span><span class=si>}</span><span class=s2>&#34;</span><span class=p>)</span>
+</span></span></code></pre></td></tr></table></div></div><h2 id=まとめ>まとめ</h2><p>Pythonでのデータ分析は、pandas、NumPy、Matplotlibの3つのライブラリを使いこなすことから始まります。基本的な操作を習得したら、実際のデータセットで練習を重ねることが上達への近道です。</p><p>次回は、scikit-learnを使った機械学習入門について解説予定です。</p></section></div><div class="article-ad article-ad-bottom"><div class=ad-container><p class=ad-label>スポンサーリンク</p></div></div><footer class=article-footer><footer class=article-footer><section class=article-tags><a href=/tags/matplotlib/>Matplotlib</a>
+<a href=/tags/numpy/>NumPy</a>
+<a href=/tags/pandas/>Pandas</a>
+<a href=/tags/python/>Python</a>
+<a href=/tags/%E3%83%87%E3%83%BC%E3%82%BF%E5%88%86%E6%9E%90/>データ分析</a>
+<a href=/tags/%E6%A9%9F%E6%A2%B0%E5%AD%A6%E7%BF%92/>機械学習</a></section></footer></footer><footer class=site-footer><section class=copyright>&copy;
+2025 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></article><style>.article-ad{margin:40px 0;padding:20px 0;border-top:1px solid var(--card-separator-color);border-bottom:1px solid var(--card-separator-color)}.ad-label{text-align:center;color:var(--card-text-color-secondary);font-size:.9em;margin-bottom:15px}.ad-container{display:flex;flex-direction:column;align-items:center;justify-content:center}[data-scheme=dark] .ad-placeholder{background:#2d2d2d !important;border-color:#444 !important;color:#666 !important}</style></main></div><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
