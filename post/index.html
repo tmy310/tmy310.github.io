@@ -121,31 +121,27 @@
         </span>
     </button>
 
-    <header>
+    <header class="compact-header">
         
             
-            <figure class="site-avatar">
+            <figure class="site-avatar compact">
                 <a href="/">
                 
                     
                     
                     
                         
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                        <img src="/img/avatar_hu_af6821f6102cb0b.png" width="80"
+                            height="80" class="site-logo compact" loading="lazy" alt="Avatar">
                     
                 
                 </a>
-                
-                    <span class="emoji">🎯</span>
-                
             </figure>
             
         
         
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
+        <div class="site-meta compact">
+            <h1 class="site-name compact"><a href="/">firebirdテクテクテクブログ</a></h1>
         </div>
     </header><ol class="menu-social">
             
@@ -995,26 +991,111 @@
 
 <style>
  
-.media-sidebar-content {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--card-separator-color);
-}
-
-.media-sidebar-content .widget {
-    margin-bottom: 25px;
+.compact-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
     padding: 15px;
-    background: var(--body-background);
+    background: var(--card-background);
     border-radius: 8px;
     border: 1px solid var(--card-separator-color);
 }
 
+.site-avatar.compact {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.site-avatar.compact .site-logo.compact {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.site-meta.compact {
+    flex: 1;
+    min-width: 0;
+}
+
+.site-name.compact {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.site-name.compact a {
+    color: var(--card-text-color-main);
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.site-name.compact a:hover {
+    color: var(--accent-color);
+}
+
+ 
+.media-sidebar-content {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--card-separator-color);
+}
+
+.media-sidebar-content .widget {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: var(--body-background);
+    border-radius: 6px;
+    border: 1px solid var(--card-separator-color);
+}
+
 .media-sidebar-content .widget .widget-title {
-    font-size: 1em;
-    margin-bottom: 15px;
+    font-size: 0.95em;
+    margin-bottom: 12px;
     color: var(--accent-color);
     border-bottom: 1px solid var(--accent-color);
-    padding-bottom: 8px;
+    padding-bottom: 6px;
+}
+
+ 
+.media-sidebar-content .topic-section {
+    margin-bottom: 15px;
+}
+
+.media-sidebar-content .media-section {
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+}
+
+.media-sidebar-content .topic-title,
+.media-sidebar-content .media-title {
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.media-sidebar-content .topic-item,
+.media-sidebar-content .featured-item {
+    margin-bottom: 8px;
+    padding: 6px;
+}
+
+.media-sidebar-content .trend-tag,
+.media-sidebar-content .guide-item,
+.media-sidebar-content .topic-category {
+    padding: 6px 8px;
+}
+
+.media-sidebar-content .breaking-item {
+    padding: 8px;
+}
+
+.media-sidebar-content .pickup-item {
+    padding: 8px;
 }
 
  
@@ -1027,8 +1108,8 @@
  
 @media (min-width: 1024px) {
     .left-sidebar {
-        width: 320px;
-        min-width: 320px;
+        width: 300px;
+        min-width: 300px;
     }
 }
 </style>
@@ -1734,6 +1815,78 @@ DeepDiff との関連: DeepDiff は、このPythonの特性を活かして、_pr
                 <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
 
                 <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
+ <button class="pswp__button pswp__button--share" title="Share"></button>
 
                 <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
 

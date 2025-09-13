@@ -121,31 +121,27 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
         </span>
     </button>
 
-    <header>
+    <header class="compact-header">
         
             
-            <figure class="site-avatar">
+            <figure class="site-avatar compact">
                 <a href="/">
                 
                     
                     
                     
                         
-                        <img src="/img/avatar_hu_762f71fa991dd853.png" width="300"
-                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                        <img src="/img/avatar_hu_af6821f6102cb0b.png" width="80"
+                            height="80" class="site-logo compact" loading="lazy" alt="Avatar">
                     
                 
                 </a>
-                
-                    <span class="emoji">🎯</span>
-                
             </figure>
             
         
         
-        <div class="site-meta">
-            <h1 class="site-name"><a href="/">firebirdテクテクテクブログ</a></h1>
-            <h2 class="site-description">技術ネタ、趣味や備忘録などを書いているブログです</h2>
+        <div class="site-meta compact">
+            <h1 class="site-name compact"><a href="/">firebirdテクテクテクブログ</a></h1>
         </div>
     </header><ol class="menu-social">
             
@@ -995,26 +991,111 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
 
 <style>
  
-.media-sidebar-content {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid var(--card-separator-color);
-}
-
-.media-sidebar-content .widget {
-    margin-bottom: 25px;
+.compact-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
     padding: 15px;
-    background: var(--body-background);
+    background: var(--card-background);
     border-radius: 8px;
     border: 1px solid var(--card-separator-color);
 }
 
+.site-avatar.compact {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.site-avatar.compact .site-logo.compact {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.site-meta.compact {
+    flex: 1;
+    min-width: 0;
+}
+
+.site-name.compact {
+    margin: 0;
+    font-size: 1.1em;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.site-name.compact a {
+    color: var(--card-text-color-main);
+    text-decoration: none;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.site-name.compact a:hover {
+    color: var(--accent-color);
+}
+
+ 
+.media-sidebar-content {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--card-separator-color);
+}
+
+.media-sidebar-content .widget {
+    margin-bottom: 20px;
+    padding: 12px;
+    background: var(--body-background);
+    border-radius: 6px;
+    border: 1px solid var(--card-separator-color);
+}
+
 .media-sidebar-content .widget .widget-title {
-    font-size: 1em;
-    margin-bottom: 15px;
+    font-size: 0.95em;
+    margin-bottom: 12px;
     color: var(--accent-color);
     border-bottom: 1px solid var(--accent-color);
-    padding-bottom: 8px;
+    padding-bottom: 6px;
+}
+
+ 
+.media-sidebar-content .topic-section {
+    margin-bottom: 15px;
+}
+
+.media-sidebar-content .media-section {
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+}
+
+.media-sidebar-content .topic-title,
+.media-sidebar-content .media-title {
+    font-size: 0.9em;
+    margin-bottom: 8px;
+}
+
+.media-sidebar-content .topic-item,
+.media-sidebar-content .featured-item {
+    margin-bottom: 8px;
+    padding: 6px;
+}
+
+.media-sidebar-content .trend-tag,
+.media-sidebar-content .guide-item,
+.media-sidebar-content .topic-category {
+    padding: 6px 8px;
+}
+
+.media-sidebar-content .breaking-item {
+    padding: 8px;
+}
+
+.media-sidebar-content .pickup-item {
+    padding: 8px;
 }
 
  
@@ -1027,8 +1108,8 @@ GCPにおけるVPC間接続は、システム設計の重要な要素です。�
  
 @media (min-width: 1024px) {
     .left-sidebar {
-        width: 320px;
-        min-width: 320px;
+        width: 300px;
+        min-width: 300px;
     }
 }
 </style>
