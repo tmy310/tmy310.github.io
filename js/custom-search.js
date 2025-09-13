@@ -28,14 +28,18 @@ class SearchEngine {
 
     async loadSearchData() {
         try {
+            console.log('Loading search data from /index.json...');
             const response = await fetch('/index.json');
+            console.log('Response status:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             this.searchData = await response.json();
-            console.log(`Loaded ${this.searchData.length} articles for search`);
+            console.log(`Successfully loaded ${this.searchData.length} articles for search`);
+            console.log('First article:', this.searchData[0]);
         } catch (error) {
             console.error('Failed to load search data:', error);
+            console.error('Error details:', error.message);
             this.searchData = [];
         }
     }
@@ -51,15 +55,27 @@ class SearchEngine {
         const searchResults = document.querySelector('.search-result--list');
         const searchTitle = document.querySelector('.search-result--title');
 
+        console.log('Found elements:');
+        console.log('- Header form:', headerForm);
+        console.log('- Header input:', headerInput);
+        console.log('- Search page form:', searchPageForm);
+        console.log('- Search page input:', searchPageInput);
+        console.log('- Search results:', searchResults);
+        console.log('- Search title:', searchTitle);
+
         // 優先順位: 検索ページ > ヘッダー
         if (searchPageForm && searchPageInput) {
             this.searchForm = searchPageForm;
             this.searchInput = searchPageInput;
             this.searchResults = searchResults;
             this.searchTitle = searchTitle;
+            console.log('Using search page elements');
         } else if (headerForm && headerInput) {
             this.searchForm = headerForm;
             this.searchInput = headerInput;
+            console.log('Using header elements');
+        } else {
+            console.log('No search elements found');
         }
     }
 
