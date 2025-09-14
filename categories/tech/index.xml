@@ -1,621 +1,650 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Tech on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/categories/tech/</link><description>Recent content in Tech on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sun, 14 Sep 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/categories/tech/index.xml" rel="self" type="application/rss+xml"/><item><title>Escape from Protocol Buffer Hell: My 3-Week Battle Crying 'It's Not Encryption!'</title><link>https://firebird-techtalktech.com/post/escape-from-protocol-buffer-hell-my-3-week-battle-crying-its-not-encryption/</link><pubDate>Sun, 14 Sep 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/escape-from-protocol-buffer-hell-my-3-week-battle-crying-its-not-encryption/</guid><description>&lt;h1 id="escape-from-protocol-buffer-hell-my-3-week-battle-crying-its-not-encryption">Escape from Protocol Buffer Hell: My 3-Week Battle Crying &amp;lsquo;It&amp;rsquo;s Not Encryption!&amp;rsquo;
-&lt;/h1>&lt;h2 id="wait-isnt-this-encryption---the-initial-misconception">&amp;ldquo;Wait, isn&amp;rsquo;t this encryption?&amp;rdquo; - The Initial Misconception
-&lt;/h2>&lt;p>When a new microservices project started and the team leader said &amp;ldquo;Let&amp;rsquo;s use Protocol Buffer with gRPC,&amp;rdquo; I internally panicked thinking &amp;ldquo;Oh no, I don&amp;rsquo;t understand encryption technology&amp;hellip;&amp;rdquo;&lt;/p>
-&lt;p>&lt;strong>My first major misconception: &amp;ldquo;Protocol Buffer = Encryption technology&amp;rdquo;&lt;/strong>&lt;/p>
-&lt;p>When I actually saw Protocol Buffer binary data:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">0A 05 41 6C 69 63 65 10 1A
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&amp;ldquo;Wow, it&amp;rsquo;s completely encrypted! Can I decode this?&amp;rdquo;&lt;/p>
-&lt;p>This is the record of my 3-week investigation, failures, and discoveries.&lt;/p>
-&lt;h2 id="week-1-the-why-did-json-become-9-bytes-incident">Week 1: The &amp;ldquo;Why did JSON become 9 bytes!?&amp;rdquo; Incident
-&lt;/h2>&lt;h3 id="failure-experience-the-initial-shock">Failure Experience: The Initial Shock
-&lt;/h3>&lt;p>Day 2 of the project. A senior said &amp;ldquo;Protocol Buffer is 3 times more efficient than JSON,&amp;rdquo; so I tried it out.&lt;/p>
-&lt;p>&lt;strong>Original data (JSON)&lt;/strong>:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Alice&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;age&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">26&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&lt;strong>Size&lt;/strong>: 26 bytes&lt;/p>
-&lt;p>&lt;strong>Protocol Buffer binary&lt;/strong>:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">0A 05 41 6C 69 63 65 10 1A
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&lt;strong>Size&lt;/strong>: 9 bytes&lt;/p>
-&lt;p>&amp;ldquo;Really? Actually one-third? But what language is this? Alien characters?&amp;rdquo;&lt;/p>
-&lt;h3 id="investigation-begins-solving-the-binary-mystery">Investigation Begins: Solving the Binary Mystery
-&lt;/h3>&lt;p>I went into complete panic mode and started investigating until late at night.&lt;/p>
-&lt;p>&lt;strong>First failure&lt;/strong>: Googled &amp;ldquo;Protocol Buffer encryption&amp;rdquo;
-→ Nothing found, because it&amp;rsquo;s not encryption in the first place&lt;/p>
-&lt;p>&lt;strong>Next failure&lt;/strong>: Opened with binary editor and stared at it
-→ &amp;ldquo;What are 41 6C 69 63 65? ASCII? But what are 0A 05?&amp;rdquo;&lt;/p>
-&lt;p>&lt;strong>Finally discovered&lt;/strong>: Looked up ASCII code table&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>41&lt;/code> = 65 = &amp;lsquo;A&amp;rsquo;&lt;/li>
-&lt;li>&lt;code>6C&lt;/code> = 108 = &amp;rsquo;l'&lt;/li>
-&lt;li>&lt;code>69&lt;/code> = 105 = &amp;lsquo;i&amp;rsquo;&lt;/li>
-&lt;li>&lt;code>63&lt;/code> = 99 = &amp;lsquo;c&amp;rsquo;&lt;/li>
-&lt;li>&lt;code>65&lt;/code> = 101 = &amp;rsquo;e'&lt;/li>
-&lt;/ul>
-&lt;p>&amp;ldquo;Ah! It&amp;rsquo;s &amp;quot;Alice&amp;quot;! It&amp;rsquo;s not encryption, just encoding!&amp;rdquo;&lt;/p>
-&lt;h2 id="week-2-the-shocking-discovery-of-the-field-number-system">Week 2: The Shocking Discovery of the &amp;ldquo;Field Number System&amp;rdquo;
-&lt;/h2>&lt;h3 id="failure-experience-the-mystery-of-proto-files">Failure Experience: The Mystery of .proto Files
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-protobuf" data-lang="protobuf">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">User&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int64&lt;/span> &lt;span class="n">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// What&amp;#39;s this &amp;#34;= 1&amp;#34;?
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// &amp;#34;= 2&amp;#34; too? Default value?
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">age&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// &amp;#34;= 3&amp;#34; too?
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&amp;ldquo;Huh? Is the default for id 1, and name 2? This makes no sense&amp;hellip;&amp;rdquo;&lt;/p>
-&lt;h3 id="discovery-of-truth-shocking-facts">Discovery of Truth: Shocking Facts
-&lt;/h3>&lt;p>After 3 days of puzzling, I read the official documentation and was stunned.&lt;/p>
-&lt;p>&lt;strong>Shocking facts&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Field names are not transmitted!&lt;/strong>&lt;/li>
-&lt;li>&lt;strong>Only field numbers are transmitted!&lt;/strong>&lt;/li>
-&lt;li>&lt;strong>&lt;code>= 2&lt;/code> is not a default value but an identification number!&lt;/strong>&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">0A 05 41 6C 69 63 65 10 1A
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">↓
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">0A 05: Field 2 (name), length 5
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">41 6C 69 63 65: &amp;#34;Alice&amp;#34;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">10 1A: Field 3 (age) = 26
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&amp;ldquo;That&amp;rsquo;s why it&amp;rsquo;s small! It doesn&amp;rsquo;t send field names! Genius!&amp;rdquo;&lt;/p>
-&lt;h3 id="verification-experiment-really-3x-more-efficient">Verification Experiment: Really 3x More Efficient?
-&lt;/h3>&lt;p>&lt;strong>JSON vs Protocol Buffer Showdown&lt;/strong>&lt;/p>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Data&lt;/th>
-&lt;th>JSON&lt;/th>
-&lt;th>Protocol Buffer&lt;/th>
-&lt;th>Efficiency&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>Simple data&lt;/td>
-&lt;td>26 bytes&lt;/td>
-&lt;td>9 bytes&lt;/td>
-&lt;td>2.9x&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>100 user array&lt;/td>
-&lt;td>2,600 bytes&lt;/td>
-&lt;td>900 bytes&lt;/td>
-&lt;td>2.9x&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>Complex object&lt;/td>
-&lt;td>1,200 bytes&lt;/td>
-&lt;td>420 bytes&lt;/td>
-&lt;td>2.9x&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;p>&amp;ldquo;It&amp;rsquo;s true&amp;hellip; about 3x more efficient for any data!&amp;rdquo;&lt;/p>
-&lt;h2 id="week-3-grpc-vs-trpc-which-one-selection-hell">Week 3: &amp;ldquo;gRPC vs tRPC, which one?&amp;rdquo; Selection Hell
-&lt;/h2>&lt;h3 id="failure-experience-lost-in-the-rpc-technology-selection-maze">Failure Experience: Lost in the RPC Technology Selection Maze
-&lt;/h3>&lt;p>As the project reached its climax, the &amp;ldquo;So, do we use gRPC or tRPC?&amp;rdquo; problem erupted.&lt;/p>
-&lt;p>&lt;strong>Initial shallow understanding&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>gRPC = Old technology?&lt;/li>
-&lt;li>tRPC = New technology so it&amp;rsquo;s good?&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>After trying both&amp;hellip;&lt;/strong>&lt;/p>
-&lt;h3 id="grpc-implementation-experience-why-isnt-it-type-safe">gRPC Implementation Experience: &amp;ldquo;Why isn&amp;rsquo;t it type-safe?&amp;rdquo;
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// gRPC client
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">UserServiceClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;localhost:50051&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">request&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">GetUserRequest&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">request&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getUser&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">request&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">response&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// response.getName() ← This isn&amp;#39;t type-checked!
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&amp;ldquo;Huh? It&amp;rsquo;s TypeScript but not type-safe? What&amp;rsquo;s the point of gRPC?&amp;rdquo;&lt;/p>
-&lt;h3 id="trpc-implementation-experience-this-is-too-comfortable">tRPC Implementation Experience: &amp;ldquo;This is too comfortable&amp;hellip;&amp;rdquo;
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// tRPC client
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">trpc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getUser&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">id&lt;/span>: &lt;span class="kt">123&lt;/span>&lt;span class="p">});&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ↑ Completely type-safe! IDE completion works too!
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&amp;ldquo;This is amazing&amp;hellip; the development experience is like night and day!&amp;rdquo;&lt;/p>
-&lt;h3 id="reality-check-but-what-about-inter-microservice-communication">Reality Check: &amp;ldquo;But what about inter-microservice communication?&amp;rdquo;
-&lt;/h3>&lt;p>I noticed the tRPC trap after implementation.&lt;/p>
-&lt;p>&lt;strong>tRPC limitations discovered&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>TypeScript only (no integration with other languages)&lt;/li>
-&lt;li>Server-to-server communication uses JSON = Large data transfer&lt;/li>
-&lt;li>Can&amp;rsquo;t benefit from Protocol Buffer advantages&lt;/li>
-&lt;/ul>
-&lt;p>&amp;ldquo;Ah, we&amp;rsquo;re using Go and Python for microservices too&amp;hellip;&amp;rdquo;&lt;/p>
-&lt;h2 id="final-battle-the-truth-of-technology-selection">Final Battle: The Truth of Technology Selection
-&lt;/h2>&lt;h3 id="blood-and-sweat-comparison-chart">Blood and Sweat Comparison Chart
-&lt;/h3>&lt;p>My blood and sweat crystallized after 3 weeks of investigation:&lt;/p>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>Technology&lt;/th>
-&lt;th>Data Format&lt;/th>
-&lt;th>Transfer Efficiency&lt;/th>
-&lt;th>Dev Experience&lt;/th>
-&lt;th>Multi-language&lt;/th>
-&lt;th>Learning Cost&lt;/th>
-&lt;th>Use Case&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>&lt;strong>gRPC&lt;/strong>&lt;/td>
-&lt;td>Protocol Buffer&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>Inter-microservice&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;strong>tRPC&lt;/strong>&lt;/td>
-&lt;td>JSON&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐&lt;/td>
-&lt;td>Frontend↔Backend (TS unified environment)&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;strong>REST&lt;/strong>&lt;/td>
-&lt;td>JSON&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>General Web API&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h3 id="final-decision-the-importance-of-right-tool-for-right-job">Final Decision: The Importance of &amp;ldquo;Right Tool for Right Job&amp;rdquo;
-&lt;/h3>&lt;p>&lt;strong>Final project selection&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Inter-microservice communication&lt;/strong>: gRPC + Protocol Buffer
-&lt;ul>
-&lt;li>Reason: Prioritized transfer efficiency and performance&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>Frontend↔API&lt;/strong>: tRPC
-&lt;ul>
-&lt;li>Reason: Prioritized development experience and type safety&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>&amp;ldquo;In the end, there&amp;rsquo;s no silver bullet&amp;hellip;&amp;rdquo;&lt;/p>
-&lt;h2 id="what-i-learned-lessons-from-3-weeks-of-struggle">What I Learned: Lessons from 3 Weeks of Struggle
-&lt;/h2>&lt;h3 id="lesson-1-encryption-vs-encoding">Lesson 1: &amp;ldquo;Encryption&amp;rdquo; vs &amp;ldquo;Encoding&amp;rdquo;
-&lt;/h3>&lt;p>&lt;strong>Biggest misconception&lt;/strong>: I thought Protocol Buffer was encryption technology
-&lt;strong>Truth&lt;/strong>: Just efficient binary encoding technology&lt;/p>
-&lt;p>&lt;strong>Understanding the difference&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>Encryption&lt;/strong>: Security purpose, requires decryption key&lt;/li>
-&lt;li>&lt;strong>Encoding&lt;/strong>: Efficiency purpose, decodable if you know the rules&lt;/li>
-&lt;/ul>
-&lt;h3 id="lesson-2-the-trap-of-new--better">Lesson 2: The Trap of &amp;ldquo;New = Better&amp;rdquo;
-&lt;/h3>&lt;p>&lt;strong>Initial thinking&lt;/strong>: tRPC is new so it must be better
-&lt;strong>Reality&lt;/strong>: Sometimes old gRPC is more suitable depending on use case&lt;/p>
-&lt;p>&lt;strong>Truth of technology selection&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>Clarify requirements&lt;/li>
-&lt;li>Understand trade-offs&lt;/li>
-&lt;li>Select appropriate tools for specific purposes&lt;/li>
-&lt;/ul>
-&lt;h3 id="lesson-3-the-power-of-binary-encoding">Lesson 3: The Power of Binary Encoding
-&lt;/h3>&lt;p>&lt;strong>True value of Protocol Buffer&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>Not sending field names = Data size reduction&lt;/li>
-&lt;li>Managing type information with schema = Type safety&lt;/li>
-&lt;li>Multi-language support = Ecosystem breadth&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>Actual measurement data&lt;/strong>:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">Regular REST API: 2.6KB per request
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">Same data with gRPC: 0.9KB per request
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">For 1 million requests per month:
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- REST: 2.6GB
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- gRPC: 0.9GB
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- Reduction effect: 1.7GB (65% reduction)
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="summary-the-obvious-conclusion-that-protocol-buffer-isnt-encryption">Summary: The Obvious Conclusion That &amp;ldquo;Protocol Buffer Isn&amp;rsquo;t Encryption&amp;rdquo;
-&lt;/h2>&lt;p>What I learned through 3 weeks of struggle:&lt;/p>
-&lt;ol>
-&lt;li>&lt;strong>Protocol Buffer is not encryption technology&lt;/strong> (should have been obvious&amp;hellip;)&lt;/li>
-&lt;li>&lt;strong>Binary encoding is truly efficient&lt;/strong> (proven by actual measurement)&lt;/li>
-&lt;li>&lt;strong>RPC technologies are about right tool for right job&lt;/strong> (no silver bullet)&lt;/li>
-&lt;li>&lt;strong>Getting your hands dirty is better than reading technical articles for understanding&lt;/strong>&lt;/li>
-&lt;/ol>
-&lt;p>Starting from the misconception &amp;ldquo;Protocol Buffer is encryption, right?&amp;rdquo;, the investigation resulted in understanding the full picture of modern RPC technologies.&lt;/p>
-&lt;p>&lt;strong>For the next similar technical investigation&lt;/strong>:&lt;/p>
-&lt;ul>
-&lt;li>Read official documentation first&lt;/li>
-&lt;li>Actually write code and try it out&lt;/li>
-&lt;li>Question your assumptions&lt;/li>
-&lt;li>Compare multiple technologies to understand&lt;/li>
-&lt;/ul>
-&lt;p>When asked &amp;ldquo;Is Protocol Buffer encryption?&amp;rdquo; I can now confidently answer &amp;ldquo;No! It&amp;rsquo;s efficient binary encoding!&amp;rdquo;&lt;/p>
-&lt;p>&lt;strong>Everyone, when you encounter new technologies, don&amp;rsquo;t be afraid to get your hands dirty and investigate. You&amp;rsquo;ll surely discover more than you expect.&lt;/strong>&lt;/p></description></item><item><title>Protocol Buffer地獄からの脱出：「暗号化じゃないよ！」と叫んだ3週間の戦い</title><link>https://firebird-techtalktech.com/post/protocol-buffer%E5%9C%B0%E7%8D%84%E3%81%8B%E3%82%89%E3%81%AE%E8%84%B1%E5%87%BA%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%98%E3%82%83%E3%81%AA%E3%81%84%E3%82%88%E3%81%A8%E5%8F%AB%E3%82%93%E3%81%A03%E9%80%B1%E9%96%93%E3%81%AE%E6%88%A6%E3%81%84/</link><pubDate>Sun, 14 Sep 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/protocol-buffer%E5%9C%B0%E7%8D%84%E3%81%8B%E3%82%89%E3%81%AE%E8%84%B1%E5%87%BA%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%98%E3%82%83%E3%81%AA%E3%81%84%E3%82%88%E3%81%A8%E5%8F%AB%E3%82%93%E3%81%A03%E9%80%B1%E9%96%93%E3%81%AE%E6%88%A6%E3%81%84/</guid><description>&lt;h1 id="protocol-buffer地獄からの脱出暗号化じゃないよと叫んだ3週間の戦い">Protocol Buffer地獄からの脱出：「暗号化じゃないよ！」と叫んだ3週間の戦い
-&lt;/h1>&lt;h2 id="えっこれ暗号化じゃないの--最初の誤解">「えっ、これ暗号化じゃないの？」- 最初の誤解
-&lt;/h2>&lt;p>新しいマイクロサービスプロジェクトが始まった時、チームリーダーから「Protocol Buffer使ってgRPCで行こう」と言われて、内心「やばい、暗号化技術なんて分からない&amp;hellip;」と青ざめました。&lt;/p>
-&lt;p>&lt;strong>最初の大誤解：「Protocol Buffer = 暗号化技術」&lt;/strong>&lt;/p>
-&lt;p>実際にProtocol Bufferのバイナリデータを見たとき：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">0A 05 41 6C 69 63 65 10 1A
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>「うわ、完全に暗号化されてる！これ解読できるの？」&lt;/p>
-&lt;p>そんな私の3週間に渡る調査と失敗の記録をお話しします。&lt;/p>
-&lt;h2 id="第1週なぜjsonが9バイトになるんだ事件">第1週：「なぜJSONが9バイトになるんだ！？」事件
-&lt;/h2>&lt;h3 id="失敗体験最初の衝撃">失敗体験：最初の衝撃
-&lt;/h3>&lt;p>プロジェクト開始2日目。先輩が「Protocol BufferってJSONより3倍効率いいよ」と言うので、実際に試してみました。&lt;/p>
-&lt;p>&lt;strong>元データ（JSON）&lt;/strong>:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-json" data-lang="json">&lt;span class="line">&lt;span class="cl">&lt;span class="p">{&lt;/span>&lt;span class="nt">&amp;#34;name&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="s2">&amp;#34;Alice&amp;#34;&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nt">&amp;#34;age&amp;#34;&lt;/span>&lt;span class="p">:&lt;/span> &lt;span class="mi">26&lt;/span>&lt;span class="p">}&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&lt;strong>サイズ&lt;/strong>: 26バイト&lt;/p>
-&lt;p>&lt;strong>Protocol Bufferバイナリ&lt;/strong>:&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">0A 05 41 6C 69 63 65 10 1A
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>&lt;strong>サイズ&lt;/strong>: 9バイト&lt;/p>
-&lt;p>「マジで？本当に3分の1？でも、これ何語？宇宙人の文字？」&lt;/p>
-&lt;h3 id="調査開始バイナリの謎を解く">調査開始：バイナリの謎を解く
-&lt;/h3>&lt;p>完全にパニックになった私は、深夜まで調査開始。&lt;/p>
-&lt;p>&lt;strong>最初の失敗&lt;/strong>：Googleで「Protocol Buffer 暗号化」で検索
-→ 見つからない、というかそもそも暗号化じゃない&lt;/p>
-&lt;p>&lt;strong>次の失敗&lt;/strong>：バイナリエディタで開いて眺める
-→ 「41 6C 69 63 65って何？ASCII？でも0A 05って何？」&lt;/p>
-&lt;p>&lt;strong>ついに発見&lt;/strong>：ASCIIコード表を引いてみる&lt;/p>
-&lt;ul>
-&lt;li>&lt;code>41&lt;/code> = 65 = &amp;lsquo;A&amp;rsquo;&lt;/li>
-&lt;li>&lt;code>6C&lt;/code> = 108 = &amp;rsquo;l'&lt;/li>
-&lt;li>&lt;code>69&lt;/code> = 105 = &amp;lsquo;i&amp;rsquo;&lt;/li>
-&lt;li>&lt;code>63&lt;/code> = 99 = &amp;lsquo;c&amp;rsquo;&lt;/li>
-&lt;li>&lt;code>65&lt;/code> = 101 = &amp;rsquo;e'&lt;/li>
-&lt;/ul>
-&lt;p>「あ！&amp;ldquo;Alice&amp;quot;だ！暗号化じゃなくて、ただのエンコーディングじゃん！」&lt;/p>
-&lt;h2 id="第2週フィールド番号システムの衝撃的発見">第2週：「フィールド番号システム」の衝撃的発見
-&lt;/h2>&lt;h3 id="失敗体験protoファイルの謎">失敗体験：&lt;code>.proto&lt;/code>ファイルの謎
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-protobuf" data-lang="protobuf">&lt;span class="line">&lt;span class="cl">&lt;span class="kd">message&lt;/span> &lt;span class="nc">User&lt;/span> &lt;span class="p">{&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="err">&lt;/span> &lt;span class="kt">int64&lt;/span> &lt;span class="n">id&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">1&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// この「= 1」って何？
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">string&lt;/span> &lt;span class="n">name&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">2&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 「= 2」も？初期値？
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span> &lt;span class="kt">int32&lt;/span> &lt;span class="n">age&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="mi">3&lt;/span>&lt;span class="p">;&lt;/span> &lt;span class="c1">// 「= 3」も？
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">}&lt;/span>&lt;span class="err">
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>「え？idのデフォルトが1で、nameのデフォルトが2？意味不明&amp;hellip;」&lt;/p>
-&lt;h3 id="真実の発見衝撃的な事実">真実の発見：衝撃的な事実
-&lt;/h3>&lt;p>3日間悩んだ末、公式ドキュメントを読んで愕然。&lt;/p>
-&lt;p>&lt;strong>衝撃の事実&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>フィールド名は送信されない！&lt;/strong>&lt;/li>
-&lt;li>&lt;strong>フィールド番号だけが送信される！&lt;/strong>&lt;/li>
-&lt;li>&lt;strong>&lt;code>= 2&lt;/code>は初期値じゃなくて識別番号！&lt;/strong>&lt;/li>
-&lt;/ul>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">0A 05 41 6C 69 63 65 10 1A
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">↓
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">0A 05: フィールド2（name）、長さ5
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">41 6C 69 63 65: &amp;#34;Alice&amp;#34;
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">10 1A: フィールド3（age）= 26
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>「フィールド名送らないから小さいのか！天才的じゃん！」&lt;/p>
-&lt;h3 id="実証実験本当に3倍効率的">実証実験：本当に3倍効率的？
-&lt;/h3>&lt;p>&lt;strong>JSON vs Protocol Buffer 対決&lt;/strong>&lt;/p>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>データ&lt;/th>
-&lt;th>JSON&lt;/th>
-&lt;th>Protocol Buffer&lt;/th>
-&lt;th>効率化&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>単純データ&lt;/td>
-&lt;td>26バイト&lt;/td>
-&lt;td>9バイト&lt;/td>
-&lt;td>2.9倍&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>ユーザー配列100件&lt;/td>
-&lt;td>2,600バイト&lt;/td>
-&lt;td>900バイト&lt;/td>
-&lt;td>2.9倍&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>複雑なオブジェクト&lt;/td>
-&lt;td>1,200バイト&lt;/td>
-&lt;td>420バイト&lt;/td>
-&lt;td>2.9倍&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;p>「本当だ&amp;hellip;どのデータでも約3倍効率的！」&lt;/p>
-&lt;h2 id="第3週grpcとtrpc結局どっち地獄の選択">第3週：「gRPCとtRPC、結局どっち？」地獄の選択
-&lt;/h2>&lt;h3 id="失敗体験rpc技術選択の迷宮">失敗体験：RPC技術選択の迷宮
-&lt;/h3>&lt;p>プロジェクトも佳境に入り、「結局、gRPCとtRPCどっち使うの？」問題が勃発。&lt;/p>
-&lt;p>&lt;strong>最初の浅い理解&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>gRPC = 古い技術？&lt;/li>
-&lt;li>tRPC = 新しい技術だから良い？&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>実際に両方試してみた結果&lt;/strong>&amp;hellip;&lt;/p>
-&lt;h3 id="grpc実装体験なんで型安全じゃないの">gRPC実装体験：「なんで型安全じゃないの？」
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;span class="lnt">8
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-javascript" data-lang="javascript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// gRPCクライアント
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">client&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">UserServiceClient&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="s1">&amp;#39;localhost:50051&amp;#39;&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="kr">const&lt;/span> &lt;span class="nx">request&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">new&lt;/span> &lt;span class="nx">GetUserRequest&lt;/span>&lt;span class="p">();&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">request&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">setId&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="mi">123&lt;/span>&lt;span class="p">);&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="nx">client&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getUser&lt;/span>&lt;span class="p">(&lt;/span>&lt;span class="nx">request&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="p">(&lt;/span>&lt;span class="nx">err&lt;/span>&lt;span class="p">,&lt;/span> &lt;span class="nx">response&lt;/span>&lt;span class="p">)&lt;/span> &lt;span class="p">=&amp;gt;&lt;/span> &lt;span class="p">{&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl"> &lt;span class="c1">// response.getName() ← これ、型チェックされない！
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="p">});&lt;/span>
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>「え？TypeScriptなのに型安全じゃない？何のためのgRPC？」&lt;/p>
-&lt;h3 id="trpc実装体験これは快適すぎる">tRPC実装体験：「これは快適すぎる&amp;hellip;」
-&lt;/h3>&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-typescript" data-lang="typescript">&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// tRPCクライアント
-&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">&lt;/span>&lt;span class="kr">const&lt;/span> &lt;span class="nx">user&lt;/span> &lt;span class="o">=&lt;/span> &lt;span class="k">await&lt;/span> &lt;span class="nx">trpc&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">getUser&lt;/span>&lt;span class="p">.&lt;/span>&lt;span class="nx">query&lt;/span>&lt;span class="p">({&lt;/span>&lt;span class="nx">id&lt;/span>: &lt;span class="kt">123&lt;/span>&lt;span class="p">});&lt;/span>
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="c1">// ↑ 完全に型安全！IDEで補完も効く！
-&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;p>「これはやばい&amp;hellip;開発体験が天と地の差！」&lt;/p>
-&lt;h3 id="現実の壁でもマイクロサービス間通信は">現実の壁：「でも、マイクロサービス間通信は？」
-&lt;/h3>&lt;p>tRPCの罠に気づいたのは実装後。&lt;/p>
-&lt;p>&lt;strong>tRPCの制限発見&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>TypeScript専用（他言語との連携不可）&lt;/li>
-&lt;li>サーバー間通信でJSONを使う = データ転送量が大きい&lt;/li>
-&lt;li>Protocol Bufferの恩恵を受けられない&lt;/li>
-&lt;/ul>
-&lt;p>「あー、マイクロサービスでGoやPythonも使うのに&amp;hellip;」&lt;/p>
-&lt;h2 id="最終決戦技術選択の真実">最終決戦：技術選択の真実
-&lt;/h2>&lt;h3 id="血と汗の比較表">血と汗の比較表
-&lt;/h3>&lt;p>3週間の調査結果をまとめた、私の血と汗の結晶：&lt;/p>
-&lt;table>
-&lt;thead>
-&lt;tr>
-&lt;th>技術&lt;/th>
-&lt;th>データ形式&lt;/th>
-&lt;th>転送効率&lt;/th>
-&lt;th>開発体験&lt;/th>
-&lt;th>多言語対応&lt;/th>
-&lt;th>学習コスト&lt;/th>
-&lt;th>適用場面&lt;/th>
-&lt;/tr>
-&lt;/thead>
-&lt;tbody>
-&lt;tr>
-&lt;td>&lt;strong>gRPC&lt;/strong>&lt;/td>
-&lt;td>Protocol Buffer&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>マイクロサービス間&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;strong>tRPC&lt;/strong>&lt;/td>
-&lt;td>JSON&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐&lt;/td>
-&lt;td>フロント↔バック（TS統一環境）&lt;/td>
-&lt;/tr>
-&lt;tr>
-&lt;td>&lt;strong>REST&lt;/strong>&lt;/td>
-&lt;td>JSON&lt;/td>
-&lt;td>⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>⭐⭐⭐⭐⭐&lt;/td>
-&lt;td>汎用Web API&lt;/td>
-&lt;/tr>
-&lt;/tbody>
-&lt;/table>
-&lt;h3 id="最終判断適材適所の重要性">最終判断：「適材適所」の重要性
-&lt;/h3>&lt;p>&lt;strong>プロジェクトでの最終選択&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>マイクロサービス間通信&lt;/strong>: gRPC + Protocol Buffer
-&lt;ul>
-&lt;li>理由：転送効率とパフォーマンスを最重視&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;li>&lt;strong>フロントエンド↔API&lt;/strong>: tRPC
-&lt;ul>
-&lt;li>理由：開発体験とタイプセーフティを最重視&lt;/li>
-&lt;/ul>
-&lt;/li>
-&lt;/ul>
-&lt;p>「結局、銀の弾丸はないんだ&amp;hellip;」&lt;/p>
-&lt;h2 id="学んだこと3週間の格闘から得た教訓">学んだこと：3週間の格闘から得た教訓
-&lt;/h2>&lt;h3 id="教訓1暗号化vsエンコーディング">教訓1：「暗号化」vs「エンコーディング」
-&lt;/h3>&lt;p>&lt;strong>最大の誤解&lt;/strong>：Protocol Bufferを暗号化技術だと思っていた
-&lt;strong>真実&lt;/strong>：ただの効率的なバイナリエンコーディング技術&lt;/p>
-&lt;p>&lt;strong>違いを理解&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>&lt;strong>暗号化&lt;/strong>：セキュリティ目的、復号化キーが必要&lt;/li>
-&lt;li>&lt;strong>エンコーディング&lt;/strong>：効率化目的、ルールさえ分かれば復号可能&lt;/li>
-&lt;/ul>
-&lt;h3 id="教訓2新しい--良いの罠">教訓2：「新しい = 良い」の罠
-&lt;/h3>&lt;p>&lt;strong>最初の思考&lt;/strong>：tRPCは新しいから良いはず
-&lt;strong>現実&lt;/strong>：用途によっては古いgRPCの方が適している&lt;/p>
-&lt;p>&lt;strong>技術選択の真理&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>要件を明確にする&lt;/li>
-&lt;li>トレードオフを理解する&lt;/li>
-&lt;li>適材適所で選択する&lt;/li>
-&lt;/ul>
-&lt;h3 id="教訓3バイナリエンコーディングの威力">教訓3：バイナリエンコーディングの威力
-&lt;/h3>&lt;p>&lt;strong>Protocol Bufferの真の価値&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>フィールド名を送らない = データサイズ削減&lt;/li>
-&lt;li>型情報をスキーマで管理 = 型安全性&lt;/li>
-&lt;li>多言語対応 = エコシステムの広さ&lt;/li>
-&lt;/ul>
-&lt;p>&lt;strong>実測データ&lt;/strong>：&lt;/p>
-&lt;div class="highlight">&lt;div class="chroma">
-&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
-&lt;/span>&lt;span class="lnt">2
-&lt;/span>&lt;span class="lnt">3
-&lt;/span>&lt;span class="lnt">4
-&lt;/span>&lt;span class="lnt">5
-&lt;/span>&lt;span class="lnt">6
-&lt;/span>&lt;span class="lnt">7
-&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
-&lt;td class="lntd">
-&lt;pre tabindex="0" class="chroma">&lt;code class="language-fallback" data-lang="fallback">&lt;span class="line">&lt;span class="cl">通常のREST API：1回あたり2.6KB
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">gRPCでの同じデータ：1回あたり0.9KB
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">月間100万リクエスト時：
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- REST: 2.6GB
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- gRPC: 0.9GB
-&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">- 削減効果: 1.7GB（65%削減）
-&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
-&lt;/div>
-&lt;/div>&lt;h2 id="まとめprotocol-bufferは暗号化じゃないという当たり前の結論">まとめ：「Protocol Bufferは暗号化じゃない」という当たり前の結論
-&lt;/h2>&lt;p>3週間の格闘を通して学んだことは：&lt;/p>
-&lt;ol>
-&lt;li>&lt;strong>Protocol Bufferは暗号化技術ではない&lt;/strong>（当たり前だった&amp;hellip;）&lt;/li>
-&lt;li>&lt;strong>バイナリエンコーディングは本当に効率的&lt;/strong>（実測で証明）&lt;/li>
-&lt;li>&lt;strong>RPC技術は適材適所&lt;/strong>（銀の弾丸はない）&lt;/li>
-&lt;li>&lt;strong>読める技術記事より、実際に手を動かす方が理解が深まる&lt;/strong>&lt;/li>
-&lt;/ol>
-&lt;p>最初の「Protocol Bufferって暗号化でしょ？」という誤解から始まった調査でしたが、結果として現代のRPC技術の全貌を理解することができました。&lt;/p>
-&lt;p>&lt;strong>次に同じような技術調査をする時は&lt;/strong>：&lt;/p>
-&lt;ul>
-&lt;li>公式ドキュメントを最初に読む&lt;/li>
-&lt;li>実際にコードを書いて試す&lt;/li>
-&lt;li>思い込みを疑う&lt;/li>
-&lt;li>複数の技術を比較して理解する&lt;/li>
-&lt;/ul>
-&lt;p>「Protocol Bufferって暗号化？」と聞かれたら、今度は自信を持って「違うよ！効率的なバイナリエンコーディングだよ！」と答えられます。&lt;/p>
-&lt;p>&lt;strong>皆さんも新しい技術に出会ったら、恐れずに手を動かして調査してみてください。きっと予想以上の発見があるはずです。&lt;/strong>&lt;/p></description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Tech on firebirdテクテクテクブログ</title>
+        <link>https://firebird-techtalktech.com/categories/tech/</link>
+        <description>Recent content in Tech on firebirdテクテクテクブログ</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>ja</language>
+        <copyright>トミー</copyright>
+        <lastBuildDate>Sun, 14 Sep 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/categories/tech/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Escape from Protocol Buffer Hell: My 3-Week Battle Crying &#39;It&#39;s Not Encryption!&#39;</title>
+        <link>https://firebird-techtalktech.com/post/escape-from-protocol-buffer-hell-my-3-week-battle-crying-its-not-encryption/</link>
+        <pubDate>Sun, 14 Sep 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/escape-from-protocol-buffer-hell-my-3-week-battle-crying-its-not-encryption/</guid>
+        <description>&lt;h1 id=&#34;escape-from-protocol-buffer-hell-my-3-week-battle-crying-its-not-encryption&#34;&gt;Escape from Protocol Buffer Hell: My 3-Week Battle Crying &amp;lsquo;It&amp;rsquo;s Not Encryption!&amp;rsquo;
+&lt;/h1&gt;&lt;h2 id=&#34;wait-isnt-this-encryption---the-initial-misconception&#34;&gt;&amp;ldquo;Wait, isn&amp;rsquo;t this encryption?&amp;rdquo; - The Initial Misconception
+&lt;/h2&gt;&lt;p&gt;When a new microservices project started and the team leader said &amp;ldquo;Let&amp;rsquo;s use Protocol Buffer with gRPC,&amp;rdquo; I internally panicked thinking &amp;ldquo;Oh no, I don&amp;rsquo;t understand encryption technology&amp;hellip;&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;My first major misconception: &amp;ldquo;Protocol Buffer = Encryption technology&amp;rdquo;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;When I actually saw Protocol Buffer binary data:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05 41 6C 69 63 65 10 1A
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;Wow, it&amp;rsquo;s completely encrypted! Can I decode this?&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;This is the record of my 3-week investigation, failures, and discoveries.&lt;/p&gt;
+&lt;h2 id=&#34;week-1-the-why-did-json-become-9-bytes-incident&#34;&gt;Week 1: The &amp;ldquo;Why did JSON become 9 bytes!?&amp;rdquo; Incident
+&lt;/h2&gt;&lt;h3 id=&#34;failure-experience-the-initial-shock&#34;&gt;Failure Experience: The Initial Shock
+&lt;/h3&gt;&lt;p&gt;Day 2 of the project. A senior said &amp;ldquo;Protocol Buffer is 3 times more efficient than JSON,&amp;rdquo; so I tried it out.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Original data (JSON)&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;age&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;26&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Size&lt;/strong&gt;: 26 bytes&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Protocol Buffer binary&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05 41 6C 69 63 65 10 1A
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;Size&lt;/strong&gt;: 9 bytes&lt;/p&gt;
+&lt;p&gt;&amp;ldquo;Really? Actually one-third? But what language is this? Alien characters?&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;investigation-begins-solving-the-binary-mystery&#34;&gt;Investigation Begins: Solving the Binary Mystery
+&lt;/h3&gt;&lt;p&gt;I went into complete panic mode and started investigating until late at night.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;First failure&lt;/strong&gt;: Googled &amp;ldquo;Protocol Buffer encryption&amp;rdquo;
+→ Nothing found, because it&amp;rsquo;s not encryption in the first place&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Next failure&lt;/strong&gt;: Opened with binary editor and stared at it
+→ &amp;ldquo;What are 41 6C 69 63 65? ASCII? But what are 0A 05?&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Finally discovered&lt;/strong&gt;: Looked up ASCII code table&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;41&lt;/code&gt; = 65 = &amp;lsquo;A&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;6C&lt;/code&gt; = 108 = &amp;rsquo;l&#39;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;69&lt;/code&gt; = 105 = &amp;lsquo;i&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;63&lt;/code&gt; = 99 = &amp;lsquo;c&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;65&lt;/code&gt; = 101 = &amp;rsquo;e&#39;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;ldquo;Ah! It&amp;rsquo;s &amp;quot;Alice&amp;quot;! It&amp;rsquo;s not encryption, just encoding!&amp;rdquo;&lt;/p&gt;
+&lt;h2 id=&#34;week-2-the-shocking-discovery-of-the-field-number-system&#34;&gt;Week 2: The Shocking Discovery of the &amp;ldquo;Field Number System&amp;rdquo;
+&lt;/h2&gt;&lt;h3 id=&#34;failure-experience-the-mystery-of-proto-files&#34;&gt;Failure Experience: The Mystery of .proto Files
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-protobuf&#34; data-lang=&#34;protobuf&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;message&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;User&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;int64&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;id&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;      &lt;span class=&#34;c1&#34;&gt;// What&amp;#39;s this &amp;#34;= 1&amp;#34;?
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;   &lt;span class=&#34;c1&#34;&gt;// &amp;#34;= 2&amp;#34; too? Default value?
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;int32&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;age&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;     &lt;span class=&#34;c1&#34;&gt;// &amp;#34;= 3&amp;#34; too?
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;Huh? Is the default for id 1, and name 2? This makes no sense&amp;hellip;&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;discovery-of-truth-shocking-facts&#34;&gt;Discovery of Truth: Shocking Facts
+&lt;/h3&gt;&lt;p&gt;After 3 days of puzzling, I read the official documentation and was stunned.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Shocking facts&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Field names are not transmitted!&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Only field numbers are transmitted!&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;= 2&lt;/code&gt; is not a default value but an identification number!&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05 41 6C 69 63 65 10 1A
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05: Field 2 (name), length 5
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;41 6C 69 63 65: &amp;#34;Alice&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;10 1A: Field 3 (age) = 26
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;That&amp;rsquo;s why it&amp;rsquo;s small! It doesn&amp;rsquo;t send field names! Genius!&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;verification-experiment-really-3x-more-efficient&#34;&gt;Verification Experiment: Really 3x More Efficient?
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;JSON vs Protocol Buffer Showdown&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Data&lt;/th&gt;
+          &lt;th&gt;JSON&lt;/th&gt;
+          &lt;th&gt;Protocol Buffer&lt;/th&gt;
+          &lt;th&gt;Efficiency&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Simple data&lt;/td&gt;
+          &lt;td&gt;26 bytes&lt;/td&gt;
+          &lt;td&gt;9 bytes&lt;/td&gt;
+          &lt;td&gt;2.9x&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;100 user array&lt;/td&gt;
+          &lt;td&gt;2,600 bytes&lt;/td&gt;
+          &lt;td&gt;900 bytes&lt;/td&gt;
+          &lt;td&gt;2.9x&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;Complex object&lt;/td&gt;
+          &lt;td&gt;1,200 bytes&lt;/td&gt;
+          &lt;td&gt;420 bytes&lt;/td&gt;
+          &lt;td&gt;2.9x&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&amp;ldquo;It&amp;rsquo;s true&amp;hellip; about 3x more efficient for any data!&amp;rdquo;&lt;/p&gt;
+&lt;h2 id=&#34;week-3-grpc-vs-trpc-which-one-selection-hell&#34;&gt;Week 3: &amp;ldquo;gRPC vs tRPC, which one?&amp;rdquo; Selection Hell
+&lt;/h2&gt;&lt;h3 id=&#34;failure-experience-lost-in-the-rpc-technology-selection-maze&#34;&gt;Failure Experience: Lost in the RPC Technology Selection Maze
+&lt;/h3&gt;&lt;p&gt;As the project reached its climax, the &amp;ldquo;So, do we use gRPC or tRPC?&amp;rdquo; problem erupted.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Initial shallow understanding&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;gRPC = Old technology?&lt;/li&gt;
+&lt;li&gt;tRPC = New technology so it&amp;rsquo;s good?&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;After trying both&amp;hellip;&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&#34;grpc-implementation-experience-why-isnt-it-type-safe&#34;&gt;gRPC Implementation Experience: &amp;ldquo;Why isn&amp;rsquo;t it type-safe?&amp;rdquo;
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// gRPC client
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;client&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;UserServiceClient&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;localhost:50051&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;request&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GetUserRequest&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;setId&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;client&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getUser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;// response.getName() ← This isn&amp;#39;t type-checked!
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;Huh? It&amp;rsquo;s TypeScript but not type-safe? What&amp;rsquo;s the point of gRPC?&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;trpc-implementation-experience-this-is-too-comfortable&#34;&gt;tRPC Implementation Experience: &amp;ldquo;This is too comfortable&amp;hellip;&amp;rdquo;
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-typescript&#34; data-lang=&#34;typescript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// tRPC client
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;trpc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getUser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;query&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;({&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;id&lt;/span&gt;: &lt;span class=&#34;kt&#34;&gt;123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// ↑ Completely type-safe! IDE completion works too!
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&amp;ldquo;This is amazing&amp;hellip; the development experience is like night and day!&amp;rdquo;&lt;/p&gt;
+&lt;h3 id=&#34;reality-check-but-what-about-inter-microservice-communication&#34;&gt;Reality Check: &amp;ldquo;But what about inter-microservice communication?&amp;rdquo;
+&lt;/h3&gt;&lt;p&gt;I noticed the tRPC trap after implementation.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;tRPC limitations discovered&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TypeScript only (no integration with other languages)&lt;/li&gt;
+&lt;li&gt;Server-to-server communication uses JSON = Large data transfer&lt;/li&gt;
+&lt;li&gt;Can&amp;rsquo;t benefit from Protocol Buffer advantages&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;ldquo;Ah, we&amp;rsquo;re using Go and Python for microservices too&amp;hellip;&amp;rdquo;&lt;/p&gt;
+&lt;h2 id=&#34;final-battle-the-truth-of-technology-selection&#34;&gt;Final Battle: The Truth of Technology Selection
+&lt;/h2&gt;&lt;h3 id=&#34;blood-and-sweat-comparison-chart&#34;&gt;Blood and Sweat Comparison Chart
+&lt;/h3&gt;&lt;p&gt;My blood and sweat crystallized after 3 weeks of investigation:&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;Technology&lt;/th&gt;
+          &lt;th&gt;Data Format&lt;/th&gt;
+          &lt;th&gt;Transfer Efficiency&lt;/th&gt;
+          &lt;th&gt;Dev Experience&lt;/th&gt;
+          &lt;th&gt;Multi-language&lt;/th&gt;
+          &lt;th&gt;Learning Cost&lt;/th&gt;
+          &lt;th&gt;Use Case&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;gRPC&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;Protocol Buffer&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;Inter-microservice&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;tRPC&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;JSON&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;Frontend↔Backend (TS unified environment)&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;REST&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;JSON&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;General Web API&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;final-decision-the-importance-of-right-tool-for-right-job&#34;&gt;Final Decision: The Importance of &amp;ldquo;Right Tool for Right Job&amp;rdquo;
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Final project selection&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Inter-microservice communication&lt;/strong&gt;: gRPC + Protocol Buffer
+&lt;ul&gt;
+&lt;li&gt;Reason: Prioritized transfer efficiency and performance&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Frontend↔API&lt;/strong&gt;: tRPC
+&lt;ul&gt;
+&lt;li&gt;Reason: Prioritized development experience and type safety&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&amp;ldquo;In the end, there&amp;rsquo;s no silver bullet&amp;hellip;&amp;rdquo;&lt;/p&gt;
+&lt;h2 id=&#34;what-i-learned-lessons-from-3-weeks-of-struggle&#34;&gt;What I Learned: Lessons from 3 Weeks of Struggle
+&lt;/h2&gt;&lt;h3 id=&#34;lesson-1-encryption-vs-encoding&#34;&gt;Lesson 1: &amp;ldquo;Encryption&amp;rdquo; vs &amp;ldquo;Encoding&amp;rdquo;
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Biggest misconception&lt;/strong&gt;: I thought Protocol Buffer was encryption technology
+&lt;strong&gt;Truth&lt;/strong&gt;: Just efficient binary encoding technology&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Understanding the difference&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Encryption&lt;/strong&gt;: Security purpose, requires decryption key&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Encoding&lt;/strong&gt;: Efficiency purpose, decodable if you know the rules&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;lesson-2-the-trap-of-new--better&#34;&gt;Lesson 2: The Trap of &amp;ldquo;New = Better&amp;rdquo;
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Initial thinking&lt;/strong&gt;: tRPC is new so it must be better
+&lt;strong&gt;Reality&lt;/strong&gt;: Sometimes old gRPC is more suitable depending on use case&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Truth of technology selection&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Clarify requirements&lt;/li&gt;
+&lt;li&gt;Understand trade-offs&lt;/li&gt;
+&lt;li&gt;Select appropriate tools for specific purposes&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;lesson-3-the-power-of-binary-encoding&#34;&gt;Lesson 3: The Power of Binary Encoding
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;True value of Protocol Buffer&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Not sending field names = Data size reduction&lt;/li&gt;
+&lt;li&gt;Managing type information with schema = Type safety&lt;/li&gt;
+&lt;li&gt;Multi-language support = Ecosystem breadth&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;Actual measurement data&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Regular REST API: 2.6KB per request
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;Same data with gRPC: 0.9KB per request
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;For 1 million requests per month:
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- REST: 2.6GB
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- gRPC: 0.9GB
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- Reduction effect: 1.7GB (65% reduction)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;summary-the-obvious-conclusion-that-protocol-buffer-isnt-encryption&#34;&gt;Summary: The Obvious Conclusion That &amp;ldquo;Protocol Buffer Isn&amp;rsquo;t Encryption&amp;rdquo;
+&lt;/h2&gt;&lt;p&gt;What I learned through 3 weeks of struggle:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Protocol Buffer is not encryption technology&lt;/strong&gt; (should have been obvious&amp;hellip;)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Binary encoding is truly efficient&lt;/strong&gt; (proven by actual measurement)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RPC technologies are about right tool for right job&lt;/strong&gt; (no silver bullet)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Getting your hands dirty is better than reading technical articles for understanding&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Starting from the misconception &amp;ldquo;Protocol Buffer is encryption, right?&amp;rdquo;, the investigation resulted in understanding the full picture of modern RPC technologies.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;For the next similar technical investigation&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Read official documentation first&lt;/li&gt;
+&lt;li&gt;Actually write code and try it out&lt;/li&gt;
+&lt;li&gt;Question your assumptions&lt;/li&gt;
+&lt;li&gt;Compare multiple technologies to understand&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;When asked &amp;ldquo;Is Protocol Buffer encryption?&amp;rdquo; I can now confidently answer &amp;ldquo;No! It&amp;rsquo;s efficient binary encoding!&amp;rdquo;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Everyone, when you encounter new technologies, don&amp;rsquo;t be afraid to get your hands dirty and investigate. You&amp;rsquo;ll surely discover more than you expect.&lt;/strong&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Protocol Buffer地獄からの脱出：「暗号化じゃないよ！」と叫んだ3週間の戦い</title>
+        <link>https://firebird-techtalktech.com/post/protocol-buffer%E5%9C%B0%E7%8D%84%E3%81%8B%E3%82%89%E3%81%AE%E8%84%B1%E5%87%BA%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%98%E3%82%83%E3%81%AA%E3%81%84%E3%82%88%E3%81%A8%E5%8F%AB%E3%82%93%E3%81%A03%E9%80%B1%E9%96%93%E3%81%AE%E6%88%A6%E3%81%84/</link>
+        <pubDate>Sun, 14 Sep 2025 00:00:00 +0000</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/protocol-buffer%E5%9C%B0%E7%8D%84%E3%81%8B%E3%82%89%E3%81%AE%E8%84%B1%E5%87%BA%E6%9A%97%E5%8F%B7%E5%8C%96%E3%81%98%E3%82%83%E3%81%AA%E3%81%84%E3%82%88%E3%81%A8%E5%8F%AB%E3%82%93%E3%81%A03%E9%80%B1%E9%96%93%E3%81%AE%E6%88%A6%E3%81%84/</guid>
+        <description>&lt;h1 id=&#34;protocol-buffer地獄からの脱出暗号化じゃないよと叫んだ3週間の戦い&#34;&gt;Protocol Buffer地獄からの脱出：「暗号化じゃないよ！」と叫んだ3週間の戦い
+&lt;/h1&gt;&lt;h2 id=&#34;えっこれ暗号化じゃないの--最初の誤解&#34;&gt;「えっ、これ暗号化じゃないの？」- 最初の誤解
+&lt;/h2&gt;&lt;p&gt;新しいマイクロサービスプロジェクトが始まった時、チームリーダーから「Protocol Buffer使ってgRPCで行こう」と言われて、内心「やばい、暗号化技術なんて分からない&amp;hellip;」と青ざめました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;最初の大誤解：「Protocol Buffer = 暗号化技術」&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;実際にProtocol Bufferのバイナリデータを見たとき：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05 41 6C 69 63 65 10 1A
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;「うわ、完全に暗号化されてる！これ解読できるの？」&lt;/p&gt;
+&lt;p&gt;そんな私の3週間に渡る調査と失敗の記録をお話しします。&lt;/p&gt;
+&lt;h2 id=&#34;第1週なぜjsonが9バイトになるんだ事件&#34;&gt;第1週：「なぜJSONが9バイトになるんだ！？」事件
+&lt;/h2&gt;&lt;h3 id=&#34;失敗体験最初の衝撃&#34;&gt;失敗体験：最初の衝撃
+&lt;/h3&gt;&lt;p&gt;プロジェクト開始2日目。先輩が「Protocol BufferってJSONより3倍効率いいよ」と言うので、実際に試してみました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;元データ（JSON）&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-json&#34; data-lang=&#34;json&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;nt&#34;&gt;&amp;#34;name&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;s2&#34;&gt;&amp;#34;Alice&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nt&#34;&gt;&amp;#34;age&amp;#34;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;:&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;26&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;サイズ&lt;/strong&gt;: 26バイト&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Protocol Bufferバイナリ&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05 41 6C 69 63 65 10 1A
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;strong&gt;サイズ&lt;/strong&gt;: 9バイト&lt;/p&gt;
+&lt;p&gt;「マジで？本当に3分の1？でも、これ何語？宇宙人の文字？」&lt;/p&gt;
+&lt;h3 id=&#34;調査開始バイナリの謎を解く&#34;&gt;調査開始：バイナリの謎を解く
+&lt;/h3&gt;&lt;p&gt;完全にパニックになった私は、深夜まで調査開始。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;最初の失敗&lt;/strong&gt;：Googleで「Protocol Buffer 暗号化」で検索
+→ 見つからない、というかそもそも暗号化じゃない&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;次の失敗&lt;/strong&gt;：バイナリエディタで開いて眺める
+→ 「41 6C 69 63 65って何？ASCII？でも0A 05って何？」&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;ついに発見&lt;/strong&gt;：ASCIIコード表を引いてみる&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;41&lt;/code&gt; = 65 = &amp;lsquo;A&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;6C&lt;/code&gt; = 108 = &amp;rsquo;l&#39;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;69&lt;/code&gt; = 105 = &amp;lsquo;i&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;63&lt;/code&gt; = 99 = &amp;lsquo;c&amp;rsquo;&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;65&lt;/code&gt; = 101 = &amp;rsquo;e&#39;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;「あ！&amp;ldquo;Alice&amp;quot;だ！暗号化じゃなくて、ただのエンコーディングじゃん！」&lt;/p&gt;
+&lt;h2 id=&#34;第2週フィールド番号システムの衝撃的発見&#34;&gt;第2週：「フィールド番号システム」の衝撃的発見
+&lt;/h2&gt;&lt;h3 id=&#34;失敗体験protoファイルの謎&#34;&gt;失敗体験：&lt;code&gt;.proto&lt;/code&gt;ファイルの謎
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-protobuf&#34; data-lang=&#34;protobuf&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kd&#34;&gt;message&lt;/span&gt; &lt;span class=&#34;nc&#34;&gt;User&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;err&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;int64&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;id&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;1&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;      &lt;span class=&#34;c1&#34;&gt;// この「= 1」って何？
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;string&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;name&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;2&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;   &lt;span class=&#34;c1&#34;&gt;// 「= 2」も？初期値？
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;  &lt;span class=&#34;kt&#34;&gt;int32&lt;/span&gt; &lt;span class=&#34;n&#34;&gt;age&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;mi&#34;&gt;3&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;;&lt;/span&gt;     &lt;span class=&#34;c1&#34;&gt;// 「= 3」も？
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;}&lt;/span&gt;&lt;span class=&#34;err&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;「え？idのデフォルトが1で、nameのデフォルトが2？意味不明&amp;hellip;」&lt;/p&gt;
+&lt;h3 id=&#34;真実の発見衝撃的な事実&#34;&gt;真実の発見：衝撃的な事実
+&lt;/h3&gt;&lt;p&gt;3日間悩んだ末、公式ドキュメントを読んで愕然。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;衝撃の事実&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;フィールド名は送信されない！&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;フィールド番号だけが送信される！&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;code&gt;= 2&lt;/code&gt;は初期値じゃなくて識別番号！&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05 41 6C 69 63 65 10 1A
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;↓
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;0A 05: フィールド2（name）、長さ5
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;41 6C 69 63 65: &amp;#34;Alice&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;10 1A: フィールド3（age）= 26
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;「フィールド名送らないから小さいのか！天才的じゃん！」&lt;/p&gt;
+&lt;h3 id=&#34;実証実験本当に3倍効率的&#34;&gt;実証実験：本当に3倍効率的？
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;JSON vs Protocol Buffer 対決&lt;/strong&gt;&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;データ&lt;/th&gt;
+          &lt;th&gt;JSON&lt;/th&gt;
+          &lt;th&gt;Protocol Buffer&lt;/th&gt;
+          &lt;th&gt;効率化&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;単純データ&lt;/td&gt;
+          &lt;td&gt;26バイト&lt;/td&gt;
+          &lt;td&gt;9バイト&lt;/td&gt;
+          &lt;td&gt;2.9倍&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;ユーザー配列100件&lt;/td&gt;
+          &lt;td&gt;2,600バイト&lt;/td&gt;
+          &lt;td&gt;900バイト&lt;/td&gt;
+          &lt;td&gt;2.9倍&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;複雑なオブジェクト&lt;/td&gt;
+          &lt;td&gt;1,200バイト&lt;/td&gt;
+          &lt;td&gt;420バイト&lt;/td&gt;
+          &lt;td&gt;2.9倍&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;「本当だ&amp;hellip;どのデータでも約3倍効率的！」&lt;/p&gt;
+&lt;h2 id=&#34;第3週grpcとtrpc結局どっち地獄の選択&#34;&gt;第3週：「gRPCとtRPC、結局どっち？」地獄の選択
+&lt;/h2&gt;&lt;h3 id=&#34;失敗体験rpc技術選択の迷宮&#34;&gt;失敗体験：RPC技術選択の迷宮
+&lt;/h3&gt;&lt;p&gt;プロジェクトも佳境に入り、「結局、gRPCとtRPCどっち使うの？」問題が勃発。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;最初の浅い理解&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;gRPC = 古い技術？&lt;/li&gt;
+&lt;li&gt;tRPC = 新しい技術だから良い？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;実際に両方試してみた結果&lt;/strong&gt;&amp;hellip;&lt;/p&gt;
+&lt;h3 id=&#34;grpc実装体験なんで型安全じゃないの&#34;&gt;gRPC実装体験：「なんで型安全じゃないの？」
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-javascript&#34; data-lang=&#34;javascript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// gRPCクライアント
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;client&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;UserServiceClient&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;s1&#34;&gt;&amp;#39;localhost:50051&amp;#39;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;request&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;new&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;GetUserRequest&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;();&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;setId&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;mi&#34;&gt;123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;);&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;nx&#34;&gt;client&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getUser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;request&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;(&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;err&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;,&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;response&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;)&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&#34;p&#34;&gt;{&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;  &lt;span class=&#34;c1&#34;&gt;// response.getName() ← これ、型チェックされない！
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;「え？TypeScriptなのに型安全じゃない？何のためのgRPC？」&lt;/p&gt;
+&lt;h3 id=&#34;trpc実装体験これは快適すぎる&#34;&gt;tRPC実装体験：「これは快適すぎる&amp;hellip;」
+&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-typescript&#34; data-lang=&#34;typescript&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// tRPCクライアント
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;&lt;/span&gt;&lt;span class=&#34;kr&#34;&gt;const&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;user&lt;/span&gt; &lt;span class=&#34;o&#34;&gt;=&lt;/span&gt; &lt;span class=&#34;k&#34;&gt;await&lt;/span&gt; &lt;span class=&#34;nx&#34;&gt;trpc&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;getUser&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;.&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;query&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;({&lt;/span&gt;&lt;span class=&#34;nx&#34;&gt;id&lt;/span&gt;: &lt;span class=&#34;kt&#34;&gt;123&lt;/span&gt;&lt;span class=&#34;p&#34;&gt;});&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;&lt;span class=&#34;c1&#34;&gt;// ↑ 完全に型安全！IDEで補完も効く！
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;「これはやばい&amp;hellip;開発体験が天と地の差！」&lt;/p&gt;
+&lt;h3 id=&#34;現実の壁でもマイクロサービス間通信は&#34;&gt;現実の壁：「でも、マイクロサービス間通信は？」
+&lt;/h3&gt;&lt;p&gt;tRPCの罠に気づいたのは実装後。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;tRPCの制限発見&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TypeScript専用（他言語との連携不可）&lt;/li&gt;
+&lt;li&gt;サーバー間通信でJSONを使う = データ転送量が大きい&lt;/li&gt;
+&lt;li&gt;Protocol Bufferの恩恵を受けられない&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;「あー、マイクロサービスでGoやPythonも使うのに&amp;hellip;」&lt;/p&gt;
+&lt;h2 id=&#34;最終決戦技術選択の真実&#34;&gt;最終決戦：技術選択の真実
+&lt;/h2&gt;&lt;h3 id=&#34;血と汗の比較表&#34;&gt;血と汗の比較表
+&lt;/h3&gt;&lt;p&gt;3週間の調査結果をまとめた、私の血と汗の結晶：&lt;/p&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+      &lt;tr&gt;
+          &lt;th&gt;技術&lt;/th&gt;
+          &lt;th&gt;データ形式&lt;/th&gt;
+          &lt;th&gt;転送効率&lt;/th&gt;
+          &lt;th&gt;開発体験&lt;/th&gt;
+          &lt;th&gt;多言語対応&lt;/th&gt;
+          &lt;th&gt;学習コスト&lt;/th&gt;
+          &lt;th&gt;適用場面&lt;/th&gt;
+      &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;gRPC&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;Protocol Buffer&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;マイクロサービス間&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;tRPC&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;JSON&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;フロント↔バック（TS統一環境）&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+          &lt;td&gt;&lt;strong&gt;REST&lt;/strong&gt;&lt;/td&gt;
+          &lt;td&gt;JSON&lt;/td&gt;
+          &lt;td&gt;⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;⭐⭐⭐⭐⭐&lt;/td&gt;
+          &lt;td&gt;汎用Web API&lt;/td&gt;
+      &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;最終判断適材適所の重要性&#34;&gt;最終判断：「適材適所」の重要性
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;プロジェクトでの最終選択&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;マイクロサービス間通信&lt;/strong&gt;: gRPC + Protocol Buffer
+&lt;ul&gt;
+&lt;li&gt;理由：転送効率とパフォーマンスを最重視&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;フロントエンド↔API&lt;/strong&gt;: tRPC
+&lt;ul&gt;
+&lt;li&gt;理由：開発体験とタイプセーフティを最重視&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;「結局、銀の弾丸はないんだ&amp;hellip;」&lt;/p&gt;
+&lt;h2 id=&#34;学んだこと3週間の格闘から得た教訓&#34;&gt;学んだこと：3週間の格闘から得た教訓
+&lt;/h2&gt;&lt;h3 id=&#34;教訓1暗号化vsエンコーディング&#34;&gt;教訓1：「暗号化」vs「エンコーディング」
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;最大の誤解&lt;/strong&gt;：Protocol Bufferを暗号化技術だと思っていた
+&lt;strong&gt;真実&lt;/strong&gt;：ただの効率的なバイナリエンコーディング技術&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;違いを理解&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;暗号化&lt;/strong&gt;：セキュリティ目的、復号化キーが必要&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;エンコーディング&lt;/strong&gt;：効率化目的、ルールさえ分かれば復号可能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;教訓2新しい--良いの罠&#34;&gt;教訓2：「新しい = 良い」の罠
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;最初の思考&lt;/strong&gt;：tRPCは新しいから良いはず
+&lt;strong&gt;現実&lt;/strong&gt;：用途によっては古いgRPCの方が適している&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;技術選択の真理&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;要件を明確にする&lt;/li&gt;
+&lt;li&gt;トレードオフを理解する&lt;/li&gt;
+&lt;li&gt;適材適所で選択する&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;教訓3バイナリエンコーディングの威力&#34;&gt;教訓3：バイナリエンコーディングの威力
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;Protocol Bufferの真の価値&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;フィールド名を送らない = データサイズ削減&lt;/li&gt;
+&lt;li&gt;型情報をスキーマで管理 = 型安全性&lt;/li&gt;
+&lt;li&gt;多言語対応 = エコシステムの広さ&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;strong&gt;実測データ&lt;/strong&gt;：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;
+&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;2
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;3
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;4
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;5
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;6
+&lt;/span&gt;&lt;span class=&#34;lnt&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class=&#34;lntd&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;通常のREST API：1回あたり2.6KB
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;gRPCでの同じデータ：1回あたり0.9KB
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;月間100万リクエスト時：
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- REST: 2.6GB
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- gRPC: 0.9GB
+&lt;/span&gt;&lt;/span&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;- 削減効果: 1.7GB（65%削減）
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;まとめprotocol-bufferは暗号化じゃないという当たり前の結論&#34;&gt;まとめ：「Protocol Bufferは暗号化じゃない」という当たり前の結論
+&lt;/h2&gt;&lt;p&gt;3週間の格闘を通して学んだことは：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;Protocol Bufferは暗号化技術ではない&lt;/strong&gt;（当たり前だった&amp;hellip;）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;バイナリエンコーディングは本当に効率的&lt;/strong&gt;（実測で証明）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RPC技術は適材適所&lt;/strong&gt;（銀の弾丸はない）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;読める技術記事より、実際に手を動かす方が理解が深まる&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;最初の「Protocol Bufferって暗号化でしょ？」という誤解から始まった調査でしたが、結果として現代のRPC技術の全貌を理解することができました。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;次に同じような技術調査をする時は&lt;/strong&gt;：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;公式ドキュメントを最初に読む&lt;/li&gt;
+&lt;li&gt;実際にコードを書いて試す&lt;/li&gt;
+&lt;li&gt;思い込みを疑う&lt;/li&gt;
+&lt;li&gt;複数の技術を比較して理解する&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;「Protocol Bufferって暗号化？」と聞かれたら、今度は自信を持って「違うよ！効率的なバイナリエンコーディングだよ！」と答えられます。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;皆さんも新しい技術に出会ったら、恐れずに手を動かして調査してみてください。きっと予想以上の発見があるはずです。&lt;/strong&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
