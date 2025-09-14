@@ -7,7 +7,378 @@
         <generator>Hugo -- gohugo.io</generator>
         <language>ja</language>
         <copyright>トミー</copyright>
-        <lastBuildDate>Sat, 13 Sep 2025 13:29:23 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/go/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sun, 14 Sep 2025 14:54:52 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/go/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>📚 【Go】配列を再帰的に逆順にするサンプルコードを書いてみた</title>
+        <link>https://firebird-techtalktech.com/post/go%E9%85%8D%E5%88%97%E3%82%92%E5%86%8D%E5%B8%B0%E7%9A%84%E3%81%AB%E9%80%86%E9%A0%86%E3%81%AB%E3%81%99%E3%82%8B%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%84%E3%81%A6%E3%81%BF%E3%81%9F/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/go%E9%85%8D%E5%88%97%E3%82%92%E5%86%8D%E5%B8%B0%E7%9A%84%E3%81%AB%E9%80%86%E9%A0%86%E3%81%AB%E3%81%99%E3%82%8B%E3%82%B5%E3%83%B3%E3%83%97%E3%83%AB%E3%82%B3%E3%83%BC%E3%83%89%E3%82%92%E6%9B%B8%E3%81%84%E3%81%A6%E3%81%BF%E3%81%9F/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h2 data-sourcepos=&#34;2:1-2:9&#34;&gt;
+&lt;span id=&#34;概要&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E6%A6%82%E8%A6%81&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;概要&lt;/h2&gt;
+&lt;ul data-sourcepos=&#34;4:1-6:0&#34;&gt;
+&lt;li data-sourcepos=&#34;4:1-4:82&#34;&gt;Goで配列を再帰的に逆順にするサンプルコードを書いてみた&lt;/li&gt;
+&lt;li data-sourcepos=&#34;5:1-6:0&#34;&gt;配列の逆順は、配列の要素を前後から入れ替える基本的なアルゴリズム。再帰を使うことで、ループを使わずにエレガントに実装できる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 data-sourcepos=&#34;7:1-7:10&#34;&gt;
+&lt;span id=&#34;特徴&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E7%89%B9%E5%BE%B4&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;特徴&lt;/h3&gt;
+&lt;ul data-sourcepos=&#34;9:1-14:0&#34;&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/keito8080/items/ef448c4beac0cd9c6f76&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731659&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/keito8080/items/ef448c4beac0cd9c6f76&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 【備忘メモ】Go言語のVersion1.11～1.18のモジュール化推進で、ソースファイル分割とパッケージの分割が昔と変わったので思い出話とメモ（頑張って、おじさん構文風）</title>
+        <link>https://firebird-techtalktech.com/post/%E5%82%99%E5%BF%98%E3%83%A1%E3%83%A2go%E8%A8%80%E8%AA%9E%E3%81%AEversion1.111.18%E3%81%AE%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E5%8C%96%E6%8E%A8%E9%80%B2%E3%81%A7%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%88%86%E5%89%B2%E3%81%A8%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E5%88%86%E5%89%B2%E3%81%8C%E6%98%94%E3%81%A8%E5%A4%89%E3%82%8F%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%A7%E6%80%9D%E3%81%84%E5%87%BA%E8%A9%B1%E3%81%A8%E3%83%A1%E3%83%A2%E9%A0%91%E5%BC%B5%E3%81%A3%E3%81%A6%E3%81%8A%E3%81%98%E3%81%95%E3%82%93%E6%A7%8B%E6%96%87%E9%A2%A8/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%E5%82%99%E5%BF%98%E3%83%A1%E3%83%A2go%E8%A8%80%E8%AA%9E%E3%81%AEversion1.111.18%E3%81%AE%E3%83%A2%E3%82%B8%E3%83%A5%E3%83%BC%E3%83%AB%E5%8C%96%E6%8E%A8%E9%80%B2%E3%81%A7%E3%82%BD%E3%83%BC%E3%82%B9%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E5%88%86%E5%89%B2%E3%81%A8%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8%E3%81%AE%E5%88%86%E5%89%B2%E3%81%8C%E6%98%94%E3%81%A8%E5%A4%89%E3%82%8F%E3%81%A3%E3%81%9F%E3%81%AE%E3%81%A7%E6%80%9D%E3%81%84%E5%87%BA%E8%A9%B1%E3%81%A8%E3%83%A1%E3%83%A2%E9%A0%91%E5%BC%B5%E3%81%A3%E3%81%A6%E3%81%8A%E3%81%98%E3%81%95%E3%82%93%E6%A7%8B%E6%96%87%E9%A2%A8/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h1 data-sourcepos=&#34;1:1-1:20&#34;&gt;
+&lt;span id=&#34;断絶と再学習&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E6%96%AD%E7%B5%B6%E3%81%A8%E5%86%8D%E5%AD%A6%E7%BF%92&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;断絶と再学習&lt;/h1&gt;
+&lt;p data-sourcepos=&#34;2:1-2:112&#34;&gt;　Go言語は以下を理由として好き(｡･ω･｡)ﾉ♡となり2015年頃からハマっていた。&lt;/p&gt;
+&lt;ul data-sourcepos=&#34;4:1-10:0&#34;&gt;
+&lt;li data-sourcepos=&#34;4:1-4:59&#34;&gt;コンパイル型言語の中では理解しやすい。&lt;/li&gt;
+&lt;li data-sourcepos=&#34;5:1-5:56&#34;&gt;インストールファイルが比較的小さい。&lt;/li&gt;
+&lt;li data-sourcepos=&#34;6:1-6:35&#34;&gt;ワンバイナリ出力が便利&lt;/li&gt;
+&lt;li data-sourcepos=&#34;7:1-7:44&#34;&gt;コンパイルも高速だと感じる。&lt;/li&gt;
+&lt;li 
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/good_kobe/items/94d2965600f7cd1f2d71&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731709&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/good_kobe/items/94d2965600f7cd1f2d71&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 💼 How DevOps Transforms Your Business into a War Machine</title>
+        <link>https://firebird-techtalktech.com/post/how-devops-transforms-your-business-into-a-war-machine/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/how-devops-transforms-your-business-into-a-war-machine/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;Discover the 3 hidden superpowers of DevOps that revolutionize productivity, timelines, and quality of your projects.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/tavernetech/how-devops-transforms-your-business-into-a-war-machine-39km&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615330&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/tavernetech/how-devops-transforms-your-business-into-a-war-machine-39km&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 7.7 インタフェースを受け取り構造体を返す についての考察</title>
+        <link>https://firebird-techtalktech.com/post/7.7-%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%82%92%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8A%E6%A7%8B%E9%80%A0%E4%BD%93%E3%82%92%E8%BF%94%E3%81%99-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E8%80%83%E5%AF%9F/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/7.7-%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%82%92%E5%8F%97%E3%81%91%E5%8F%96%E3%82%8A%E6%A7%8B%E9%80%A0%E4%BD%93%E3%82%92%E8%BF%94%E3%81%99-%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6%E3%81%AE%E8%80%83%E5%AF%9F/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h2 data-sourcepos=&#34;2:1-2:72&#34;&gt;
+&lt;span id=&#34;インタフェースを返さないほうがよい理由について&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E3%82%A4%E3%83%B3%E3%82%BF%E3%83%95%E3%82%A7%E3%83%BC%E3%82%B9%E3%82%92%E8%BF%94%E3%81%95%E3%81%AA%E3%81%84%E3%81%BB%E3%81%86%E3%81%8C%E3%82%88%E3%81%84%E7%90%86%E7%94%B1%E3%81%AB%E3%81%A4%E3%81%84%E3%81%A6&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;インタフェースを返さないほうがよい理由について&lt;/h2&gt;
+&lt;p data-sourcepos=&#34;4:1-4:83&#34;&gt;以下のようにインタフェースを返す関数New()を定義したとする&lt;/p&gt;
+&lt;div class=&#34;code-frame&#34; data-lang=&#34;go&#34; data-sourcepos=&#34;6:1-18:3&#34;&gt;&lt;d
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/bigt23/items/007d847405eff1426385&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731674&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/bigt23/items/007d847405eff1426385&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Cariddi: Unleash the Power of Automated Web Reconnaissance!</title>
+        <link>https://firebird-techtalktech.com/post/cariddi-unleash-the-power-of-automated-web-reconnaissance/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/cariddi-unleash-the-power-of-automated-web-reconnaissance/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;Quick Summary: 📝   Cariddi is a Go-based tool designed for comprehensive web reconnaissance&amp;hellip;.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/githubopensource/cariddi-unleash-the-power-of-automated-web-reconnaissance-22a6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615325&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/githubopensource/cariddi-unleash-the-power-of-automated-web-reconnaissance-22a6&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Concurrency is a pattern, not execution.</title>
+        <link>https://firebird-techtalktech.com/post/concurrency-is-a-pattern-not-execution./</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/concurrency-is-a-pattern-not-execution./</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;Short note about what concurrency really is — not execution, but a pattern.&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/lbvf50mobile/concurrency-is-a-pattern-not-execution-5b7e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615320&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/lbvf50mobile/concurrency-is-a-pattern-not-execution-5b7e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Day 3 of My Golang Journey</title>
+        <link>https://firebird-techtalktech.com/post/day-3-of-my-golang-journey/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/day-3-of-my-golang-journey/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;I’m continuing my daily log.  Covered [Concept • Syntax • Implementation • Examples •&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/kshitij_jain_bbc56d59a866/day-3-of-my-golang-journey-5a0c&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615349&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/kshitij_jain_bbc56d59a866/day-3-of-my-golang-journey-5a0c&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 DynamoDB Support in GoFr: Supercharging Data Management for Go Applications</title>
+        <link>https://firebird-techtalktech.com/post/dynamodb-support-in-gofr-supercharging-data-management-for-go-applications/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/dynamodb-support-in-gofr-supercharging-data-management-for-go-applications/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;A caffeine-powered Go open-source maintainer who enjoys three things:     Writing code that compiles&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/coolwednesday/dynamodb-support-in-gofr-supercharging-data-management-for-go-applications-12ll&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615344&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/coolwednesday/dynamodb-support-in-gofr-supercharging-data-management-for-go-applications-12ll&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Getting Started with HTTP/3 in Golang: A Practical Guide</title>
+        <link>https://firebird-techtalktech.com/post/getting-started-with-http/3-in-golang-a-practical-guide/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/getting-started-with-http/3-in-golang-a-practical-guide/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;Introduction   HTTP/3 is the latest major revision of the Hypertext Transfer Protocol, built&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/abibeh/getting-started-with-http3-in-golang-a-practical-guide-307&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615335&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/abibeh/getting-started-with-http3-in-golang-a-practical-guide-307&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Goに入門して、ついでにクリーンアーキテクチャに入門した　ーその3</title>
+        <link>https://firebird-techtalktech.com/post/go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p data-sourcepos=&#34;1:1-1:97&#34;&gt;前回はクリーンアーキテクチャで簡単なTODOアプリを実装してみました。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;3:1-3:56&#34;&gt;&lt;iframe id=&#34;qiita-embed-content__79a38b7adbf6b9f01ff0073be09cd6b6&#34; src=&#34;https://qiita.com/embed-contents/link-card#qiita-embed-content__79a38b7adbf6b9f01ff0073be09cd6b6&#34; data-content=&#34;https%3A%2F%2Fqiita.com%2Fshimamoooon%2Fitems%2F1ed64734aa08c33e265e&#34; frameborder=&#34;0&#34; scrolling=&#34;no&#34; loading=&#34;lazy&#34; style=&#34;width:100%;&#34; height=&#34;29&#34;&gt;
+&lt;/iframe&gt;
+&lt;/p&gt;
+&lt;p data-sourcepos=&#34;5:1-5:175&#34;&gt;今回はより実践的にDockerで環境構築し、Po
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/shimamoooon/items/cc2f34943eef9b3a33cc&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731693&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/shimamoooon/items/cc2f34943eef9b3a33cc&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Go言語でPrismaのSchemaをTypeScriptと共有する方法</title>
+        <link>https://firebird-techtalktech.com/post/go%E8%A8%80%E8%AA%9E%E3%81%A7prisma%E3%81%AEschema%E3%82%92typescript%E3%81%A8%E5%85%B1%E6%9C%89%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/go%E8%A8%80%E8%AA%9E%E3%81%A7prisma%E3%81%AEschema%E3%82%92typescript%E3%81%A8%E5%85%B1%E6%9C%89%E3%81%99%E3%82%8B%E6%96%B9%E6%B3%95/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h2 data-sourcepos=&#34;1:1-1:12&#34;&gt;
+&lt;span id=&#34;最初に&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E6%9C%80%E5%88%9D%E3%81%AB&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;最初に&lt;/h2&gt;
+&lt;p data-sourcepos=&#34;2:1-2:73&#34;&gt;Go言語のPrisma Clientは2025/07/31で開発が終了しています。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;4:1-4:45&#34;&gt;&lt;iframe id=&#34;qiita-embed-content__01e863c69203710230305943e622bb4d&#34; src=&#34;https://qiita.com/embed-contents/link-card#qiita-embed-content__01e863c69203710230305943e622bb4d&#34; data-content=&#34;https%3A%2F%2Fgithub.com%2Fsteebchen%2Fprisma-client-go&#34; framebo
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/bon10/items/90eeb5b645d2f7ed1901&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731650&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/bon10/items/90eeb5b645d2f7ed1901&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 h2c (HTTP/2 平文) で通信してみた 【その1 〜 バックエンド(Go/Node.js/Python)サービス編】</title>
+        <link>https://firebird-techtalktech.com/post/h2c-http/2-%E5%B9%B3%E6%96%87-%E3%81%A7%E9%80%9A%E4%BF%A1%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F-%E3%81%9D%E3%81%AE1-%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89go/node.js/python%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E7%B7%A8/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/h2c-http/2-%E5%B9%B3%E6%96%87-%E3%81%A7%E9%80%9A%E4%BF%A1%E3%81%97%E3%81%A6%E3%81%BF%E3%81%9F-%E3%81%9D%E3%81%AE1-%E3%83%90%E3%83%83%E3%82%AF%E3%82%A8%E3%83%B3%E3%83%89go/node.js/python%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E7%B7%A8/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h2 data-sourcepos=&#34;1:1-1:15&#34;&gt;
+&lt;span id=&#34;はじめに&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E3%81%AF%E3%81%98%E3%82%81%E3%81%AB&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;はじめに&lt;/h2&gt;
+&lt;p data-sourcepos=&#34;3:1-3:170&#34;&gt;先日(2025-08)、HTTP/1.1の電文が混ざってしまうdesyncやsmugglingと呼ばれる脆弱性を告発（？）するサイトが話題になっていました。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;5:1-5:25&#34;&gt;&lt;iframe id=&#34;qiita-embed-content__0126e803df07d0ff58161640cf598d08&#34; src=&#34;https://qiita.com/embed-contents/link-card#qiita-embed-content__0126e803df07d0ff58161640cf598d08&#34; data-content=&#34;https%3A%2F%2Fh
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/ssc-ksaitou/items/a1afcd4433c5e21654fa&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731702&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/ssc-ksaitou/items/a1afcd4433c5e21654fa&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Introducing: A Go package to reduce err boilerplate</title>
+        <link>https://firebird-techtalktech.com/post/introducing-a-go-package-to-reduce-err-boilerplate/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/introducing-a-go-package-to-reduce-err-boilerplate/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;TL;DR look at it here: &lt;a class=&#34;link&#34; href=&#34;https://pkg.go.dev/github.com/ivypuckett/to@v1.0.0&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://pkg.go.dev/github.com/ivypuckett/to@v1.0.0&lt;/a&gt;  Go is a wonderful&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/winstonpuckett/introducing-a-go-package-to-reduce-err-boilerplate-3o6a&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615309&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/winstonpuckett/introducing-a-go-package-to-reduce-err-boilerplate-3o6a&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 OAuthの概要を理解する 🔑</title>
+        <link>https://firebird-techtalktech.com/post/oauth%E3%81%AE%E6%A6%82%E8%A6%81%E3%82%92%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/oauth%E3%81%AE%E6%A6%82%E8%A6%81%E3%82%92%E7%90%86%E8%A7%A3%E3%81%99%E3%82%8B/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;div data-sourcepos=&#34;1:1-10:3&#34; class=&#34;note info&#34;&gt;
+&lt;span class=&#34;fa fa-fw fa-check-circle&#34;&gt;&lt;/span&gt;&lt;div&gt;
+&lt;h1 data-sourcepos=&#34;2:1-2:12&#34;&gt;
+&lt;span id=&#34;概要-&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E6%A6%82%E8%A6%81-&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;概要 ✨&lt;/h1&gt;
+&lt;ul data-sourcepos=&#34;3:1-6:0&#34;&gt;
+&lt;li data-sourcepos=&#34;3:1-3:108&#34;&gt;
+&lt;code&gt;認可&lt;/code&gt;とは&lt;code&gt;何ができるか（リソースを利用すること）を許可する仕組み&lt;/code&gt;のこと&lt;/li&gt;
+&lt;li data-sourcepos=&#34;4:1-4:178&#34;&gt;
+&lt;code&gt;OAuth&lt;/code&gt;とは&lt;code&gt;リソースを持つサービスAがそのリソースを利用したいサービスBにそのリソースを利用することを許可する仕組み&lt;/code&gt;のこと&lt;/li&gt;
+&lt;li
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/yamatai12/items/26d17f1f9b21eb7af50f&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731607&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/yamatai12/items/26d17f1f9b21eb7af50f&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 OIDCを試してみよう</title>
+        <link>https://firebird-techtalktech.com/post/oidc%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%88%E3%81%86/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/oidc%E3%82%92%E8%A9%A6%E3%81%97%E3%81%A6%E3%81%BF%E3%82%88%E3%81%86/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h2 data-sourcepos=&#34;1:1-1:20&#34;&gt;
+&lt;span id=&#34;identity-provider&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#identity-provider&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;Identity Provider&lt;/h2&gt;
+&lt;h3 data-sourcepos=&#34;2:1-2:18&#34;&gt;
+&lt;span id=&#34;oidc-discovery&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#oidc-discovery&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;OIDC Discovery&lt;/h3&gt;
+&lt;p data-sourcepos=&#34;4:1-4:141&#34;&gt;サポートされる機能に関する情報を提供します。エンドポイントは、&lt;code&gt;GET /.well-known/openid-configuration&lt;/code&gt;です。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;6:1-7:30&#34;&gt;一部フィールドのみを紹介します。詳細は、&lt;a href=&#34;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/taniko/items/201e3c1724f72756d2d4&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731683&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/taniko/items/201e3c1724f72756d2d4&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Outbox Done Right in Go: Building Resilient Event-Driven Systems with NATS and SQL</title>
+        <link>https://firebird-techtalktech.com/post/outbox-done-right-in-go-building-resilient-event-driven-systems-with-nats-and-sql/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/outbox-done-right-in-go-building-resilient-event-driven-systems-with-nats-and-sql/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;🪧 Introduction   In modern distributed systems, maintaining data consistency while reliably&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/zanzythebar/outbox-done-right-in-go-building-resilient-event-driven-systems-with-nats-and-sql-32gh&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615315&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/zanzythebar/outbox-done-right-in-go-building-resilient-event-driven-systems-with-nats-and-sql-32gh&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 pgdbtemplate – fast PostgreSQL test databases in Go using templates</title>
+        <link>https://firebird-techtalktech.com/post/pgdbtemplate-fast-postgresql-test-databases-in-go-using-templates/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/pgdbtemplate-fast-postgresql-test-databases-in-go-using-templates/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;Tired of waiting for your test suite to slowly create and migrate PostgreSQL databases over and over&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/andrei-polukhin/pgdbtemplate-fast-postgresql-test-databases-in-go-using-templates-138n&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615290&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/andrei-polukhin/pgdbtemplate-fast-postgresql-test-databases-in-go-using-templates-138n&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Rust/GoアプリケーションのAWS Lambda向けクロスビルド方法</title>
+        <link>https://firebird-techtalktech.com/post/rust/go%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AEaws-lambda%E5%90%91%E3%81%91%E3%82%AF%E3%83%AD%E3%82%B9%E3%83%93%E3%83%AB%E3%83%89%E6%96%B9%E6%B3%95/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/rust/go%E3%82%A2%E3%83%97%E3%83%AA%E3%82%B1%E3%83%BC%E3%82%B7%E3%83%A7%E3%83%B3%E3%81%AEaws-lambda%E5%90%91%E3%81%91%E3%82%AF%E3%83%AD%E3%82%B9%E3%83%93%E3%83%AB%E3%83%89%E6%96%B9%E6%B3%95/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h1 data-sourcepos=&#34;1:1-1:8&#34;&gt;
+&lt;span id=&#34;概要&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E6%A6%82%E8%A6%81&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;概要&lt;/h1&gt;
+&lt;p data-sourcepos=&#34;2:1-3:60&#34;&gt;前回はPythonのデプロイパッケージのクロスビルドを紹介しました。&lt;br&gt;
+&lt;a href=&#34;https://qiita.com/lucidfrontier45/items/5f285290500639bc6a82&#34; class=&#34;autolink&#34; id=&#34;reference-7456cdaf6d8f5ef2163a&#34;&gt;https://qiita.com/lucidfrontier45/items/5f285290500639bc6a82&lt;/a&gt;&lt;/p&gt;
+&lt;p data-sourcepos=&#34;5:1-5:98&#34;&gt;今回はRustとGoについて、主にLinux向けのクロスビルド方法をまとめます。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;7:1-7:61&#34;&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/lucidfrontier45/items/ea0ec9d710b32e86a3c7&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731717&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/lucidfrontier45/items/ea0ec9d710b32e86a3c7&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 This Is How I Deploy My SSH App</title>
+        <link>https://firebird-techtalktech.com/post/this-is-how-i-deploy-my-ssh-app/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/this-is-how-i-deploy-my-ssh-app/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p&gt;I put my SSH app on the internet.  Yes, I admit that I am highly inspired by Terminal.shop. It really&amp;hellip;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://dev.to/hiro_111/this-is-how-i-deploy-my-ssh-app-k6i&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Dev.to&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:27.615340&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://dev.to/hiro_111/this-is-how-i-deploy-my-ssh-app-k6i&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 vscodeでgoを使うとき初期に入れておくと便利なパッケージ</title>
+        <link>https://firebird-techtalktech.com/post/vscode%E3%81%A7go%E3%82%92%E4%BD%BF%E3%81%86%E3%81%A8%E3%81%8D%E5%88%9D%E6%9C%9F%E3%81%AB%E5%85%A5%E3%82%8C%E3%81%A6%E3%81%8A%E3%81%8F%E3%81%A8%E4%BE%BF%E5%88%A9%E3%81%AA%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/vscode%E3%81%A7go%E3%82%92%E4%BD%BF%E3%81%86%E3%81%A8%E3%81%8D%E5%88%9D%E6%9C%9F%E3%81%AB%E5%85%A5%E3%82%8C%E3%81%A6%E3%81%8A%E3%81%8F%E3%81%A8%E4%BE%BF%E5%88%A9%E3%81%AA%E3%83%91%E3%83%83%E3%82%B1%E3%83%BC%E3%82%B8/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p data-sourcepos=&#34;1:1-3:122&#34;&gt;vscodeで初期に入れておくと便利だった設定をメモしておきます。&lt;br&gt;
+まずはGoの拡張パッケージを入れます。&lt;br&gt;
+&lt;a href=&#34;https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws.com%2F0%2F2445529%2F259ad5f1-a352-4285-ba26-b88abb5bd7f2.png?ixlib=rb-4.0.0&amp;amp;auto=format&amp;amp;gif-q=60&amp;amp;q=75&amp;amp;s=717456bf19e6c4a9cd47083d56c388d5&#34; target=&#34;_blank&#34; rel=&#34;nofollow noopener&#34;&gt;&lt;img src=&#34;https://qiita-user-contents.imgix.net/https%3A%2F%2Fqiita-image-store.s3.ap-northeast-1.amazonaws
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/hiro949/items/4b1053d830b37b351ca9&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:11.731666&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/hiro949/items/4b1053d830b37b351ca9&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>🔥 [GO] Goに入門して、ついでにクリーンアーキテクチャに入門した　ーその3</title>
         <link>https://firebird-techtalktech.com/post/go-go%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%A6%E3%81%A4%E3%81%84%E3%81%A7%E3%81%AB%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%A2%E3%83%BC%E3%82%AD%E3%83%86%E3%82%AF%E3%83%81%E3%83%A3%E3%81%AB%E5%85%A5%E9%96%80%E3%81%97%E3%81%9F-%E3%83%BC%E3%81%9D%E3%81%AE3/</link>
         <pubDate>Sat, 13 Sep 2025 13:29:23 +0900</pubDate>

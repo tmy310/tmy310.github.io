@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Bash on firebirdテクテクテクブログ</title>
+        <link>https://firebird-techtalktech.com/tags/bash/</link>
+        <description>Recent content in Bash on firebirdテクテクテクブログ</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>ja</language>
+        <copyright>トミー</copyright>
+        <lastBuildDate>Sun, 14 Sep 2025 14:54:52 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/bash/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>📚 Day21_Reflected XSS検証ツール(ログイン対応版, Python)</title>
+        <link>https://firebird-techtalktech.com/post/day21_reflected-xss%E6%A4%9C%E8%A8%BC%E3%83%84%E3%83%BC%E3%83%AB%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E5%AF%BE%E5%BF%9C%E7%89%88-python/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/day21_reflected-xss%E6%A4%9C%E8%A8%BC%E3%83%84%E3%83%BC%E3%83%AB%E3%83%AD%E3%82%B0%E3%82%A4%E3%83%B3%E5%AF%BE%E5%BF%9C%E7%89%88-python/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p data-sourcepos=&#34;1:1-1:74&#34;&gt;連日投稿21日目です。昨日のリベンジを果たしました。&lt;/p&gt;
+&lt;h4 data-sourcepos=&#34;3:1-3:20&#34;&gt;
+&lt;span id=&#34;今回の目的&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E4%BB%8A%E5%9B%9E%E3%81%AE%E7%9B%AE%E7%9A%84&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;今回の目的&lt;/h4&gt;
+&lt;p data-sourcepos=&#34;5:1-5:296&#34;&gt;昨日のDay20で、&lt;code&gt;BeautifulSoup&lt;/code&gt;を使ったより高度なXSS検証ツールのロジックは完成しました。しかし、Day18・19で実装した&lt;strong&gt;ログイン機能&lt;/strong&gt;を組み込んでいなかったため、DVWAに弾かれてしまい、テストを実行できませんでした。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;7:1-7:306&#34;&gt;そこで、今日のチャレンジでは、Day20で作成したVerifierに、&lt;strong&gt;ログイン機能とCSRFトーク
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/inugasuki44/items/2b96bbbaba052991fd7d&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:09.935176&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/inugasuki44/items/2b96bbbaba052991fd7d&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 Day22_BurpSuiteの導入と設定</title>
+        <link>https://firebird-techtalktech.com/post/day22_burpsuite%E3%81%AE%E5%B0%8E%E5%85%A5%E3%81%A8%E8%A8%AD%E5%AE%9A/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/day22_burpsuite%E3%81%AE%E5%B0%8E%E5%85%A5%E3%81%A8%E8%A8%AD%E5%AE%9A/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;h3 data-sourcepos=&#34;1:1-1:19&#34;&gt;
+&lt;span id=&#34;今回の目的&#34; class=&#34;fragment&#34;&gt;&lt;/span&gt;&lt;a href=&#34;#%E4%BB%8A%E5%9B%9E%E3%81%AE%E7%9B%AE%E7%9A%84&#34;&gt;&lt;i class=&#34;fa fa-link&#34;&gt;&lt;/i&gt;&lt;/a&gt;今回の目的&lt;/h3&gt;
+&lt;p data-sourcepos=&#34;3:1-4:210&#34;&gt;これまでのチャレンジで自動化されたスキャナをいくつか作ってきたけど、自分が事前に想定している脆弱性のチェックしかできない。&lt;br&gt;
+ここからは、”自分の知ってる脆弱性”だけでなく、”知らない脆弱性”やツールのスキャンでは見つけられないような細かいものを探せるようにしたい。&lt;/p&gt;
+&lt;p data-sourcepos=&#34;6:1-6:36&#34;&gt;あとは以下も目的にある。&lt;/p&gt;
+&lt;ul data-sourcepos=&#34;7:1-10:0&#34;&gt;
+&lt;li data-sourcepos=&#34;7:1-7:76&#34;&gt;Webリクエストを途中で止めて、中身を書き換えたい。&lt;/li&gt;
+&lt;li data-sourcepos=&#34;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/inugasuki44/items/57201d0461e5daafcdea&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:09.935112&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/inugasuki44/items/57201d0461e5daafcdea&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>📚 今日のdocker error, bash</title>
+        <link>https://firebird-techtalktech.com/post/%E4%BB%8A%E6%97%A5%E3%81%AEdocker-error-bash/</link>
+        <pubDate>Sun, 14 Sep 2025 14:54:52 +0900</pubDate>
+        
+        <guid>https://firebird-techtalktech.com/post/%E4%BB%8A%E6%97%A5%E3%81%AEdocker-error-bash/</guid>
+        <description>&lt;h2 id=&#34;記事概要&#34;&gt;記事概要
+&lt;/h2&gt;&lt;p data-sourcepos=&#34;1:1-1:20&#34;&gt;mis type bash -&amp;gt; bsh&lt;/p&gt;
+&lt;div class=&#34;code-frame&#34; data-lang=&#34;macOS&#34; data-sourcepos=&#34;3:1-7:3&#34;&gt;
+&lt;div class=&#34;code-lang&#34;&gt;&lt;span class=&#34;bold&#34;&gt;bash&lt;/span&gt;&lt;/div&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;pre&gt;&lt;code&gt;$ docker run -it kaizenjapan/qiitatag /bin/bsh
+docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: exec: &#34;/bin/bsh&#34;: stat /bin/bsh: no such file or di
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;出典&lt;/strong&gt;: &lt;a class=&#34;link&#34; href=&#34;https://qiita.com/kaizen_nagoya/items/1d78a2f78a4349597d5e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Qiita&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;収集日時&lt;/strong&gt;: 2025-09-14T14:54:09.935160&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://qiita.com/kaizen_nagoya/items/1d78a2f78a4349597d5e&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;🔗 元記事を読む&lt;/a&gt;&lt;/p&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>
