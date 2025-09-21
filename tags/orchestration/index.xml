@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Orchestration on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/orchestration/</link><description>Recent content in Orchestration on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sun, 21 Sep 2025 17:00:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/orchestration/index.xml" rel="self" type="application/rss+xml"/><item><title>⚙️ Kubernetes総合ニュースダイジェスト - 2025年9月</title><link>https://firebird-techtalktech.com/post/%EF%B8%8F-kubernetes%E7%B7%8F%E5%90%88%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/</link><pubDate>Sun, 21 Sep 2025 17:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/%EF%B8%8F-kubernetes%E7%B7%8F%E5%90%88%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/</guid><description>&lt;p>2025年9月のKubernetes関連ニュースと技術記事を総合的にまとめたダイジェスト版です。Kubernetes v1.34の新機能、AWS EKSでの実践的な実装方法、運用自動化のベストプラクティスなど、重要なトピックを厳選してお届けします。&lt;/p>
+&lt;h2 id="-kubernetes-v134-新機能総まとめ">🚀 Kubernetes v1.34 新機能総まとめ
+&lt;/h2>&lt;h3 id="1-pod-replacement-policy-for-jobsga">1. Pod Replacement Policy for Jobs（GA）
+&lt;/h3>&lt;p>Jobsのポッド置換ポリシーが**GA（一般利用可能）**に昇格しました。この機能により、Jobの失敗したポッドの処理方法を細かく制御できるようになります。&lt;/p>
+&lt;p>&lt;strong>主な利点：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>不要なポッド再起動の削減&lt;/li>
+&lt;li>ジョブの信頼性向上&lt;/li>
+&lt;li>リソース効率の最適化&lt;/li>
+&lt;/ul>
+&lt;p>&lt;strong>実装例：&lt;/strong>&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">batch/v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Job&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">podReplacementPolicy&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">Failed &lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="c"># 失敗時のみポッドを置換&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h3 id="2-psi-metricsbeta">2. PSI Metrics（Beta）
+&lt;/h3>&lt;p>**Pressure Stall Information（PSI）**メトリクスがBetaに昇格。ノードの健全性とパフォーマンスをより深く理解できるようになりました。&lt;/p>
+&lt;p>&lt;strong>活用シナリオ：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>大規模クラスターでのリソース圧力監視&lt;/li>
+&lt;li>スケジューリング決定の最適化&lt;/li>
+&lt;li>ノードの実際の状態に基づいた運用判断&lt;/li>
+&lt;/ul>
+&lt;h3 id="3-volumeattributesclassga">3. VolumeAttributesClass（GA）
+&lt;/h3>&lt;p>永続ボリューム属性の動的変更APIが&lt;strong>GA&lt;/strong>に到達。ストレージのチューニングがKubernetes内で完結できるようになりました。&lt;/p>
+&lt;p>&lt;strong>メリット：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>手動でのストレージ再設定が不要&lt;/li>
+&lt;li>ダウンタイムなしでボリューム属性を変更&lt;/li>
+&lt;li>CSIドライバーとの統合強化&lt;/li>
+&lt;/ul>
+&lt;h3 id="4-snapshottable-api-server-cache">4. Snapshottable API Server Cache
+&lt;/h3>&lt;p>APIサーバーの安定性とパフォーマンスを大幅に改善する新機能です。&lt;/p>
+&lt;p>&lt;strong>改善点：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>高メモリ使用量の問題を解決&lt;/li>
+&lt;li>etcdへの負荷を軽減&lt;/li>
+&lt;li>リスト要求の処理効率向上&lt;/li>
+&lt;/ul>
+&lt;h3 id="5-init-container-environment-variables">5. Init Container Environment Variables
+&lt;/h3>&lt;p>ConfigMapsやSecretsに代わる環境変数管理の新しいアプローチです。&lt;/p>
+&lt;p>&lt;strong>利点：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>API呼び出しの削減&lt;/li>
+&lt;li>ベンダー提供コンテナとの互換性向上&lt;/li>
+&lt;li>動的な環境変数設定の簡素化&lt;/li>
+&lt;/ul>
+&lt;h3 id="6-mutable-csi-node-allocatablebeta">6. Mutable CSI Node Allocatable（Beta）
+&lt;/h3>&lt;p>CSIドライバーがアタッチ可能なボリューム数の情報を動的に更新できるようになりました。&lt;/p>
+&lt;p>&lt;strong>効果：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>ステートフルポッドのスケジューリング精度向上&lt;/li>
+&lt;li>古い容量情報によるスケジューリング失敗の削減&lt;/li>
+&lt;/ul>
+&lt;h3 id="7-autoconfiguration-for-node-cgroup-driverga">7. Autoconfiguration for Node Cgroup Driver（GA）
+&lt;/h3>&lt;p>cgroupドライバーの自動設定機能が&lt;strong>GA&lt;/strong>に昇格。&lt;/p>
+&lt;p>&lt;strong>解決される問題：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>手動設定の煩雑さを解消&lt;/li>
+&lt;li>cgroupfsとsystemdドライバーの自動検出&lt;/li>
+&lt;li>kubeletの設定ミスマッチによる問題を防止&lt;/li>
+&lt;/ul>
+&lt;h3 id="8-decoupled-taint-managerstable">8. Decoupled Taint Manager（Stable）
+&lt;/h3>&lt;p>ノードライフサイクル管理とポッドエビクションを分離する機能が&lt;strong>Stable&lt;/strong>に。&lt;/p>
+&lt;p>&lt;strong>改善点：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>専用のテイントエビクションコントローラー&lt;/li>
+&lt;li>ノード障害処理の信頼性向上&lt;/li>
+&lt;li>より良い責任分離&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="-aws-eksでの実践的実装">☁️ AWS EKSでの実践的実装
+&lt;/h2>&lt;h3 id="高可用性アプリケーションの構築-with-eks-auto-mode">高可用性アプリケーションの構築 with EKS Auto Mode
+&lt;/h3>&lt;p>EKS Auto Modeを使用した高可用性アプリケーションの構築方法について、実践的なガイドラインが公開されました。&lt;/p>
+&lt;p>&lt;strong>主要な実装ポイント：&lt;/strong>&lt;/p>
+&lt;h4 id="1-pod-disruption-budgets-pdb">1. Pod Disruption Budgets (PDB)
+&lt;/h4>&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;span class="lnt">6
+&lt;/span>&lt;span class="lnt">7
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">apiVersion&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">policy/v1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">kind&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">PodDisruptionBudget&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w">&lt;/span>&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">minAvailable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">2&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">selector&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">matchLabels&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">app&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">critical-service&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="2-topology-spread-constraints">2. Topology Spread Constraints
+&lt;/h4>&lt;p>アベイラビリティゾーン間でのポッド分散を最適化：&lt;/p>
+&lt;div class="highlight">&lt;div class="chroma">
+&lt;table class="lntable">&lt;tr>&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code>&lt;span class="lnt">1
+&lt;/span>&lt;span class="lnt">2
+&lt;/span>&lt;span class="lnt">3
+&lt;/span>&lt;span class="lnt">4
+&lt;/span>&lt;span class="lnt">5
+&lt;/span>&lt;/code>&lt;/pre>&lt;/td>
+&lt;td class="lntd">
+&lt;pre tabindex="0" class="chroma">&lt;code class="language-yaml" data-lang="yaml">&lt;span class="line">&lt;span class="cl">&lt;span class="nt">spec&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">topologySpreadConstraints&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>- &lt;span class="nt">maxSkew&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="m">1&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">topologyKey&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">topology.kubernetes.io/zone&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;span class="line">&lt;span class="cl">&lt;span class="w"> &lt;/span>&lt;span class="nt">whenUnsatisfiable&lt;/span>&lt;span class="p">:&lt;/span>&lt;span class="w"> &lt;/span>&lt;span class="l">DoNotSchedule&lt;/span>&lt;span class="w">
+&lt;/span>&lt;/span>&lt;/span>&lt;/code>&lt;/pre>&lt;/td>&lt;/tr>&lt;/table>
+&lt;/div>
+&lt;/div>&lt;h4 id="3-pod-readiness-gates">3. Pod Readiness Gates
+&lt;/h4>&lt;p>カスタム条件でポッドの準備状態を制御&lt;/p>
+&lt;p>&lt;strong>テストシナリオ：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>ポッド障害&lt;/li>
+&lt;li>ノード障害&lt;/li>
+&lt;li>アベイラビリティゾーン障害&lt;/li>
+&lt;li>クラスターアップグレード&lt;/li>
+&lt;/ul>
+&lt;h3 id="gitopsによるリソース最適化">GitOpsによるリソース最適化
+&lt;/h3>&lt;p>Amazon Managed PrometheusとBedrockを活用した自動リソース最適化の実装方法が紹介されました。&lt;/p>
+&lt;p>&lt;strong>実装フロー：&lt;/strong>&lt;/p>
+&lt;ol>
+&lt;li>メトリクス収集（Prometheus）&lt;/li>
+&lt;li>AI分析（Bedrock）&lt;/li>
+&lt;li>最適化提案の生成&lt;/li>
+&lt;li>GitOpsによる自動PR作成&lt;/li>
+&lt;li>レビュー後の自動適用&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="-実践的学習リソース">📚 実践的学習リソース
+&lt;/h2>&lt;h3 id="dockerからawsコンテナへの移行ガイド">DockerからAWSコンテナへの移行ガイド
+&lt;/h3>&lt;p>「Dockerはわかるけど…」から始める30日間集中講座の&lt;strong>Day 11：ECSクラスター設計&lt;/strong>が話題になっています。&lt;/p>
+&lt;p>&lt;strong>主要な判断ポイント：&lt;/strong>&lt;/p>
+&lt;table>
+&lt;thead>
+&lt;tr>
+&lt;th>観点&lt;/th>
+&lt;th>EC2&lt;/th>
+&lt;th>Fargate&lt;/th>
+&lt;/tr>
+&lt;/thead>
+&lt;tbody>
+&lt;tr>
+&lt;td>コスト&lt;/td>
+&lt;td>長期運用で有利&lt;/td>
+&lt;td>短期・変動負荷で有利&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>管理負荷&lt;/td>
+&lt;td>インフラ管理必要&lt;/td>
+&lt;td>フルマネージド&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>カスタマイズ性&lt;/td>
+&lt;td>高い&lt;/td>
+&lt;td>制限あり&lt;/td>
+&lt;/tr>
+&lt;tr>
+&lt;td>スケーリング&lt;/td>
+&lt;td>手動/自動設定&lt;/td>
+&lt;td>自動&lt;/td>
+&lt;/tr>
+&lt;/tbody>
+&lt;/table>
+&lt;hr>
+&lt;h2 id="-編集者のハイライト">🔍 編集者のハイライト
+&lt;/h2>&lt;p>今月のKubernetesニュースの中で特に注目すべきは：&lt;/p>
+&lt;ol>
+&lt;li>&lt;strong>v1.34の成熟度&lt;/strong>: 多くの機能がGAに到達し、プロダクション環境での採用準備が整いました&lt;/li>
+&lt;li>&lt;strong>運用自動化の進化&lt;/strong>: GitOpsやAI活用による運用効率化が実用段階に&lt;/li>
+&lt;li>&lt;strong>AWS統合の深化&lt;/strong>: EKSの機能拡張により、より簡単に高可用性システムが構築可能に&lt;/li>
+&lt;/ol>
+&lt;hr>
+&lt;h2 id="-トレンド分析">📊 トレンド分析
+&lt;/h2>&lt;p>&lt;strong>2025年9月のKubernetesエコシステムトレンド：&lt;/strong>&lt;/p>
+&lt;ul>
+&lt;li>&lt;strong>安定性重視&lt;/strong>: v1.34では新機能追加よりも既存機能の安定化に注力&lt;/li>
+&lt;li>&lt;strong>運用自動化&lt;/strong>: AIとGitOpsの組み合わせが主流に&lt;/li>
+&lt;li>&lt;strong>マルチクラウド&lt;/strong>: ベンダー固有機能とポータビリティのバランス重視&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;h2 id="-関連リンク">🔗 関連リンク
+&lt;/h2>&lt;ul>
+&lt;li>&lt;a class="link" href="https://kubernetes.io/blog/" target="_blank" rel="noopener"
+>Kubernetes公式ブログ&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://aws.amazon.com/blogs/containers/" target="_blank" rel="noopener"
+>AWS Containers Blog&lt;/a>&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.cncf.io/" target="_blank" rel="noopener"
+>CNCF（Cloud Native Computing Foundation）&lt;/a>&lt;/li>
+&lt;/ul>
+&lt;hr>
+&lt;p>&lt;em>このダイジェストは2025年9月のKubernetes関連ニュースを総合的にまとめたものです。最新情報は各公式サイトでご確認ください。&lt;/em>&lt;/p></description></item></channel></rss>
