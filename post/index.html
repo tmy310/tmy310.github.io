@@ -63,7 +63,7 @@
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "",
-  "description": "\u003cp\u003eナレッジ項目：DeepDiff を用いたBigQueryスキーマ比較とPythonオブジェクトの扱い\n今回のやり取りでは、DeepDiff を使ってBigQueryスキーマ（google.cloud.bigquery.SchemaField オブジェクト）の差分を正確に検出する過程で、いくつかの重要なポイントが明らかになりました。\u003c\/p\u003e",
+  "description": "\u003cp\u003e⏺ 記事1: VPC Service ControlsでのGitHub Actions対応：エラーベース権限設定のベストプラクティス\u003c\/p\u003e\n\u003cp\u003eはじめに\u003c\/p\u003e\n\u003cp\u003eGoogle Cloud の VPC Service Controls（VPC-SC）を enforced mode で運用している環境で、GitHub Actions による Terraform\n実行が突然失敗するようになった経験はありませんか？\u003c\/p\u003e",
   "author": {
     "@type": "Person",
     "name": "トミー"
@@ -76,7 +76,7 @@
   "datePublished": "0001-01-01T00:00:00Z",
   "dateModified": "0001-01-01T00:00:00Z",
   "url": "https:\/\/firebird-techtalktech.com\/post\/",
-  "wordCount": "7743",
+  "wordCount": "4021",
   "keywords": []
 }
 </script>
@@ -87,8 +87,9 @@
 
 
 
-<meta name="description" content="ナレッジ項目：DeepDiff を用いたBigQueryスキーマ比較とPythonオブジェクトの扱い
-今回のやり取りでは、DeepDiff を使ってBigQueryスキーマ（google.cloud.bigquery.SchemaField オブジェクト）の差分を正確に検出する過程で、いくつかの重要なポイントが明らかに …">
+<meta name="description" content="⏺ 記事1: VPC Service ControlsでのGitHub Actions対応：エラーベース権限設定のベストプラクティス
+はじめに
+Google Cloud の VPC Service Controls（VPC-SC）を enforced mode で運用している環境で、GitHub Actions …">
 
 
 
@@ -1523,150 +1524,607 @@
     <section class="article-content">
     
     
-    <p>ナレッジ項目：DeepDiff を用いたBigQueryスキーマ比較とPythonオブジェクトの扱い
-今回のやり取りでは、DeepDiff を使ってBigQueryスキーマ（google.cloud.bigquery.SchemaField オブジェクト）の差分を正確に検出する過程で、いくつかの重要なポイントが明らかになりました。</p>
+    <p>⏺ 記事1: VPC Service ControlsでのGitHub Actions対応：エラーベース権限設定のベストプラクティス</p>
+<p>はじめに</p>
+<p>Google Cloud の VPC Service Controls（VPC-SC）を enforced mode で運用している環境で、GitHub Actions による Terraform
+実行が突然失敗するようになった経験はありませんか？</p>
+<p>本記事では、VPC-SC 違反エラーの解決にエラーベース権限設定というアプローチを用いて、セキュリティを保ちながら効率的に権限を設定
+する方法を解説します。</p>
+<p>問題の背景</p>
+<p>VPC Service Controls が dry-run mode から enforced mode に移行すると、今まで動いていた GitHub Actions
+ワークフローが以下のようなエラーで失敗するようになります：</p>
+<p>Error 403: Request is prohibited by organization&rsquo;s policy.
+vpcServiceControlsUniqueIdentifier: xxxxx</p>
+<p>これは、GitHub Actions の Workload Identity Federation で使用するサービスアカウントが、VPC-SC
+で保護されたリソースにアクセスできなくなったためです。</p>
+<p>エラーベース権限設定とは</p>
+<p>従来のアプローチでは、事前に「必要そうな権限」をすべて付与することが多かったのですが、エラーベース権限設定では：</p>
 <ol>
-<li>Pythonオブジェクトの「内部構造」とDeepDiffの比較対象
-Pythonの属性アクセスの特性: Pythonでは、アンダースコア（_）で始まる変数やメソッドは「プライベート」という慣習的な意味合いを持つだけであり、言語レベルでの強制的なアクセス制限（カプセル化）は存在しません。つまり、コード上はどこからでもアクセス可能です。
-DeepDiff の挙動: DeepDiff は、オブジェクトの深い（Deep）な差分を検出するため、単に公開されている属性 (obj.attr) だけでなく、オブジェクトが内部的にデータを保持している辞書 (obj.<strong>dict</strong> や SchemaField の _properties など）の内容も比較対象とします。これは、オブジェクトがどのような形でデータを保持していようと、Pythonの標準的なメカニズムで参照可能であれば、比較対象に含まれるためです。
-BigQuery SchemaField の具体例: SchemaField オブジェクトには、公開属性としての policy_tags と、内部的な _properties 辞書内の &lsquo;policyTags&rsquo; という2つの経路でポリシータグ情報が保持されています。DeepDiff はこれら両方を比較対象とするため、片方を除外しただけでは差分が残り得ます。</li>
-<li>DeepDiff のexclude_obj_callbackの適切な利用
-特定の属性を除外する要件: 「policy_tags の変更はスキーマの差分として検出したくない」というビジネス要件を満たすために、DeepDiff のカスタマイズ機能である exclude_obj_callback が非常に有効です。
-精密な除外ロジック: exclude_obj_callback は、比較対象から除外したい「値」に到達したときにのみ True を返すように、精密なロジックを組む必要があります。
-isinstance(obj, PolicyTagList): SchemaField.policy_tags のように、DeepDiff が比較対象の obj を PolicyTagList インスタンスそのものとして渡してきた場合に除外する条件。
-path.endswith(&quot;[&lsquo;policyTags&rsquo;]&quot;): _properties 辞書内の &lsquo;policyTags&rsquo; キーのように、obj が PolicyTagList インスタンスではない辞書型の一部として渡された場合でも、特定のパスに合致すれば除外する条件。
-冗長性の排除: if condition: return True else: return False というパターンは return condition に置き換えることで、コードをより簡潔（Pythonic）に記述できます（RuffのSIM103ルール）。</li>
-<li>コールバック関数の位置づけと命名
-ヘルパー関数の役割: _exclude_policy_tags_callback は、DeepDiff の特定機能 (exclude_obj_callback) を利用するための補助的な役割を果たすため、「ヘルパー関数」として位置づけられます。
-ビジネスロジックのサポート: このヘルパー関数は、「特定の差分（ポリシータグ）を無視する」という具体的なビジネス要件を実現するため、ビジネスロジックの一部をサポートしているとも言えます。
-クラスメソッドとしての適切性: もしスキーマ比較ロジック全体が特定のクラスの責務であるならば、このコールバック関数をそのクラスのプライベートメソッド（<em>exclude</em>&hellip;）として定義するのは、カプセル化とコードのまとまりの点で適切です。
-flatten_schema_fields との比較: flatten_schema_fields のような、特定のデータ構造を汎用的に変換する関数も、メインのビジネスロジックを簡素化する点で典型的な「ヘルパー関数」です。</li>
-<li>DeepDiff の出力の読み方と活用
-DeepDiff の出力は、values_changed, iterable_item_added, iterable_item_removed などのセクションに分かれ、変更されたパスと新旧の値が詳細に示されます。
-この出力は、プログラムでの自動解析に適した辞書形式であると同時に、DeepDiff オブジェクトの pretty() メソッドを使用することで、人間が視覚的に確認しやすい整形された形式で表示することも可能です。
-これらのナレッジ項目は、DeepDiff を BigQuery スキーマの比較に応用するだけでなく、他の複雑なPythonオブジェクトの差分検出や、特定の要件に基づいた比較ロジックを構築する際にも役立つでしょう。</li>
+<li>最小限の権限でスタート</li>
+<li>実際にエラーが発生したタイミングで権限を追加</li>
+<li>エラーログから必要な権限を正確に特定</li>
 </ol>
-<p>このナレッジ項目で、今回の学びが整理できたでしょうか？他に何か追加すべき点や、さらに深掘りしたい点があれば教えてください。</p>
-<p>pythonにおいてはDeepdiffでよいように思えました。typescript、java、php、rubyでも似たようなものがありますか？</p>
-<p>そういえば、noteなどdeepdiff以外にも聞いたことがあったかと思います。それもナレッジとして抽出してください。</p>
-<p>はい、承知いたしました。DeepDiff 以外にも、オブジェクトやデータの差分検出に関連して言及される可能性のある概念やツールをナレッジとして抽出します。これらは直接 DeepDiff の代替となるライブラリでなくても、似たような文脈で議論されるものです。</p>
-<p>ナレッジ項目：DeepDiff 以外の差分検出・比較に関連する概念とツール
-Pythonにおける DeepDiff はオブジェクトの構造的な差分検出に優れていますが、他にも様々なレベルや目的で差分を扱う概念やツールが存在します。</p>
+<p>このアプローチにより、真に必要な権限のみを付与することができます。</p>
+<p>実践：エラーログの読み方</p>
+<p>VPC-SC違反が発生すると、Cloud Logging に詳細なエラーログが記録されます：</p>
+<p>{
+&ldquo;protoPayload&rdquo;: {
+&ldquo;serviceName&rdquo;: &ldquo;storage.googleapis.com&rdquo;,
+&ldquo;methodName&rdquo;: &ldquo;google.storage.buckets.testIamPermissions&rdquo;,
+&ldquo;authenticationInfo&rdquo;: {
+&ldquo;principalEmail&rdquo;: &ldquo;<a class="link" href="mailto:github-actions-plan@project.iam.gserviceaccount.com" >github-actions-plan@project.iam.gserviceaccount.com</a>&rdquo;
+}
+}
+}</p>
+<p>このログから以下の情報を読み取れます：</p>
+<ul>
+<li>対象サービス: storage.googleapis.com</li>
+<li>必要なメソッド: google.storage.buckets.testIamPermissions</li>
+<li>エラーの主体: GitHub Actions のサービスアカウント</li>
+</ul>
+<p>VPC-SC Ingress Policy の設定</p>
+<p>エラーログをもとに、ingress policy を設定します：</p>
+<p>resource &ldquo;google_access_context_manager_service_perimeter_ingress_policy&rdquo; &ldquo;github_actions&rdquo; {
+perimeter = var.service_perimeter_name</p>
+<pre><code>ingress_from {
+  identities = [
+    &quot;serviceAccount:github-actions-plan@project.iam.gserviceaccount.com&quot;,
+    &quot;serviceAccount:github-actions-apply@project.iam.gserviceaccount.com&quot;
+  ]
+  sources {
+    access_level = &quot;*&quot;  # GitHub Actions の IP は動的
+  }
+}
+
+ingress_to {
+  resources = [&quot;projects/123456789&quot;]
+  operations {
+    service_name = &quot;storage.googleapis.com&quot;
+    method_selectors {
+      method = &quot;google.storage.buckets.testIamPermissions&quot;
+    }
+  }
+}
+</code></pre>
+<p>}</p>
+<p>段階的な権限追加の実例</p>
+<p>Terraform での一般的な権限追加パターン：</p>
 <ol>
-<li>バージョン管理システム (Git, SVNなど)
-目的: ファイルやコードベース全体の変更履歴を管理し、異なるバージョン間の差分（diff）を追跡します。
-特徴:
-通常、テキストベースの差分（行の追加、削除、変更）を検出します。
-コードレビュー、変更履歴の追跡、共同開発に不可欠です。
-バイナリファイルの変更も追跡できますが、中身の差分を表示することはできません。
-DeepDiff との関連: Git diff はファイル間の差分を検出しますが、DeepDiff はプログラム内のメモリ上にあるオブジェクト構造の差分を検出します。用途が異なります。</li>
-<li>テキスト差分ツール (diff, Beyond Compare, WinMerge, kdiff3など)
-目的: 2つのテキストファイルやディレクトリ間の差分を視覚的に表示し、マージを支援します。
-特徴:
-ラインベースの比較が基本です。
-プログラミングコード、設定ファイル、ドキュメントなどの比較によく使われます。
-高度なツールは、ディレクトリ比較、3者間マージ、構文ハイライトなどを提供します。
-DeepDiff との関連: これらはファイルの内容を文字列として比較するのに対し、DeepDiff はPythonオブジェクトの内部構造（辞書、リスト、カスタムクラスの属性など）をプログラム的に比較します。</li>
-<li>データ比較・検証ライブラリ（Python: pandas.testing, numpy.testingなど）
-目的: 特定のデータ構造（例: DataFrame, NumPy配列）における値の比較や、近似値の許容範囲での比較を行います。
-特徴:
-データサイエンスや数値計算の文脈で、計算結果の一致性検証やテストに利用されます。
-浮動小数点数の誤差を許容する比較などが可能です。
-DeepDiff との関連: DeepDiff は汎用的なオブジェクト構造の比較に重点を置くのに対し、これらは特定のデータ型に特化しており、多くの場合、より厳密な数値比較や統計的な比較機能を提供します。</li>
-<li>オブジェクトの等価性チェック（言語組み込み）
-目的: 2つのオブジェクトが「等しい」と見なせるかどうかを判断します。
-特徴:
-Pythonの == 演算子、Javaの .equals() メソッド、JavaScriptの === 演算子などが該当します。
-デフォルトでは、参照の等価性（同じメモリ上のオブジェクトか）や、クラスが定義する基本的な値の等価性をチェックします。
-「深い等価性」の概念: オブジェクトがネストされた構造を持つ場合、その内部の全要素が等しいかどうかを再帰的にチェックする「深い等価性」の概念が重要になります。DeepDiff はこの「深い等価性」が満たされない場合に、その理由（差分）を詳細に報告するツールと言えます。
-DeepDiff との関連: DeepDiff は、単に等しいか否かだけでなく、「どこが、どのように違うのか」を詳細に知りたい場合に利用されます。多くの言語の標準ライブラリには、DeepDiff のような詳細な差分報告機能は含まれていません。</li>
-<li>APIレスポンス比較ツール / スキーマ検証ツール
-目的: APIからのJSON/XMLレスポンスや、データ構造が期待されるスキーマ（例: JSON Schema）と一致するかを検証します。
-特徴:
-テスト自動化やAPI監視でよく利用されます。
-フィールドの存在、型、制約などをチェックします。
-一部のツールは、レスポンス間の差分を検出する機能も持ちます。
-DeepDiff との関連: 今回のBigQueryスキーマ比較のように、PythonオブジェクトとしてAPIレスポンスを扱える場合、DeepDiff を用いてレスポンスオブジェクト間の詳細な差分を検出することは可能です。スキーマ検証は「型が合っているか」に主眼を置くのに対し、DeepDiff は「内容が一致するか」に主眼を置きます。
-これらのツールや概念は、それぞれ異なるレベルや目的でデータの「変更」や「違い」を扱います。DeepDiff は特に、プログラム内で扱う複雑なPythonオブジェクトの構造的な差分を、詳細かつプログラム的に検出・報告するというニッチで強力な役割を担っている、という位置づけになります。</li>
+<li>初期設定（Terraform state 管理）</li>
 </ol>
-<p>違います。noteとはどういうものか？ヘルパーとはどういうものか？などをきいたと思います。</p>
-<p>ご指摘いただきありがとうございます。私の理解が不足しておりました。</p>
-<p>「note」とはどういうものか、そして「ヘルパー」とはどういうものか、といった概念や定義についてのご質問でしたね。大変失礼いたしました。</p>
-<p>今回のやり取りを振り返り、それらの概念について明確にまとめ、今後のナレッジとさせていただきます。</p>
-<p>ナレッジ項目：ソフトウェア開発における「ノート」と「ヘルパー」の概念
-今回の会話では、特定のコードの役割やドキュメントに関する用語について議論がありました。これらの概念を明確にすることで、チーム内でのコミュニケーションやコードベースの理解が深まります。</p>
-<ol>
-<li>「ノート (Note)」の概念
-会話の中で「noteなど」という形で出てきた「note」は、文脈によって複数の意味を持ち得ます。ソフトウェア開発においては、一般的に以下のような意味で使われることが多いです。</li>
-</ol>
-<p>開発メモ/記録:</p>
-<p>開発中に個人やチームで記録する、非公式なメモや覚書のこと。
-特定の設計上の決定、一時的な作業ログ、試行錯誤の過程、後で検討すべき事項などを指す場合があります。
-コードのコメントとしてではなく、別途ドキュメントやWiki、プロジェクト管理ツールなどに記録されることが多いです。
-目的は、将来の参照のためや、チームメンバー間での情報共有のためです。
-コードコメント内の注意書き:</p>
-<p>ソースコード内に書かれた、特定の処理や実装に関する注意点、警告、補足説明などを指す場合があります。
-例えば、「FIXME」「TODO」「HACK」「NOTE」といった特殊なコメントタグとして使われ、特定のリンターやIDEで検出されることがあります。
-今回の Docstring 内で「例:root[&hellip;]._properties[&lsquo;fields&rsquo;][0][&lsquo;policyTags&rsquo;]」のように書かれた箇所は、関数の使用方法や挙動に関する「ノート（補足説明）」として機能しています。
-今回の文脈では、後者の**「コードコメント内の補足説明や注意書き」、または一般的な「開発における記録やメモ」**といった意味合いで使われた可能性が高いと推測されます。</p>
+<p>operations {
+service_name = &ldquo;storage.googleapis.com&rdquo;
+method_selectors {
+method = &ldquo;google.storage.objects.list&rdquo;
+method = &ldquo;google.storage.objects.get&rdquo;
+method = &ldquo;google.storage.buckets.get&rdquo;
+}
+}</p>
 <ol start="2">
-<li>「ヘルパー (Helper)」の概念
-「ヘルパー」または「ヘルパー関数/メソッド」は、ソフトウェア開発において非常に一般的な用語です。</li>
+<li>エラー発生後の追加</li>
 </ol>
-<p>定義と目的:</p>
-<p>特定の、反復的または補助的なタスクを実行するために設計された関数やメソッドのこと。
-メインのビジネスロジックを簡素化し、可読性を高める役割を担います。
-主なビジネスロジックやコア機能から分離され、それらの機能を「助ける（help）」存在です。
-通常、ヘルパー関数自体が複雑なビジネス判断を含むことは稀で、データの整形、計算、特定のAPIの呼び出しなど、より低レベルな操作を行うことが多いです。
-主な特徴:</p>
-<p>再利用性: 複数の場所で同じような処理が必要になる場合に、コードの重複を防ぐために使われます。
-モジュール性/カプセル化: 特定のタスクを独立した関数にまとめることで、コードベース全体のモジュール性が向上し、保守しやすくなります。
-可読性の向上: メインのコードパスから詳細な実装を隠蔽することで、メインロジックの理解を容易にします。
-今回の _exclude_policy_tags_callback および flatten_schema_fields との関連:</p>
-<p>_exclude_policy_tags_callback: DeepDiff という特定のライブラリのコールバックインターフェースに適合し、そのライブラリの動作をカスタマイズ（policy_tags の除外）する補助的な役割を担っています。これは、メインのスキーマ比較処理を「助ける」機能であり、ヘルパー関数と呼ぶのが適切です。同時に、そのカスタマイズ自体が「ポリシータグは無視する」というビジネス要件を満たすため、ビジネスロジックをサポートする側面も持ちます。
-flatten_schema_fields: BigQueryの階層的な SchemaField オブジェクトを、DeepDiff で比較しやすいように「平坦化」という形に変換します。これは、データの「前処理」や「整形」という補助的なタスクであり、メインの比較ロジックをシンプルに保つために不可欠な機能であるため、これも典型的なヘルパー関数と言えます。
-3. 用語の解釈とチーム内での合意
-「ヘルパー関数」という用語の厳密な定義は存在せず、プロジェクトやチームのコーディング規約、文化、個人の解釈によって、その適用範囲や呼び方が異なることがあります。
-例えば、ある人は汎用的なユーティリティ関数をヘルパーと呼び、別の人は特定のクラスに属する補助メソッドのみをヘルパーと呼ぶかもしれません。
-最も重要なのは、チーム内でこれらの用語に関する共通の理解と合意を形成することです。コードの意図が明確に伝わり、一貫したスタイルが保たれることが、保守性の高いコードベースを構築する上で不可欠です。
-このナレッジ項目で、ご質問いただいた概念がより明確になったでしょうか。</p>
-<p>他に会話の中でdeepdiff, note, ヘルパー以外でこれも知ったほうがいいことはありますか？</p>
-<p>はい、今回の会話の中で、DeepDiff、note、ヘルパー 以外にも、ソフトウェア開発全般、特にPythonを用いた開発やチーム開発において、知っておくと役立つ重要な概念やプラクティスがいくつかありました。</p>
-<p>以下にそれらをナレッジとして抽出します。</p>
-<p>ナレッジ項目：ソフトウェア開発における重要概念とプラクティス</p>
+<p>operations {
+service_name = &ldquo;storage.googleapis.com&rdquo;
+method_selectors {
+method = &ldquo;google.storage.objects.create&rdquo;        # state更新用
+method = &ldquo;google.storage.buckets.testIamPermissions&rdquo;  # 権限確認用
+}
+}</p>
+<ol start="3">
+<li>BigQuery リソース管理</li>
+</ol>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.create&rdquo;
+permission = &ldquo;bigquery.tables.create&rdquo;
+}
+}</p>
+<p>ベストプラクティス</p>
 <ol>
-<li>Pythonの「Pythonic（パイソニック）」なコーディングスタイル
-概要: Pythonicとは、単に文法的に正しいだけでなく、Python言語の特性や慣習、思想に沿った、より簡潔で読みやすく、効率的なコードを書くことを指します。
-具体例:
-冗長な if/else の排除: if condition: return True else: return False を return condition と書く（今回のRuff SIM103 の指摘）。これは、条件式の結果がそのままブール値として返されることを利用したPythonicな書き方です。
-リスト内包表記やジェネレータ式を活用する。
-適切な命名規則（PEP 8）に従う。
-なぜ重要か: コードの可読性、保守性、そしてPythonコミュニティでの一般的な理解度を高めます。リンター（Ruffなど）は、このようなPythonicな記述を推奨・強制するのに役立ちます。</li>
-<li>リンター (Ruff など) の活用
-概要: リンターは、ソースコードのスタイル、文法エラー、潜在的なバグなどを静的に（実行せずに）分析し、問題点を指摘するツールです。Ruff はPythonの高速なリンターとして注目されています。
-役割:
-コーディング規約の統一: チーム内で一貫したコードスタイルを強制し、レビューの負担を減らします。
-バグの早期発見: 実行時エラーにつながる可能性のある記述や、一般的な落とし穴を指摘します。
-可読性・保守性の向上: Pythonicな書き方やベストプラクティスを推奨し、コード品質全体を向上させます。
-なぜ重要か: 開発効率を高め、品質の高いコードを維持するために不可欠なツールです。CI/CDパイプラインに組み込むことで、コード品質を自動的にチェックできます。</li>
-<li>Docstring（ドキュメンテーション文字列）の重要性
-概要: Pythonの関数、クラス、モジュールに記述される複数行の文字列で、そのコードブロックの目的、引数、戻り値、例外などを説明するために使用されます。
-役割:
-自己文書化: コードの動作を理解するための最も直接的な情報源となります。
-IDE/ツールとの連携: IDE（VS Code, PyCharmなど）がDocstringを解析し、関数の使い方や引数のヒントをポップアップ表示するなど、開発体験を向上させます。
-自動ドキュメント生成: Sphinxなどのツールを用いて、DocstringからAPIリファレンスドキュメントを自動生成できます。
-なぜ重要か: コードの可読性と保守性を飛躍的に向上させ、特にチーム開発や長期プロジェクトにおいて、新しいメンバーのオンボーディングや既存コードの理解を容易にします。Docstringのスタイル（Googleスタイル、NumPyスタイルなど）を統一することも重要です。</li>
-<li>カプセル化と内部構造の扱い
-概要: オブジェクト指向プログラミングの主要な原則の一つで、オブジェクトの内部状態や実装詳細を外部から隠蔽し、公開されたインターフェース（メソッドや公開属性）を通じてのみアクセスさせることです。
-Pythonにおける特性: Pythonでは、アンダースコア（_）で始まる属性は「内部的である」という慣習を示すものであり、他の言語のような厳密なアクセス制限はありません。これは「大人のプログラミング」と呼ばれます。
-DeepDiff との関連: DeepDiff は、このPythonの特性を活かして、_properties のような内部属性にもアクセスして比較します。これにより、意図せず変更された内部状態も検出できますが、逆に除外したい場合は明示的な設定（exclude_obj_callback など）が必要になります。
-なぜ重要か: コードの変更による影響範囲を限定し、保守性を高めます。しかし、DeepDiff のように内部に踏み込むツールを使う際は、そのツールの挙動とカプセル化の概念との兼ね合いを理解しておく必要があります。</li>
-<li>要件定義とテストの重要性（特に差分検出において）
-概要: 何を「差分」と見なすか、何を「無視」するかという要件を明確に定義し、それがテストで正しく検証されていることを確認するプロセス。
-今回のケース: policy_tags の変更は「無視する」という要件を明確にし、それが DeepDiff のコールバック関数で正しく機能しているかを実際のログで確認しました。
-なぜ重要か: 複雑なデータ構造の比較では、「何が重要で、何が無視できる変更なのか」というビジネスルールが曖昧になりがちです。これを明確にすることで、意図しない変更を検出し、必要な変更のみを適切に扱うことができます。テスト駆動開発（TDD）のアプローチも有効です。
-これらの概念は、個々のコード実装の技術的な詳細を超えて、より良いソフトウェアを開発し、チームとして効率的に働くための基盤となるものです。</li>
+<li>ログ監視の自動化</li>
 </ol>
+<h1 id="vpc-sc違反を監視するクエリ例">VPC-SC違反を監視するクエリ例
+</h1><p>gcloud logging read '
+protoPayload.metadata.&quot;@type&quot;=&ldquo;type.googleapis.com/google.cloud.audit.VpcServiceControlAuditMetadata&rdquo;
+AND protoPayload.authenticationInfo.principalEmail:&ldquo;github-actions&rdquo;
+&rsquo; &ndash;format=&ldquo;json&rdquo;</p>
+<ol start="2">
+<li>権限の文書化</li>
+</ol>
+<p>エラーベースで追加した権限は、なぜその権限が必要なのかをコメントで記録：</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# Terraform での dataset 存在確認に必要
+permission = &ldquo;bigquery.datasets.get&rdquo;
+# BigQuery audit log sink の作成に必要
+permission = &ldquo;bigquery.datasets.create&rdquo;
+}
+}</p>
+<ol start="3">
+<li>定期的な権限見直し</li>
+</ol>
+<p>使用されていない権限を定期的にチェック：</p>
+<h1 id="過去30日の-api-使用状況を確認">過去30日の API 使用状況を確認
+</h1><p>gcloud logging read '
+protoPayload.serviceName=&ldquo;bigquery.googleapis.com&rdquo;
+AND protoPayload.authenticationInfo.principalEmail:&ldquo;github-actions&rdquo;
+AND timestamp&gt;=&ldquo;2024-01-01&rdquo;
+&rsquo; &ndash;format=&ldquo;table(protoPayload.methodName)&rdquo;</p>
+<p>まとめ</p>
+<p>エラーベース権限設定は、VPC Service Controls 環境での権限管理において：</p>
+<ul>
+<li>セキュリティ向上: 最小権限の原則を実践</li>
+<li>運用効率化: 不要な権限調査時間を削減</li>
+<li>透明性確保: 権限付与の根拠が明確</li>
+</ul>
+<p>GitHub Actions と VPC-SC の組み合わせでお困りの際は、ぜひこのアプローチを試してみてください。</p>
+<hr>
+<p>記事2: Google CloudサービスのVPC Service Controls対応状況：メソッド指定の罠と対策</p>
+<p>はじめに</p>
+<p>VPC Service Controls（VPC-SC）で ingress/egress policy
+を設定する際、サービスによってメソッド指定の対応状況が大きく異なることをご存知でしょうか？</p>
+<p>本記事では、実際に遭遇したエラーから学んだ、Google Cloud
+サービス別のメソッド指定対応状況と、それぞれの対策方法を詳しく解説します。</p>
+<p>VPC-SC でのメソッド指定の基本</p>
+<p>VPC-SC の ingress/egress policy では、以下の2つの方法でアクセス権限を指定できます：</p>
+<ol>
+<li>Permissions 指定</li>
+</ol>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.tables.create&rdquo;
+}
+}</p>
+<ol start="2">
+<li>Methods 指定</li>
+</ol>
+<p>operations {
+service_name = &ldquo;storage.googleapis.com&rdquo;
+method_selectors {
+method = &ldquo;google.storage.objects.get&rdquo;
+method = &ldquo;google.storage.buckets.list&rdquo;
+}
+}</p>
+<p>サービス別対応状況一覧</p>
+<p>実際に検証した結果、サービスごとに対応状況が大きく異なることが判明しました：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>サービス</th>
+          <th>個別メソッド指定</th>
+          <th>対応形式</th>
+          <th>備考</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>storage.googleapis.com</td>
+          <td>✅</td>
+          <td>フルパス</td>
+          <td>google.storage.objects.get</td>
+      </tr>
+      <tr>
+          <td>bigquery.googleapis.com</td>
+          <td>✅</td>
+          <td>permissions/methods併用</td>
+          <td>用途により使い分け</td>
+      </tr>
+      <tr>
+          <td>logging.googleapis.com</td>
+          <td>✅</td>
+          <td>短縮形式</td>
+          <td>ConfigServiceV2.GetSink</td>
+      </tr>
+      <tr>
+          <td>monitoring.googleapis.com</td>
+          <td>❌</td>
+          <td>* のみ</td>
+          <td>個別指定不可</td>
+      </tr>
+      <tr>
+          <td>secretmanager.googleapis.com</td>
+          <td>❌</td>
+          <td>* のみ</td>
+          <td>個別指定不可</td>
+      </tr>
+      <tr>
+          <td>datacatalog.googleapis.com</td>
+          <td>❌</td>
+          <td>* のみ</td>
+          <td>個別指定不可</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>実際のエラーパターンと対策</p>
+<p>パターン1: フルパス指定が必要なケース</p>
+<p>エラー例（Storage）:
+Error 400: METHOD &lsquo;objects.get&rsquo; is not supported in storage.googleapis.com</p>
+<p>対策:</p>
+<h1 id="-短縮形式">❌ 短縮形式
+</h1><p>method = &ldquo;objects.get&rdquo;</p>
+<h1 id="-フルパス指定">✅ フルパス指定
+</h1><p>method = &ldquo;google.storage.objects.get&rdquo;</p>
+<p>パターン2: 短縮形式でないとエラーになるケース</p>
+<p>エラー例（Logging）:
+Error 400: METHOD &lsquo;google.logging.v2.ConfigServiceV2.GetSink&rsquo; is not supported in logging.googleapis.com</p>
+<p>対策:</p>
+<h1 id="-フルパス">❌ フルパス
+</h1><p>method = &ldquo;google.logging.v2.ConfigServiceV2.GetSink&rdquo;</p>
+<h1 id="-短縮形式-1">✅ 短縮形式
+</h1><p>method = &ldquo;ConfigServiceV2.GetSink&rdquo;</p>
+<p>パターン3: 個別指定が一切サポートされないケース</p>
+<p>エラー例（Monitoring）:
+Error 400: METHOD &lsquo;NotificationChannelService.GetNotificationChannel&rsquo; is not supported in monitoring.googleapis.com</p>
+<p>対策:</p>
+<h1 id="-個別メソッド指定">❌ 個別メソッド指定
+</h1><p>method = &ldquo;NotificationChannelService.GetNotificationChannel&rdquo;</p>
+<h1 id="-ワイルドカード使用">✅ ワイルドカード使用
+</h1><p>method = &ldquo;*&rdquo;</p>
+<p>BigQuery の特殊ケース</p>
+<p>BigQuery は permissions と methods の使い分けが重要です：</p>
+<p>Permissions を使用するケース</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# データセット・テーブル操作
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.tables.create&rdquo;
+}
+}</p>
+<p>Methods を使用するケース</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# 特定の API 呼び出し
+method = &ldquo;DatasetService.InsertDataset&rdquo;
+method = &ldquo;TableDataService.InsertAll&rdquo;
+}
+}</p>
+<p>IAM 操作の罠</p>
+<p>BigQuery での IAM 操作は特に注意が必要です：</p>
+<h1 id="-bigquery-サービス内でのiam指定エラーになる">❌ BigQuery サービス内でのIAM指定（エラーになる）
+</h1><p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.getIamPolicy&rdquo;  # サポート外
+method = &ldquo;google.iam.v1.IAMPolicy.GetIamPolicy&rdquo; # サポート外
+}
+}</p>
+<h1 id="-実際にはbigqueryの標準権限で処理される">✅ 実際にはBigQueryの標準権限で処理される
+</h1><p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.update&rdquo;
+}
+}</p>
+<p>効率的な調査方法</p>
+<ol>
+<li>エラーメッセージからの推測</li>
+</ol>
+<p>エラーメッセージのパターンで対応状況を推測：</p>
+<h1 id="パターン1-フルパス不足">パターン1: フルパス不足
+</h1><p>&ldquo;METHOD &lsquo;objects.get&rsquo; is not supported&rdquo;
+→ google.storage.objects.get を試す</p>
+<h1 id="パターン2-フルパス過多">パターン2: フルパス過多
+</h1><p>&ldquo;METHOD &lsquo;google.logging.v2.ConfigServiceV2.GetSink&rsquo; is not supported&rdquo;
+→ ConfigServiceV2.GetSink を試す</p>
+<h1 id="パターン3-個別指定不可">パターン3: 個別指定不可
+</h1><p>&ldquo;METHOD &lsquo;NotificationChannelService.GetNotificationChannel&rsquo; is not supported&rdquo;
+→ &ldquo;*&rdquo; を使用</p>
+<ol start="2">
+<li>段階的テスト戦略</li>
+</ol>
+<h1 id="step-1-具体的メソッドを試す">Step 1: 具体的メソッドを試す
+</h1><p>method = &ldquo;SpecificMethod.Action&rdquo;</p>
+<h1 id="step-2-短縮形式を試す">Step 2: 短縮形式を試す
+</h1><p>method = &ldquo;Action&rdquo;</p>
+<h1 id="step-3-ワイルドカードにフォールバック">Step 3: ワイルドカードにフォールバック
+</h1><p>method = &ldquo;*&rdquo;</p>
+<ol start="3">
+<li>ドキュメント確認</li>
+</ol>
+<p>Google Cloud のドキュメントで対応状況を確認：</p>
+<ul>
+<li><a class="link" href="https://cloud.google.com/vpc-service-controls/docs/supported-services"  target="_blank" rel="noopener"
+    >https://cloud.google.com/vpc-service-controls/docs/supported-services</a></li>
+<li>各サービスの API リファレンス</li>
+</ul>
+<p>まとめとベストプラクティス</p>
+<p>対応状況の把握</p>
+<ol>
+<li>Storage/BigQuery: 詳細な制御が可能</li>
+<li>Logging: 短縮形式で制御可能</li>
+<li>Monitoring/SecretManager: ワイルドカードのみ</li>
+</ol>
+<p>設定時の推奨手順</p>
+<ol>
+<li>具体的なメソッド指定から開始</li>
+<li>エラーに応じて形式を調整</li>
+<li>最終手段として * を使用</li>
+<li>設定理由をコメントで文書化</li>
+</ol>
+<p>コメント記載例</p>
+<p>operations {
+service_name = &ldquo;monitoring.googleapis.com&rdquo;
+method_selectors {
+method = &ldquo;*&rdquo;  # 個別のメソッドは未サポート
+}
+}</p>
+<p>VPC Service Controls の複雑な仕様に惑わされず、段階的なアプローチで効率的に設定を進めていきましょう。</p>
+<hr>
+<p>記事3: Terraformプロバイダーから読み解く必要なGoogle Cloud権限設計</p>
+<p>はじめに</p>
+<p>Terraform で Google Cloud リソースを管理する際、「どの権限が本当に必要なのか？」という疑問を持ったことはありませんか？</p>
+<p>特に VPC Service Controls 環境では、過不足ない権限設定が重要になります。本記事では、Terraform のリソース定義から必要な Google
+Cloud 権限を逆算し、効率的な権限設計を行う方法を解説します。</p>
+<p>基本的な考え方</p>
+<ol>
+<li>Terraformリソース ≠ 必要権限</li>
+</ol>
+<p>多くの場合、Terraform の1つのリソースを管理するために複数の Google Cloud 権限が必要になります：</p>
+<p>resource &ldquo;google_bigquery_dataset&rdquo; &ldquo;example&rdquo; {
+dataset_id = &ldquo;example_dataset&rdquo;
+location   = &ldquo;US&rdquo;
+}</p>
+<p>このシンプルなリソースでも、実際には以下の権限が必要：</p>
+<ul>
+<li>bigquery.datasets.get (状態確認)</li>
+<li>bigquery.datasets.create (作成)</li>
+<li>bigquery.datasets.update (更新)</li>
+</ul>
+<ol start="2">
+<li>CRUD操作の分析</li>
+</ol>
+<p>Terraform の操作フローから必要権限を導き出せます：</p>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>Terraform操作</th>
+          <th>必要なGoogle Cloud権限</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>terraform plan</td>
+          <td>Read権限 (*.get, *.list)</td>
+      </tr>
+      <tr>
+          <td>terraform apply (作成)</td>
+          <td>Create権限 (*.create)</td>
+      </tr>
+      <tr>
+          <td>terraform apply (更新)</td>
+          <td>Update権限 (*.update, *.patch)</td>
+      </tr>
+      <tr>
+          <td>terraform destroy</td>
+          <td>Delete権限 (*.delete)</td>
+      </tr>
+  </tbody>
+</table></div>
+<p>実践例1: BigQuery Dataset管理</p>
+<p>Terraformリソース定義</p>
+<p>resource &ldquo;google_bigquery_dataset&rdquo; &ldquo;analytics&rdquo; {
+dataset_id    = &ldquo;analytics&rdquo;
+friendly_name = &ldquo;Analytics Dataset&rdquo;
+description   = &ldquo;Dataset for analytics data&rdquo;
+location      = &ldquo;US&rdquo;</p>
+<pre><code># データセットアクセス制御
+access {
+  role          = &quot;OWNER&quot;
+  special_group = &quot;projectOwners&quot;
+}
+
+access {
+  role         = &quot;READER&quot;
+  user_by_email = &quot;analyst@example.com&quot;
+}
+</code></pre>
+<p>}</p>
+<p>必要権限の分析</p>
+<p>基本的なデータセット操作:</p>
+<h1 id="vpc-sc-policy設定例">VPC-SC Policy設定例
+</h1><p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.get&rdquo;     # plan時の状態確認
+permission = &ldquo;bigquery.datasets.create&rdquo;  # 初回作成
+permission = &ldquo;bigquery.datasets.update&rdquo;  # 設定変更
+}
+}</p>
+<p>アクセス制御の罠:</p>
+<p>多くの人が見落とすのが、access ブロックによる IAM 操作です：</p>
+<h1 id="-不十分な権限設定">❌ 不十分な権限設定
+</h1><p>permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.create&rdquo;</p>
+<h1 id="-iam操作も含めた完全な設定">✅ IAM操作も含めた完全な設定
+</h1><p>permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.create&rdquo;
+permission = &ldquo;bigquery.datasets.update&rdquo;</p>
+<h1 id="access-ブロックの変更には-update-権限が必要">access ブロックの変更には update 権限が必要
+</h1><p>実践例2: BigQuery Dataset Access管理</p>
+<p>より複雑なケース</p>
+<p>resource &ldquo;google_bigquery_dataset_access&rdquo; &ldquo;analyst_access&rdquo; {
+dataset_id     = google_bigquery_dataset.analytics.dataset_id
+role           = &ldquo;READER&rdquo;
+user_by_email  = &ldquo;<a class="link" href="mailto:analyst@example.com" >analyst@example.com</a>&rdquo;
+}</p>
+<p>resource &ldquo;google_bigquery_dataset_access&rdquo; &ldquo;service_account_access&rdquo; {
+dataset_id     = google_bigquery_dataset.analytics.dataset_id
+role           = &ldquo;WRITER&rdquo;
+user_by_email  = &ldquo;<a class="link" href="mailto:service-account@project.iam.gserviceaccount.com" >service-account@project.iam.gserviceaccount.com</a>&rdquo;
+}</p>
+<p>権限設計</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# データセット基本操作
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.update&rdquo;  # access変更に必要</p>
+<pre><code>  # IAM操作（dataset_access リソース用）
+  # 注意: BigQueryのIAM操作は特殊で、標準的なIAM権限ではなく
+  # BigQuery固有の権限で制御される
+}
+</code></pre>
+<p>}</p>
+<p>実践例3: テーブル作成を含むケース</p>
+<p>Terraformリソース</p>
+<p>resource &ldquo;google_bigquery_table&rdquo; &ldquo;user_events&rdquo; {
+dataset_id = google_bigquery_dataset.analytics.dataset_id
+table_id   = &ldquo;user_events&rdquo;</p>
+<pre><code>time_partitioning {
+  type  = &quot;DAY&quot;
+  field = &quot;event_timestamp&quot;
+}
+
+schema = jsonencode([
+  {
+    name = &quot;user_id&quot;
+    type = &quot;STRING&quot;
+    mode = &quot;REQUIRED&quot;
+  },
+  {
+    name = &quot;event_timestamp&quot;
+    type = &quot;TIMESTAMP&quot;
+    mode = &quot;REQUIRED&quot;
+  }
+])
+</code></pre>
+<p>}</p>
+<p>拡張された権限設計</p>
+<p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+# データセット操作（依存関係で必要）
+permission = &ldquo;bigquery.datasets.get&rdquo;</p>
+<pre><code>  # テーブル操作
+  permission = &quot;bigquery.tables.get&quot;      # plan時の確認
+  permission = &quot;bigquery.tables.create&quot;   # 作成
+  permission = &quot;bigquery.tables.update&quot;   # スキーマ変更等
+  permission = &quot;bigquery.tables.list&quot;     # 依存関係確認
+}
+</code></pre>
+<p>}</p>
+<p>実践例4: ロギング設定を含む複合ケース</p>
+<p>Terraformリソース</p>
+<p>resource &ldquo;google_logging_project_sink&rdquo; &ldquo;bigquery_sink&rdquo; {
+name                   = &ldquo;bigquery-audit-sink&rdquo;
+destination           =
+&ldquo;bigquery.googleapis.com/projects/${var.project}/datasets/${google_bigquery_dataset.audit_logs.dataset_id}&rdquo;
+filter                = &ldquo;resource.type=bigquery_resource&rdquo;
+unique_writer_identity = true
+}</p>
+<p>resource &ldquo;google_bigquery_dataset&rdquo; &ldquo;audit_logs&rdquo; {
+dataset_id = &ldquo;audit_logs&rdquo;
+location   = &ldquo;US&rdquo;</p>
+<pre><code># Sink からの書き込み用アクセス
+access {
+  role          = &quot;WRITER&quot;
+  user_by_email = google_logging_project_sink.bigquery_sink.writer_identity
+}
+</code></pre>
+<p>}</p>
+<p>マルチサービス権限設計</p>
+<h1 id="bigquery権限">BigQuery権限
+</h1><p>operations {
+service_name = &ldquo;bigquery.googleapis.com&rdquo;
+method_selectors {
+permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.datasets.create&rdquo;
+permission = &ldquo;bigquery.datasets.update&rdquo;
+}
+}</p>
+<h1 id="logging権限">Logging権限
+</h1><p>operations {
+service_name = &ldquo;logging.googleapis.com&rdquo;
+method_selectors {
+method = &ldquo;ConfigServiceV2.GetSink&rdquo;     # sink状態確認
+method = &ldquo;ConfigServiceV2.CreateSink&rdquo;  # sink作成
+method = &ldquo;ConfigServiceV2.UpdateSink&rdquo;  # sink更新
+}
+}</p>
+<p>権限設計のベストプラクティス</p>
+<ol>
+<li>段階的な権限付与戦略</li>
+</ol>
+<h1 id="phase-1-基本的な読み取り権限">Phase 1: 基本的な読み取り権限
+</h1><p>permission = &ldquo;bigquery.datasets.get&rdquo;
+permission = &ldquo;bigquery.tables.get&rdquo;</p>
+<h1 id="phase-2-作成権限初回apply時に追加">Phase 2: 作成権限（初回apply時に追加）
+</h1><p>permission = &ldquo;bigquery.datasets.create&rdquo;
+permission = &ldquo;bigquery.tables.create&rdquo;</p>
+<h1 id="phase-3-更新権限設定変更時に追加">Phase 3: 更新権限（設定変更時に追加）
+</h1><p>permission = &ldquo;bigquery.datasets.update&rdquo;
+permission = &ldquo;bigquery.tables.update&rdquo;</p>
+<ol start="2">
+<li>依存関係の理解</li>
+</ol>
+<h1 id="テーブル作成にはデータセット読み取り権限も必要">テーブル作成にはデータセット読み取り権限も必要
+</h1><p>resource &ldquo;google_bigquery_table&rdquo; &ldquo;example&rdquo; {
+dataset_id = google_bigquery_dataset.example.dataset_id  # この参照により必要
+table_id   = &ldquo;example_table&rdquo;
+}</p>
+<h1 id="必要権限">必要権限:
+</h1><h1 id="--bigquerydatasetsget-依存関係確認">- bigquery.datasets.get (依存関係確認)
+</h1><h1 id="--bigquerytablescreate-テーブル作成">- bigquery.tables.create (テーブル作成)
+</h1><ol start="3">
+<li>環境別の権限調整</li>
+</ol>
+<p>locals {
+# 開発環境：より多くの権限
+dev_permissions = [
+&ldquo;bigquery.datasets.get&rdquo;,
+&ldquo;bigquery.datasets.create&rdquo;,
+&ldquo;bigquery.datasets.update&rdquo;,
+&ldquo;bigquery.datasets.delete&rdquo;,  # 開発では削除も許可
+&ldquo;bigquery.tables.get&rdquo;,
+&ldquo;bigquery.tables.create&rdquo;,
+&ldquo;bigquery.tables.update&rdquo;,
+&ldquo;bigquery.tables.delete&rdquo;
+]</p>
+<pre><code># 本番環境：最小権限
+prod_permissions = [
+  &quot;bigquery.datasets.get&quot;,
+  &quot;bigquery.datasets.update&quot;,  # 設定変更のみ
+  &quot;bigquery.tables.get&quot;,
+  &quot;bigquery.tables.update&quot;     # スキーマ変更のみ
+]
+</code></pre>
+<p>}</p>
+<p>検証とモニタリング</p>
+<ol>
+<li>権限使用状況の確認</li>
+</ol>
+<h1 id="実際に使用された権限の確認">実際に使用された権限の確認
+</h1><p>gcloud logging read '
+protoPayload.serviceName=&ldquo;bigquery.googleapis.com&rdquo;
+AND protoPayload.authenticationInfo.principalEmail:&ldquo;terraform-service-account&rdquo;
+AND timestamp&gt;=TIMESTAMP_FROM_RFC3339(&ldquo;2024-01-01T00:00:00Z&rdquo;)
+&rsquo; &ndash;format=&ldquo;table(protoPayload.methodName, protoPayload.authorizationInfo.permission)&rdquo;</p>
+<ol start="2">
+<li>不要権限の特定</li>
+</ol>
+<h1 id="付与されているが使用されていない権限を特定">付与されているが使用されていない権限を特定
+</h1><p>gcloud projects get-iam-policy PROJECT_ID <br>
+&ndash;flatten=&ldquo;bindings[].members&rdquo; <br>
+&ndash;filter=&ldquo;bindings.members:terraform-service-account&rdquo; <br>
+&ndash;format=&ldquo;table(bindings.role)&rdquo;</p>
+<p>まとめ</p>
+<p>Terraform リソースから Google Cloud 権限を設計する際のポイント：</p>
+<ol>
+<li>リソース定義の詳細分析: 単純なリソースでも複数の権限が必要</li>
+<li>依存関係の考慮: 参照されるリソースの読み取り権限も必要</li>
+<li>段階的な権限付与: plan → apply → update の流れに沿って権限を追加</li>
+<li>環境別の調整: 開発と本番で異なる権限レベルを設定</li>
+<li>継続的な見直し: 実際の使用状況に基づく権限の最適化</li>
+</ol>
+<p>適切な権限設計により、セキュリティを保ちながら効率的な Terraform 運用が実現できます。</p>
 
 </section>
 
@@ -2179,156 +2637,7 @@ DeepDiff との関連: DeepDiff は、このPythonの特性を活かして、_pr
 </script>
 
     </body>
-</html>    text-decoration: none;
-    font-size: 0.9em;
-    transition: color 0.2s;
-}
-
-.footer-links a:hover {
-    color: var(--accent-color);
-}
-
- 
-.footer-social {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-}
-
-.social-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: var(--card-separator-color);
-    border-radius: 50%;
-    color: var(--card-text-color-secondary);
-    text-decoration: none;
-    transition: all 0.2s;
-}
-
-.social-link:hover {
-    background: var(--accent-color);
-    color: white;
-}
-
- 
-.footer-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.tag-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 8px;
-    background: var(--card-separator-color);
-    border-radius: 4px;
-    color: var(--card-text-color-secondary);
-    text-decoration: none;
-    font-size: 0.8em;
-    transition: all 0.2s;
-}
-
-.tag-link:hover {
-    background: var(--accent-color-light);
-    color: var(--accent-color);
-}
-
-.tag-count {
-    background: var(--accent-color);
-    color: white;
-    padding: 1px 4px;
-    border-radius: 3px;
-    font-size: 0.7em;
-    font-weight: bold;
-}
-
- 
-.footer-bottom {
-    padding-top: 20px;
-    border-top: 1px solid var(--card-separator-color);
-    text-align: center;
-}
-
-.footer-copyright {
-    color: var(--card-text-color-tertiary);
-    font-size: 0.8em;
-}
-
-.footer-copyright p {
-    margin: 4px 0;
-}
-
-
- 
-@media (max-width: 768px) {
-    .site-footer {
-        padding: 30px 0 15px;
-        margin-top: 40px;
-    }
-    
-    .footer-container {
-        padding: 0 15px;
-    }
-    
-    .footer-content {
-        grid-template-columns: 1fr;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-    
-    .footer-section {
-        text-align: center;
-    }
-    
-    .footer-links {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
-    }
-    
-    .footer-tags {
-        justify-content: center;
-    }
-    
-    .footer-social {
-        justify-content: center;
-    }
-}
-</style>
-        <script 
-                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
-                
-                >
-            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
-<script>
-    (function () {
-        const customFont = document.createElement('link');
-        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
-
-        customFont.type = "text/css";
-        customFont.rel = "stylesheet";
-
-        document.head.appendChild(customFont);
-    }());
-</script>
-
-    </body>
-</html>  Network
-                            <span class="tag-count">9</span>
-                        </a>
-                    
-                        <a href="/tags/gemini/" class="tag-link">
-                            Gemini
-                            <span class="tag-count">8</span>
-                        </a>
-                    
-                        <a href="/tags/grpc/" class="tag-link">
+</html>             <a href="/tags/grpc/" class="tag-link">
                             GRPC
                             <span class="tag-count">8</span>
                         </a>
