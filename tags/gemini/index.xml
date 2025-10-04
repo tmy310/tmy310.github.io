@@ -1,4 +1,81 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Gemini on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/gemini/</link><description>Recent content in Gemini on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Mon, 29 Sep 2025 12:00:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/gemini/index.xml" rel="self" type="application/rss+xml"/><item><title>Qiitaトレンド総まとめ2025 - AI時代のエンジニアリング最前線</title><link>https://firebird-techtalktech.com/post/qiita-trending-digest-2025/</link><pubDate>Mon, 29 Sep 2025 12:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/qiita-trending-digest-2025/</guid><description>&lt;h2 id="-2025年9月qiitaトレンドから見る技術動向"&gt;📊 2025年9月Qiitaトレンドから見る技術動向
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Gemini on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/gemini/</link><description>Recent content in Gemini on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sat, 04 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/gemini/index.xml" rel="self" type="application/rss+xml"/><item><title>Conversational Analytics API パブリックプレビュー概要紹介</title><link>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</link><pubDate>Sat, 04 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</guid><description>&lt;p&gt;Google Cloud Next ’25 で発表された &lt;strong&gt;Conversational Analytics API&lt;/strong&gt; が、2025年8月末から &lt;strong&gt;パブリックプレビュー&lt;/strong&gt; として提供開始されました。&lt;br&gt;
+BigQuery や Looker / Looker Studio 向けに &lt;strong&gt;データエージェントを自動生成&lt;/strong&gt; し、自然言語での分析を可能にする強力な機能です。&lt;br&gt;
+日本語での情報がまだ少ないため、この記事では概要を整理してご紹介します。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="conversational-analytics-apiとは"&gt;Conversational Analytics APIとは？
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;Google Cloudの自然言語クエリエンジンをAPIとして利用可能にするもの&lt;/strong&gt; です。&lt;br&gt;
+LookerやBigQuery Data Canvasで使われている自然言語分析の仕組みを、API経由で自分のアプリケーションにも組み込めるようになります。&lt;/p&gt;
+&lt;p&gt;イメージとしては：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;BigQuery&lt;/strong&gt; のテーブルに対して自然言語で質問&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Looker / Looker Studio&lt;/strong&gt; の可視化を自然言語で操作&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;SQL生成・実行 → 可視化 → 回答生成&lt;/strong&gt; を自動処理&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;が可能になります。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="利用イメージ"&gt;利用イメージ
+&lt;/h2&gt;&lt;p&gt;基本的な流れは次の通りです。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;データエージェントの作成&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Conversationの作成&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自然言語での分析実行&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;例として、BigQueryのデータに「空港の総数が多い上位5州の棒グラフを作成してください」と質問すると：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;エージェントが &lt;strong&gt;テーブル定義を取得&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;自動で &lt;strong&gt;SQLを生成・実行&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;グラフを作成&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;最終的な回答を返却&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;と進みます。SQLを自分で書かなくても、自然言語で分析できるのは非常に魅力的です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="adkとの使い分け"&gt;ADKとの使い分け
+&lt;/h2&gt;&lt;p&gt;Google Cloudには &lt;strong&gt;ADK (Agent Development Kit)&lt;/strong&gt; もあり、こちらでもBigQueryやLookerに対するAIエージェントを作成できます。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Conversational Analytics API&lt;/strong&gt;&lt;br&gt;
+→ Googleが用意した自然言語分析エージェントをそのまま利用可能&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;ADK&lt;/strong&gt;&lt;br&gt;
+→ 自分でプロンプト設計や制御ができる高カスタマイズ型&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;使い分けとしては、&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;手軽に自然言語分析を始めたい → Conversational Analytics API&lt;/li&gt;
+&lt;li&gt;より細かい制御や独自仕様を組み込みたい → ADK&lt;br&gt;
+という形になりそうです。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;なお、ADKの &lt;code&gt;ask_data_insights&lt;/code&gt; ツールは Conversational Analytics API をベースとしており、組み合わせて使うことも可能です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="個人的に推しポイント"&gt;個人的に推しポイント
+&lt;/h2&gt;&lt;p&gt;実際に試してみて「これは良い」と思った点を3つ挙げます。&lt;/p&gt;
+&lt;h3 id="1-データ指定がシンプル"&gt;1. データ指定がシンプル
+&lt;/h3&gt;&lt;p&gt;BigQueryテーブルを以下のように指定するだけでエージェントを作成可能です。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-python" data-lang="python"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;bigquery_table_reference&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;geminidataanalytics&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;BigQueryTableReference&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;bigquery_table_reference&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;project_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;my_project_id&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;bigquery_table_reference&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;dataset_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;my_dataset_id&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="n"&gt;bigquery_table_reference&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;table_id&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s2"&gt;&amp;#34;my_table_id&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;LookerやLooker Studioでも同様の設定が可能。
+とりあえず対象テーブルを渡すだけで自然言語分析ができる手軽さが魅力です。&lt;/p&gt;
+&lt;h3 id="2-ビジネス用語をsystem_instructionに渡せる"&gt;2. ビジネス用語をsystem_instructionに渡せる
+&lt;/h3&gt;&lt;p&gt;自然言語での分析では、ユーザーの言葉とテーブル定義を正しく対応づけるのが重要です。
+このAPIでは system_instruction にYAMLでビジネス用語やmeasureを定義でき、精度を向上させられる設計になっています。&lt;/p&gt;
+&lt;h3 id="3-bigqueryクエリのスキャン量制限"&gt;3. BigQueryクエリのスキャン量制限
+&lt;/h3&gt;&lt;p&gt;big_query_max_billed_bytes を設定することで、エージェントが実行するクエリのスキャン量を制御できます。
+BigQueryのオンデマンド課金を使っている場合に「誤って巨大クエリを実行される」リスクを防げるのは非常に安心です。&lt;/p&gt;
+&lt;h2 id="まとめ"&gt;まとめ
+&lt;/h2&gt;&lt;p&gt;BigQueryやLookerのデータを 自然言語で分析可能というのはとても便利そうです。
+データエージェントを簡単に構築できる
+ADKとも組み合わせ可能
+やはり、特に、SQLを書かずにBigQueryを操作できる点は多くのユーザーにとって魅力的だと思います。&lt;/p&gt;</description></item><item><title>Qiitaトレンド総まとめ2025 - AI時代のエンジニアリング最前線</title><link>https://firebird-techtalktech.com/post/qiita-trending-digest-2025/</link><pubDate>Mon, 29 Sep 2025 12:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/qiita-trending-digest-2025/</guid><description>&lt;h2 id="-2025年9月qiitaトレンドから見る技術動向"&gt;📊 2025年9月Qiitaトレンドから見る技術動向
 &lt;/h2&gt;&lt;p&gt;2025年9月のQiita人気記事を分析すると、**AI・機械学習関連が全体の52.5%**を占め、エンジニアリングの世界がAI中心に急速に変化していることが明確になりました。本記事では、40の人気記事から見えてくる技術トレンドを体系的に整理し、今押さえるべき技術要素をまとめます。&lt;/p&gt;
 &lt;h2 id="-ai機械学習の最新動向"&gt;🤖 AI・機械学習の最新動向
 &lt;/h2&gt;&lt;h3 id="1-プロンプトエンジニアリングの民主化"&gt;1. プロンプトエンジニアリングの民主化
