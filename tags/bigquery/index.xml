@@ -1,4 +1,453 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bigquery on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/bigquery/</link><description>Recent content in Bigquery on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sat, 04 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/bigquery/index.xml" rel="self" type="application/rss+xml"/><item><title>Conversational Analytics API パブリックプレビュー概要紹介</title><link>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</link><pubDate>Sat, 04 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</guid><description>&lt;p&gt;Google Cloud Next ’25 で発表された &lt;strong&gt;Conversational Analytics API&lt;/strong&gt; が、2025年8月末から &lt;strong&gt;パブリックプレビュー&lt;/strong&gt; として提供開始されました。&lt;br&gt;
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Bigquery on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/bigquery/</link><description>Recent content in Bigquery on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sat, 04 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/bigquery/index.xml" rel="self" type="application/rss+xml"/><item><title>Conversational Analytics API パブリックプレビュー概要紹介</title><link>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</link><pubDate>Sat, 04 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</guid><description>&lt;p&gt;承知いたしました。 「GitHub FlowとTrunk-Based開発の違い」について、10分程度で読める技術記事風にまとめました。
+GitHub Flow vs. Trunk-Based開発：あなたのチームに最適なワークフローは？
+ソフトウェア開発において、Gitのワークフローはチームの生産性とコードの品質を左右する重要な要素です。世の中には様々なワークフローが存在しますが、今回は特に頻繁に比較される「GitHub Flow」と「Trunk-Based Development」に焦点を当て、その違いと、それぞれのメリット・デメリットを解説します。&lt;/p&gt;
+&lt;p&gt;開発スタイルを分ける2つのアプローチ
+まず、両者の根本的な違いは「メインブランチへのマージ頻度」にあります。
+Trunk-Based Development（トランクベース開発）
+このアプローチの最大の特徴は、すべての開発者がmain（またはtrunk）という単一のメインブランチに、ごく短い期間で頻繁にコミット（マージ）することです。
+特徴:
+フィーチャーは非常に短い期間のブランチ（数時間～1日程度）で開発されます。
+開発者は、自身の変更を迅速にmainブランチに統合します。
+常にmainブランチが「デプロイ可能」な状態に保たれるよう、厳格なテストとCI/CDパイプラインが不可欠です。
+メリット:
+継続的な統合: 変更が常に統合されるため、マージコンフリクトが最小限に抑えられます。
+迅速なフィードバック: 問題が発生した場合でも、原因特定が容易で、迅速に修正できます。
+リリースサイクルの短縮: いつでもデプロイできるため、市場への投入が早まります。
+GitHub Flow
+GitHubが提唱したこのワークフローは、**プルリクエスト（PR）**を軸にした、ブランチベースの開発モデルです。
+特徴:
+新機能やバグ修正ごとに、mainブランチから新しいフィーチャーブランチを作成します。
+作業が完了したらプルリクエストを作成し、コードレビューを経てからmainブランチにマージします。
+多くの場合、develop、staging、productionといった複数の環境ブランチを設けて、段階的に変更をテスト・デプロイします。
+メリット:
+厳格なレビュープロセス: マージ前に必ずレビューが行われるため、コードの品質を保ちやすいです。
+リスクの隔離: 複数のフィーチャーを統合するdevelopブランチや、本番環境の最終確認を行うstagingブランチを設けることで、段階的にリスクを減らせます。
+柔軟なリリース制御: 安定したproductionブランチを維持しつつ、必要に応じてstagingブランチの内容をリリースできます。&lt;/p&gt;
+&lt;p&gt;あなたのチームが採用しているのは？
+冒頭の質問に戻ると、あなたのチームのdevelop → staging → productionというマージフローは、典型的なGitHub Flowの運用形態です。
+これは「まとめて作業を実施する」というよりは、「段階的なテストとデプロイ」を重視しているため、このようなフローになっています。
+develop: 複数のフィーチャーを統合し、初期の結合テストを行う場。
+staging: 本番環境に近い状態で、最終的なユーザー受け入れテスト（UAT）や性能テストを行う場。
+production: ライブ環境。このブランチへのマージは、いよいよ本番リリースを意味します。
+この多段階のプロセスは、特にユーザーへの影響が大きいアプリケーションや、大規模なチームでの開発において、リスクを最小限に抑えるための合理的な選択と言えます。
+まとめ&lt;/p&gt;
+&lt;p&gt;Trunk-Based Development
+GitHub Flow
+マージ頻度
+非常に高い（毎日複数回）
+比較的低い（PRごとに都度）
+主な目的
+継続的な統合、迅速なデリバリー
+リスク管理、厳格なレビュー
+適したチーム
+小規模～中規模、高い自動化レベルのチーム
+大規模、複雑なアプリケーションを開発するチーム
+主な課題
+高度なCI/CDパイプラインが必要
+マージ作業の複雑化、リリースが遅れる可能性
+どちらのワークフローも、それぞれメリットとデメリットがあります。あなたのチームが何を最も重視するかによって、最適な選択は異なります。重要なのは、チーム全体が共通のワークフローを理解し、そのルールに従って一貫した開発を進めることです。
+承知いたしました。 「GitHub FlowとTrunk-Based開発の違い」について、10分程度で読める技術記事風にまとめました。
+GitHub Flow vs. Trunk-Based開発：あなたのチームに最適なワークフローは？
+ソフトウェア開発において、Gitのワークフローはチームの生産性とコードの品質を左右する重要な要素です。世の中には様々なワークフローが存在しますが、今回は特に頻繁に比較される「GitHub Flow」と「Trunk-Based Development」に焦点を当て、その違いと、それぞれのメリット・デメリットを解説します。&lt;/p&gt;
+&lt;p&gt;開発スタイルを分ける2つのアプローチ
+まず、両者の根本的な違いは「メインブランチへのマージ頻度」にあります。
+Trunk-Based Development（トランクベース開発）
+このアプローチの最大の特徴は、すべての開発者がmain（またはtrunk）という単一のメインブランチに、ごく短い期間で頻繁にコミット（マージ）することです。
+特徴:
+フィーチャーは非常に短い期間のブランチ（数時間～1日程度）で開発されます。
+開発者は、自身の変更を迅速にmainブランチに統合します。
+常にmainブランチが「デプロイ可能」な状態に保たれるよう、厳格なテストとCI/CDパイプラインが不可欠です。
+メリット:
+継続的な統合: 変更が常に統合されるため、マージコンフリクトが最小限に抑えられます。
+迅速なフィードバック: 問題が発生した場合でも、原因特定が容易で、迅速に修正できます。
+リリースサイクルの短縮: いつでもデプロイできるため、市場への投入が早まります。
+GitHub Flow
+GitHubが提唱したこのワークフローは、**プルリクエスト（PR）**を軸にした、ブランチベースの開発モデルです。
+特徴:
+新機能やバグ修正ごとに、mainブランチから新しいフィーチャーブランチを作成します。
+作業が完了したらプルリクエストを作成し、コードレビューを経てからmainブランチにマージします。
+多くの場合、develop、staging、productionといった複数の環境ブランチを設けて、段階的に変更をテスト・デプロイします。
+メリット:
+厳格なレビュープロセス: マージ前に必ずレビューが行われるため、コードの品質を保ちやすいです。
+リスクの隔離: 複数のフィーチャーを統合するdevelopブランチや、本番環境の最終確認を行うstagingブランチを設けることで、段階的にリスクを減らせます。
+柔軟なリリース制御: 安定したproductionブランチを維持しつつ、必要に応じてstagingブランチの内容をリリースできます。&lt;/p&gt;
+&lt;p&gt;あなたのチームが採用しているのは？
+冒頭の質問に戻ると、あなたのチームのdevelop → staging → productionというマージフローは、典型的なGitHub Flowの運用形態です。
+これは「まとめて作業を実施する」というよりは、「段階的なテストとデプロイ」を重視しているため、このようなフローになっています。
+develop: 複数のフィーチャーを統合し、初期の結合テストを行う場。
+staging: 本番環境に近い状態で、最終的なユーザー受け入れテスト（UAT）や性能テストを行う場。
+production: ライブ環境。このブランチへのマージは、いよいよ本番リリースを意味します。
+この多段階のプロセスは、特にユーザーへの影響が大きいアプリケーションや、大規模なチームでの開発において、リスクを最小限に抑えるための合理的な選択と言えます。
+まとめ&lt;/p&gt;
+&lt;p&gt;Trunk-Based Development
+GitHub Flow
+マージ頻度
+非常に高い（毎日複数回）
+比較的低い（PRごとに都度）
+主な目的
+継続的な統合、迅速なデリバリー
+リスク管理、厳格なレビュー
+適したチーム
+小規模～中規模、高い自動化レベルのチーム
+大規模、複雑なアプリケーションを開発するチーム
+主な課題
+高度なCI/CDパイプラインが必要
+マージ作業の複雑化、リリースが遅れる可能性
+どちらのワークフローも、それぞれメリットとデメリットがあります。あなたのチームが何を最も重視するかによって、最適な選択は異なります。重要なのは、チーム全体が共通のワークフローを理解し、そのルールに従って一貫した開発を進めることです。&lt;/p&gt;</description></item><item><title>Conversational Analytics API パブリックプレビュー概要紹介</title><link>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</link><pubDate>Sat, 04 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</guid><description>&lt;p&gt;title: &amp;ldquo;サブモジュール経由で発生するソースコード漏えいの落とし穴と対策&amp;rdquo;
+description: &amp;ldquo;Git submodule のリモート誤設定や push 振る舞いが引き起こす情報漏えいの実例と、即時ロックから恒久対策までの実践ガイド。&amp;rdquo;
+date: 2025-09-24T09:00:00+09:00
+slug: git-submodule-source-leak
+tags: [&amp;ldquo;Git&amp;rdquo;, &amp;ldquo;GitHub&amp;rdquo;, &amp;ldquo;Security&amp;rdquo;, &amp;ldquo;Submodule&amp;rdquo;, &amp;ldquo;DevSecOps&amp;rdquo;]
+categories: [&amp;ldquo;テック&amp;rdquo;]
+draft: false
+TL;DR: サブモジュールは独立した Git リポジトリです。サブモジュール配下で origin を「自分が書き込める Public リポジトリ」に向けたまま push すると、その中身は即時に公開されます。さらに親リポジトリの push.recurseSubmodules や pre-push フックの実装次第では、親で git push しただけでサブモジュールが push され、意図せず漏えいが起こり得ます。&lt;/p&gt;
+&lt;p&gt;背景
+モノレポやサイト構築（Hugo など）で外部テーマ／ライブラリを submodule として取り込むのは一般的です。しかし、サブモジュールは“別リポジトリ”そのものであり、配下で git remote set-url origin &amp;hellip; を変えれば、単独で push できます。この性質と、親の push 時の挙動（push.recurseSubmodules、pre-push フック、CI スクリプト）が組み合わさると、気づかないうちに第三者の Public リポジトリへコードが押し出される危険があります。&lt;/p&gt;
+&lt;p&gt;よくある漏えいシナリオ
+flowchart TB
+A[開発者が親リポで作業] &amp;ndash;&amp;gt; B[サブモジュール内で修正]
+B &amp;ndash;&amp;gt; C[サブモジュール内の origin を自分の Public リポに変更]
+C &amp;ndash;&amp;gt; D{親で git push}
+D &amp;ndash;&amp;gt;|on-demand/フックが push| E[サブモジュールも push]
+E &amp;ndash;&amp;gt; F[Public リポに中身が公開]&lt;/p&gt;
+&lt;p&gt;トリガーA: サブモジュール内で origin を書き込み可能な Public リポジトリに設定&lt;/p&gt;
+&lt;p&gt;トリガーB: 親で git push した際に&lt;/p&gt;
+&lt;p&gt;push.recurseSubmodules=on-demand で「参照コミットがリモートに無ければサブモジュールも push」&lt;/p&gt;
+&lt;p&gt;あるいは pre-push フックが git submodule foreach などで push を試みる&lt;/p&gt;
+&lt;p&gt;すぐできる被害最小化（即時ロック）
+親リポジトリでサブモジュール push を止める:&lt;/p&gt;
+&lt;h1 id="親リポで-サブモジュールを-push-対象にしない"&gt;親リポで: サブモジュールを push 対象にしない
+&lt;/h1&gt;&lt;p&gt;git config push.recurseSubmodules no&lt;/p&gt;
+&lt;h1 id="push-のドライラン癖付け"&gt;push のドライラン癖付け
+&lt;/h1&gt;&lt;p&gt;git push &amp;ndash;dry-run origin main&lt;/p&gt;
+&lt;p&gt;各サブモジュールで push を物理的に無効化（安全策）:&lt;/p&gt;
+&lt;h1 id="ルートで実行-すべてのサブモジュールの-pushurl-を無効化"&gt;ルートで実行: すべてのサブモジュールの pushURL を無効化
+&lt;/h1&gt;&lt;h1 id="fetch-url-はそのまま"&gt;(fetch URL はそのまま)
+&lt;/h1&gt;&lt;p&gt;git config -f .gitmodules &amp;ndash;get-regexp &amp;lsquo;^submodule..*.path$&amp;rsquo; |
+while read -r _ path; do
+echo &amp;ldquo;Locking $path&amp;rdquo;
+git -C &amp;ldquo;$path&amp;rdquo; remote set-url &amp;ndash;push origin DISABLED || true
+hookdir=&amp;quot;$(git -C &amp;ldquo;$path&amp;rdquo; rev-parse &amp;ndash;git-dir)/hooks&amp;quot;
+mkdir -p &amp;ldquo;$hookdir&amp;rdquo;
+cat &amp;gt; &amp;ldquo;$hookdir/pre-push&amp;rdquo; &amp;laquo;&amp;lsquo;SH&amp;rsquo;
+#!/bin/sh
+echo &amp;ldquo;ERROR: Pushing from this submodule is disabled.&amp;rdquo; &amp;gt;&amp;amp;2
+exit 1
+SH
+chmod +x &amp;ldquo;$hookdir/pre-push&amp;rdquo;
+done&lt;/p&gt;
+&lt;p&gt;これでサブモジュール直下での git push は常に失敗し、誤操作やフック経由の push も止まります。&lt;/p&gt;
+&lt;p&gt;恒久対策（レイヤ別）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;設定レイヤ（Git）
+親リポ: git config push.recurseSubmodules no をデフォルトに&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;サブモジュール URL の整合性: git submodule sync &amp;ndash;recursive&lt;/p&gt;
+&lt;p&gt;危険 URL のブロック（親の pre-push フック）：&lt;/p&gt;
+&lt;h1 id="githookspre-push-親リポ"&gt;.git/hooks/pre-push （親リポ）
+&lt;/h1&gt;&lt;p&gt;#!/bin/sh
+set -e
+url=$(git remote get-url &amp;ndash;push origin 2&amp;gt;/dev/null || echo &amp;ldquo;&amp;rdquo;)
+case &amp;ldquo;$url&amp;rdquo; in
+&lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:your-org/&lt;em&gt;|https://github.com/your-org/&lt;/em&gt;) ;;
+*) echo &amp;ldquo;ERROR: Blocked push to non-allowed remote: $url&amp;rdquo; &amp;gt;&amp;amp;2; exit 1;;
+esac&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;リポジトリレイヤ（GitHub 側）
+Private 化（フォークやミラーも）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Protected Branch（強制 push 禁止、PR 必須、レビュー必須）&lt;/p&gt;
+&lt;p&gt;Secret Scanning / Push Protection を有効化&lt;/p&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;
+&lt;p&gt;CI レイヤ（検知）
+GitHub Actionsで誤 push を検知・ブロック:
+name: guard-visibility
+on: [push]
+jobs:
+check:
+runs-on: ubuntu-latest
+steps:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name: Fail if repo is public
+if: ${{ !github.event.repository.private }}
+run: |
+echo &amp;ldquo;Repository is public. Aborting.&amp;rdquo; &amp;gt;&amp;amp;2
+exit 1&lt;/li&gt;
+&lt;li&gt;uses: actions/checkout@v4&lt;/li&gt;
+&lt;li&gt;name: Allowlist push target
+run: |
+url=$(git remote get-url &amp;ndash;push origin || true)
+case &amp;ldquo;$url&amp;rdquo; in
+&lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:your-org/&lt;em&gt;|https://github.com/your-org/&lt;/em&gt;) ;;
+*) echo &amp;ldquo;Blocked remote: $url&amp;rdquo; &amp;gt;&amp;amp;2; exit 1;;
+esac&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;運用レイヤ（人の習慣）
+git remote -v／git remote get-url &amp;ndash;push origin をpush 前に確認&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;git push &amp;ndash;dry-run を毎回実行&lt;/p&gt;
+&lt;p&gt;サブモジュールに変更を加える場合は 必ずフォークを Private で作る → .gitmodules をフォーク URL に変更 → PR&lt;/p&gt;
+&lt;p&gt;兆候と検知ポイント
+git push 時に 予期しないリモート URL がログに出る（例: 第三者のテーマ作者のリポ）&lt;/p&gt;
+&lt;p&gt;pre-push / CI ログに サブモジュールでの push 成功の痕跡&lt;/p&gt;
+&lt;p&gt;GitHub の 監査ログ／Contributors に意図しない push 履歴&lt;/p&gt;
+&lt;p&gt;調査ワンライナー:&lt;/p&gt;
+&lt;h1 id="親の-push-先"&gt;親の push 先
+&lt;/h1&gt;&lt;p&gt;git remote -v | sed -n &amp;lsquo;/origin/p&amp;rsquo;&lt;/p&gt;
+&lt;h1 id="すべてのサブモジュールの-fetchpush-先一覧"&gt;すべてのサブモジュールの fetch/push 先一覧
+&lt;/h1&gt;&lt;p&gt;git config -f .gitmodules &amp;ndash;get-regexp &amp;lsquo;^submodule..*.path$&amp;rsquo; |
+while read -r _ path; do
+echo &amp;ldquo;[$path]&amp;rdquo;; git -C &amp;ldquo;$path&amp;rdquo; remote -v; echo
+done&lt;/p&gt;
+&lt;p&gt;よくある質問（FAQ）
+Q. リポジトリが Public か Private かで差はある？
+A. 公開可否と書き込み権限は別です。Public でも あなたに書き込み権限がなければ push できず、403 で止まります。逆に Public で書き込める先に向いていれば、即座に誰でも読める状態になります。
+Q. &amp;ndash;no-verify を付けても止まらないのは？
+A. &amp;ndash;no-verify は フックの実行抑止だけです。origin の向き先が第三者リポであれば素通りしてしまうため、URL ガード（pre-push 内の URL 判定）と pushURL の無効化 を合わせ技で使います。
+Q. サブモジュールの “detached HEAD” は問題？
+A. サブモジュールとしては 正常です。問題は どこに push され得るか です。&lt;/p&gt;
+&lt;p&gt;ベストプラクティス：Read‑Only 運用 + PR フロー
+結論: 外部のサブモジュールは read‑only に保ち、変更が必要になったら「別途 clone（またはフォーク）→ 修正 → 上流へ PR」。親リポには 参照コミットだけ を更新します。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Read‑Only の基本設定（親とサブモジュール）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id="親-サブモジュールを-push-対象にしない"&gt;親: サブモジュールを push 対象にしない
+&lt;/h1&gt;&lt;p&gt;git config push.recurseSubmodules no&lt;/p&gt;
+&lt;h1 id="サブモジュール側-push-を物理的に無効化誤操作防止"&gt;サブモジュール側: push を物理的に無効化（誤操作防止）
+&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; remote set-url &amp;ndash;push origin DISABLED
+cat &amp;gt; &amp;ldquo;$(git -C &lt;submodule-path&gt; rev-parse &amp;ndash;git-dir)/hooks/pre-push&amp;rdquo; &amp;laquo;&amp;lsquo;SH&amp;rsquo;
+#!/bin/sh
+echo &amp;ldquo;ERROR: Pushing from this submodule is disabled.&amp;rdquo; &amp;gt;&amp;amp;2
+exit 1
+SH
+chmod +x &amp;ldquo;$(git -C &lt;submodule-path&gt; rev-parse &amp;ndash;git-dir)/hooks/pre-push&amp;rdquo;&lt;/p&gt;
+&lt;h1 id="url-の整合を保つgitmodules--ローカルへ反映"&gt;URL の整合を保つ（.gitmodules → ローカルへ反映）
+&lt;/h1&gt;&lt;p&gt;git submodule sync &amp;ndash;recursive&lt;/p&gt;
+&lt;p&gt;.gitmodules は原典（upstream）URLのまま。サブモジュール直下では push しない運用にします。
+2) 変更が必要になったときの手順（別途 clone → PR）&lt;/p&gt;
+&lt;h1 id="1-自分の作業ディレクトリで上流のリポジトリをフォーク-or-直接-clone"&gt;1) 自分の作業ディレクトリで、上流のリポジトリをフォーク or 直接 clone
+&lt;/h1&gt;&lt;h1 id="-機微が混じる可能性があるならフォークは-private-推奨"&gt;※ 機微が混じる可能性があるならフォークは Private 推奨
+&lt;/h1&gt;&lt;h1 id="例-フォークを-clone"&gt;例: フォークを clone
+&lt;/h1&gt;&lt;p&gt;git clone &lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:&lt;you&gt;/&lt;forked-repo&gt;.git
+cd &lt;forked-repo&gt;&lt;/p&gt;
+&lt;p&gt;git remote add upstream &lt;a class="link" href="https://github.com/" target="_blank" rel="noopener"
+&gt;https://github.com/&lt;/a&gt;&lt;upstream-owner&gt;/&lt;upstream-repo&gt;.git&lt;/p&gt;
+&lt;p&gt;git checkout -b fix/your-change&lt;/p&gt;
+&lt;h1 id="-変更-"&gt;&amp;hellip; 変更 &amp;hellip;
+&lt;/h1&gt;&lt;p&gt;git commit -s -m &amp;ldquo;fix: &lt;summary&gt;&amp;rdquo;
+git push -u origin HEAD&lt;/p&gt;
+&lt;h1 id="github-で-originupstream-への-pr-を作成"&gt;GitHub で origin→upstream への PR を作成
+&lt;/h1&gt;&lt;p&gt;PR が upstream にマージ された後、親リポで参照コミットを更新します：
+cd /path/to/parent&lt;/p&gt;
+&lt;h1 id="サブモジュールで最新を取得"&gt;サブモジュールで最新を取得
+&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; fetch &amp;ndash;tags &amp;ndash;all&lt;/p&gt;
+&lt;h1 id="目的のコミットまたはタグへ移動"&gt;目的のコミット(またはタグ)へ移動
+&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; checkout &lt;merge-commit-or-tag&gt;&lt;/p&gt;
+&lt;h1 id="親にポインタ更新を記録"&gt;親にポインタ更新を記録
+&lt;/h1&gt;&lt;p&gt;git add &lt;submodule-path&gt;
+git commit -m &amp;ldquo;chore(submodule): bump &lt;name&gt; to &amp;lt;sha/tag&amp;gt;&amp;rdquo;
+git push&lt;/p&gt;
+&lt;p&gt;※ .gitmodules に branch = main を設定していれば、git submodule update &amp;ndash;remote &lt;path&gt; で「そのブランチの最新へ」上げることも可能です（明示運用推奨）。
+3) どうしても PR を待てない場合（代替案）
+オーバーレイ: 親の layouts/ / assets/ 等で上書き（Hugo などで有効）。&lt;/p&gt;
+&lt;p&gt;パッチ適用: 親レポに patches/ を置き、git apply/git am を CI/ローカルで当てる。サブモジュール自体は upstream のまま。&lt;/p&gt;
+&lt;p&gt;いずれの方法でも、サブモジュール配下からの push は不要です。&lt;/p&gt;
+&lt;p&gt;まとめ
+サブモジュールは独立リポ。origin が Public かつ書き込み可であれば即漏えい。&lt;/p&gt;
+&lt;p&gt;親の push.recurseSubmodules=no、サブモジュール pushURL 無効化、pre-push の URL Allowlist で 多層防御 を。&lt;/p&gt;
+&lt;p&gt;CI と運用ルールで最後の見張りを置いて、ヒューマンエラーを吸収する。&lt;/p&gt;
+&lt;p&gt;付録: チェックリスト（配布用）
+親: git remote -v で push 先を確認&lt;/p&gt;
+&lt;p&gt;親: git config push.recurseSubmodules が no&lt;/p&gt;
+&lt;p&gt;サブモジュール: remote -v で pushURL が DISABLED（または Private）&lt;/p&gt;
+&lt;p&gt;親 .git/hooks/pre-push に URL Allowlist 実装&lt;/p&gt;
+&lt;p&gt;GitHub: Private + Protected Branch + Secret Scanning&lt;/p&gt;
+&lt;p&gt;CI: 可視性チェック + リモート Allowlist&lt;/p&gt;
+&lt;p&gt;運用: git push &amp;ndash;dry-run を習慣化&lt;/p&gt;
+&lt;p&gt;本記事のサンプルスクリプトは 自己責任でお試しください。組織のポリシーに合わせて、許可ドメインやブランチ名、CI 条件を調整してください。&lt;/p&gt;</description></item><item><title>Conversational Analytics API パブリックプレビュー概要紹介</title><link>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</link><pubDate>Sat, 04 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</guid><description>&lt;hr&gt;
+&lt;h2 id="draft-false"&gt;title: &amp;ldquo;GitHub Pagesに独自ドメインを割り当てる手順とDNSの基礎（レジストラ/レジストリ/NSの関係）&amp;rdquo;
+date: 2025-09-24T00:00:00+09:00
+slug: github-pages-domain-dns-basics
+summary: &amp;ldquo;GitHub Pages に独自ドメインを割り当てるための最短手順と、レジストラ・レジストリ・権威DNS・NSレコードなどの用語関係を図解で整理。初心者でも“どこで何を設定するか”がわかるようにまとめました。&amp;rdquo;
+author: &amp;ldquo;anonymous&amp;rdquo;
+categories: [&amp;ldquo;インフラ&amp;rdquo;]
+tags: [&amp;ldquo;DNS&amp;rdquo;,&amp;ldquo;ドメイン&amp;rdquo;,&amp;ldquo;GitHub Pages&amp;rdquo;,&amp;ldquo;レジストラ&amp;rdquo;,&amp;ldquo;レジストリ&amp;rdquo;,&amp;ldquo;NSレコード&amp;rdquo;]
+draft: false
+&lt;/h2&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;strong&gt;この記事は匿名の個人メモです。&lt;/strong&gt; 例として &lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;www.example.com&lt;/code&gt; と &lt;code&gt;username.github.io&lt;/code&gt; を使用します。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h1 id="0-まず結論最短手順"&gt;0. まず結論（最短手順）
+&lt;/h1&gt;&lt;p&gt;GitHub Pages に独自ドメインをつなぐ最小セットはこれだけ：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;GitHub&lt;/strong&gt;（リポジトリ → &lt;em&gt;Settings → Pages&lt;/em&gt;）で &lt;strong&gt;Custom domain&lt;/strong&gt; に &lt;code&gt;example.com&lt;/code&gt; を保存（&lt;code&gt;CNAME&lt;/code&gt; ファイルが自動作成される場合あり）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;**DNS（権威DNSの管理画面）**でレコードを追加：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Apex（&lt;code&gt;example.com&lt;/code&gt;）&lt;/strong&gt; … &lt;strong&gt;A&lt;/strong&gt; を4件、&lt;strong&gt;AAAA&lt;/strong&gt; を4件（IPv6対応時）&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.108.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.109.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.110.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.111.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AAAA 2606:50c0:8000::153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AAAA 2606:50c0:8001::153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AAAA 2606:50c0:8002::153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;AAAA 2606:50c0:8003
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;em&gt;ApexにCNAMEは置けません。&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;www（&lt;code&gt;www.example.com&lt;/code&gt;）&lt;/strong&gt; … &lt;strong&gt;CNAME&lt;/strong&gt; を &lt;code&gt;username.github.io&lt;/code&gt; に向ける（末尾ドット不要）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;HTTPS を有効化&lt;/strong&gt;（GitHub Pages の &lt;em&gt;Enforce HTTPS&lt;/em&gt; をON）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;→ 反映後、&lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;www.example.com&lt;/code&gt; のどちらでも Pages サイトに到達します。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="1-用語の整理誰が何をしている"&gt;1. 用語の整理：誰が何をしている？
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Registrant（登録者）&lt;/strong&gt; … あなた。ドメインの所有者。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Registrar（レジストラ）&lt;/strong&gt; … ドメインの“販売・窓口”。例：お名前.com, Route 53 Domains, Cloudflare Registrar など。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Registry（レジストリ）&lt;/strong&gt; … TLD を運用する主体。例：&lt;code&gt;.com&lt;/code&gt; の Verisign、&lt;code&gt;.jp&lt;/code&gt; の JPRS。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Authoritative DNS（権威DNS）&lt;/strong&gt; … そのドメインの&lt;strong&gt;最終的な答え&lt;/strong&gt;（A/AAAA/CNAME/MX/TXT…）を返すDNS。例：&lt;code&gt;01–04.dnsv.jp&lt;/code&gt;（お名前.com DNS）、Cloudflare DNS、Route 53 Hosted Zone など。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Recursive Resolver（再帰DNS）&lt;/strong&gt; … 8.8.8.8 / 1.1.1.1 など。クライアントの代わりに辿って答えをキャッシュしてくれる。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;NSレコード（Name Server）&lt;/strong&gt; … 「このドメインの&lt;strong&gt;権威DNSはどれか&lt;/strong&gt;」を親ゾーンに教える“委任”情報。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;DSレコード&lt;/strong&gt; … DNSSEC を使う場合、親ゾーンに登録する検証用情報。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ポイント：&lt;strong&gt;レジストラ&lt;/strong&gt;は必ずしも自社DNSを提供するわけではありませんが、多くは&lt;strong&gt;権威DNSサービスも提供&lt;/strong&gt;しています（お名前.comの &lt;code&gt;dnsv.jp&lt;/code&gt; など）。一方、Cloudflare や Route 53 は「レジストラ機能」も「権威DNS」も提供可能です。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h1 id="2-名前解決の全体像ざっくり図解"&gt;2. 名前解決の全体像（ざっくり図解）
+&lt;/h1&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;ブラウザ/OS → 再帰DNS
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ├─ ルート(.) … 「.comの権威NSはどこ？」
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ├─ .com（レジストリ） … 「example.comの権威NSは ns1.example-dns.tld など」
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ├─ ns*.example-dns.tld（権威DNS） … 「A/AAAA/CNAME など最終回答」
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; └─ 返ってきた複数IPのうち1つへ接続（失敗時は他IPへフォールバック）
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;NSレコード&lt;/strong&gt;は「どこに聞くか」を指す&lt;strong&gt;案内板&lt;/strong&gt;。A/AAAA/CNAMEといった&lt;strong&gt;中身の答え&lt;/strong&gt;は&lt;strong&gt;権威DNS&lt;/strong&gt;が持っています。&lt;/li&gt;
+&lt;li&gt;複数のAレコードを返した場合、&lt;strong&gt;どのIPに接続するかはクライアント側&lt;/strong&gt;（OS/ブラウザ）の実装次第（順番に試す・並行接続・失敗時切替など）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id="3-github-pages--独自ドメイン具体手順"&gt;3. GitHub Pages × 独自ドメイン：具体手順
+&lt;/h1&gt;&lt;h2 id="31-github-側の設定"&gt;3.1 GitHub 側の設定
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;リポジトリ → &lt;strong&gt;Settings → Pages&lt;/strong&gt; → &lt;strong&gt;Custom domain&lt;/strong&gt; に &lt;code&gt;example.com&lt;/code&gt; を保存。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ブランチ公開の場合、ルートに &lt;code&gt;CNAME&lt;/code&gt; ファイル（中身は &lt;code&gt;example.com&lt;/code&gt; 1行）が自動コミットされるケースがあります。&lt;/li&gt;
+&lt;li&gt;Actions 等で発行する場合は &lt;code&gt;CNAME&lt;/code&gt; ファイルをビルド成果物に含めない運用も可（Pages の設定でドメインを登録してあればOK）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Enforce HTTPS&lt;/strong&gt; をON（Let’s Encrypt による証明書が自動発行）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="32-dns-側の設定権威dnsの画面"&gt;3.2 DNS 側の設定（権威DNSの画面）
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Apex（&lt;code&gt;example.com&lt;/code&gt;）&lt;/strong&gt;：A を4件、可能なら AAAA も4件（上記一覧を転記）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;www（&lt;code&gt;www.example.com&lt;/code&gt;）&lt;/strong&gt;：CNAME → &lt;code&gt;username.github.io&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;ApexにCNAMEは不可&lt;/em&gt;。もし DNS が &lt;strong&gt;ALIAS / ANAME&lt;/strong&gt; をサポートしているなら、それを &lt;code&gt;username.github.io&lt;/code&gt; に向けてもOK（提供事業者による）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="33-反映確認dig-例"&gt;3.3 反映確認（dig 例）
+&lt;/h2&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 委任（親 .com の見解）&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig NS example.com @a.gtld-servers.net +short
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 実レコード（権威DNSからの答え）&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig example.com A +short
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig example.com AAAA +short
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig www.example.com CNAME +short
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="4-よくある疑問と注意点"&gt;4. よくある疑問と注意点
+&lt;/h1&gt;&lt;p&gt;&lt;strong&gt;Q1. Aレコードは1つでも動く？&lt;/strong&gt;
+→ 動くことはありますが、&lt;strong&gt;4つ全部&lt;/strong&gt;（&lt;code&gt;185.199.108.153–111.153&lt;/code&gt;）を入れるのが実務推奨。冗長化・フォールバックに効きます。IPv6 環境なら AAAA も4つを追加。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q2. “浸透待ち”って何？&lt;/strong&gt;
+→ 誰かが配っているわけではなく、&lt;strong&gt;再帰DNSのキャッシュTTLが更新されていくのを待つ&lt;/strong&gt;こと。数分〜数時間、場合によっては24–48時間程度。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q3. &lt;code&gt;www&lt;/code&gt; にも A/AAAA を入れていい？&lt;/strong&gt;
+→ &lt;strong&gt;推奨しません。&lt;/strong&gt; &lt;code&gt;www&lt;/code&gt; は &lt;strong&gt;CNAME → &lt;code&gt;username.github.io&lt;/code&gt;&lt;/strong&gt; のみ。A/AAAA を併置すると整合性が崩れることがあります。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q4. Apex に CNAME を置けないのはなぜ？&lt;/strong&gt;
+→ DNS 仕様上、ゾーンの頂点（Apex）に CNAME を置くと他レコードと両立できません。代替は &lt;strong&gt;A/AAAA&lt;/strong&gt; か、DNS 事業者の &lt;strong&gt;ALIAS/ANAME&lt;/strong&gt; です。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q5. NS はどこで決まる？&lt;/strong&gt;
+→ &lt;strong&gt;レジストラの管理画面&lt;/strong&gt;で設定し、&lt;strong&gt;レジストリ&lt;/strong&gt;（例：&lt;code&gt;.com&lt;/code&gt;＝Verisign）へ登録されます。親ゾーンの NS が「委任先＝あなたの権威DNS」を指します。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q6. メール（MX/TXT/SPF/DMARC）は？&lt;/strong&gt;
+→ 既に運用中なら &lt;strong&gt;NS 切り替え前に新DNSへ全レコードを複製&lt;/strong&gt;しておくこと（切替直後のメール不達を防止）。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Q7. CAA は必要？&lt;/strong&gt;
+→ 任意ですが、Let’s Encrypt を明示するなら Apex に以下を1件：&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;CAA 0 issue &amp;#34;letsencrypt.org&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="5-役割の違いをもう一度誤解しがちなポイント"&gt;5. 役割の違いをもう一度（誤解しがちなポイント）
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;レジストラ（例：お名前.com/Route 53/Cloudflare）&lt;/strong&gt; … レジストリに &lt;strong&gt;NS（＋DS）&lt;/strong&gt; を登録する“窓口”。&lt;strong&gt;自社DNSを提供することも多いが必須ではない&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;レジストリ（例：&lt;code&gt;.com&lt;/code&gt;＝Verisign）&lt;/strong&gt; … 親ゾーンに &lt;strong&gt;NS（委任）&lt;/strong&gt; を掲載。&lt;strong&gt;A/AAAA/CNAME等は保持しない&lt;/strong&gt;。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;権威DNS（例：dnsv.jp / Cloudflare DNS / Route 53 Hosted Zone）&lt;/strong&gt; … &lt;strong&gt;A/AAAA/CNAME/MX/TXT…の最終回答&lt;/strong&gt;を返すサーバー群。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;組み合わせは原則自由（例：レジストラ＝お名前.com、権威DNS＝Cloudflare）。現実的には「他社レジストラのドメインでもDNSだけ受ける」かどうかは&lt;strong&gt;各事業者の提供ポリシー&lt;/strong&gt;に依存します。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id="6-仕上げチェックリストコピペ用"&gt;6. 仕上げチェックリスト（コピペ用）
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; GitHub → Pages → &lt;strong&gt;Custom domain&lt;/strong&gt; に &lt;code&gt;example.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; &lt;strong&gt;Enforce HTTPS&lt;/strong&gt; ON&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; Apex に &lt;strong&gt;A ×4&lt;/strong&gt;（185.199.108.153〜111.153）&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; Apex に &lt;strong&gt;AAAA ×4&lt;/strong&gt;（&lt;code&gt;2606:50c0:8000::153&lt;/code&gt;〜&lt;code&gt;::8003&lt;/code&gt;）※対応時&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; &lt;code&gt;www&lt;/code&gt; に &lt;strong&gt;CNAME → &lt;code&gt;username.github.io&lt;/code&gt;&lt;/strong&gt;（A/AAAAは置かない）&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; （任意）CAA &lt;code&gt;letsencrypt.org&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; &lt;code&gt;dig&lt;/code&gt; で &lt;strong&gt;NS / A / AAAA / CNAME&lt;/strong&gt; を確認&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;以上。この記事の手順をそのまま置換すれば、Hugo/静的サイトでも数分で独自ドメイン化できます。必要に応じて &lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;username.github.io&lt;/code&gt; をあなたの値に置き換えてください。&lt;/p&gt;</description></item><item><title>Conversational Analytics API パブリックプレビュー概要紹介</title><link>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</link><pubDate>Sat, 04 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/conversational-analytics-api-%E3%83%91%E3%83%96%E3%83%AA%E3%83%83%E3%82%AF%E3%83%97%E3%83%AC%E3%83%93%E3%83%A5%E3%83%BC%E6%A6%82%E8%A6%81%E7%B4%B9%E4%BB%8B/</guid><description>&lt;p&gt;Google Cloud Next ’25 で発表された &lt;strong&gt;Conversational Analytics API&lt;/strong&gt; が、2025年8月末から &lt;strong&gt;パブリックプレビュー&lt;/strong&gt; として提供開始されました。&lt;br&gt;
 BigQuery や Looker / Looker Studio 向けに &lt;strong&gt;データエージェントを自動生成&lt;/strong&gt; し、自然言語での分析を可能にする強力な機能です。&lt;br&gt;
 日本語での情報がまだ少ないため、この記事では概要を整理してご紹介します。&lt;/p&gt;
 &lt;hr&gt;
