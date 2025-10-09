@@ -1,4 +1,65 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>マイブログ on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/</link><description>Recent content in マイブログ on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Mon, 06 Oct 2025 21:00:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/index.xml" rel="self" type="application/rss+xml"/><item><title>GCP移行・マルチクラウド時代の「核」となるネットワーク設計戦略：IP計画からゼロトラスト、マイクロサービス接続の鉄則まで</title><link>https://firebird-techtalktech.com/post/gcp-network/</link><pubDate>Mon, 06 Oct 2025 21:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/gcp-network/</guid><description>&lt;h2 id="gcpにおけるネットワーク戦略についてまとめた動画になります"&gt;GCPにおけるネットワーク戦略についてまとめた動画になります。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>マイブログ on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/</link><description>Recent content in マイブログ on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Thu, 09 Oct 2025 17:00:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/index.xml" rel="self" type="application/rss+xml"/><item><title>🔎 サイト内404エラーの原因を究明せよ！GA4「経路探索」分析ガイド</title><link>https://firebird-techtalktech.com/post/ga4-404-analysis/</link><pubDate>Thu, 09 Oct 2025 17:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/ga4-404-analysis/</guid><description>&lt;p&gt;ウェブサイトを運営していると、避けられないのが「&lt;strong&gt;404 Not Found&lt;/strong&gt;」エラーです。特に、HTMLソースを調べても原因となるリンクが見つからない場合、問題は非常に根深く、対応は困難を極めます。&lt;/p&gt;
+&lt;p&gt;しかし、Google Analytics 4（GA4）の強力な機能「&lt;strong&gt;経路探索&lt;/strong&gt;」を使うことで、ユーザーがどのページから404エラーページに遷移したのかを&lt;strong&gt;視覚的かつ確定的&lt;/strong&gt;に特定できます。これにより、問題のリンクが&lt;strong&gt;どのページ&lt;/strong&gt;に、&lt;strong&gt;どのような状況で&lt;/strong&gt;存在しているかを絞り込むことができます。&lt;/p&gt;
+&lt;h2 id="1-分析の目的と事前準備"&gt;1. 分析の目的と事前準備
+&lt;/h2&gt;&lt;h3 id="目的"&gt;目的
+&lt;/h3&gt;&lt;p&gt;今回の分析の目的は、GA4のログに残る特定の404エラーURL（例: &lt;code&gt;/archives/2025年9月/&lt;/code&gt;）に対し、そのクリックを発生させた**直前のページ（ノード）**を特定することです。直前ページが判明すれば、そのページ上のどの要素（サイドバー、フッター、JavaScriptウィジェットなど）が壊れたリンクを出力しているのかを突き止めることができます。&lt;/p&gt;
+&lt;h3 id="前提条件の確認"&gt;前提条件の確認
+&lt;/h3&gt;&lt;p&gt;GA4で404エラーページを正確に追跡するには、ウェブサイト側の404ページ（例: &lt;code&gt;/404.html&lt;/code&gt;）の &lt;code&gt;&amp;lt;title&amp;gt;&lt;/code&gt; タグ、または &lt;code&gt;&amp;lt;h1&amp;gt;&lt;/code&gt; タグに「&lt;strong&gt;404 Not Found&lt;/strong&gt;」や「&lt;strong&gt;ページが見つかりません&lt;/strong&gt;」といった&lt;strong&gt;固定のキーワード&lt;/strong&gt;が設定されていることが重要です。これにより、GA4がエラーページを一つのグループとして正確に認識できます。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="2-ga4経路探索の設定手順"&gt;2. GA4「経路探索」の設定手順
+&lt;/h2&gt;&lt;p&gt;GA4の左メニューから以下の順序で機能を開きます。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;レポート &amp;gt; 探索 &amp;gt; 経路探索&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id="ステップ1-開始ポイント404ページの設定"&gt;ステップ1: 開始ポイント（404ページ）の設定
+&lt;/h3&gt;&lt;p&gt;経路探索レポートを開いたら、デフォルトの開始ノードを、特定したいノードに切り替えます。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;「&lt;strong&gt;ステップ 1&lt;/strong&gt;」の鉛筆アイコンをクリックし、ディメンションを「&lt;strong&gt;ページタイトルとスクリーン名&lt;/strong&gt;」に変更します。&lt;/li&gt;
+&lt;li&gt;表示されるリストから、&lt;strong&gt;あなたのサイトの404エラーページのタイトル&lt;/strong&gt;（例: &lt;code&gt;404 Not Found&lt;/code&gt;）を選択し、開始ポイントとします。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;これにより、分析は**「最終的に404ページにたどり着いたユーザーが、その前にどこにいたか？」**という逆向きのフローとなり、原因を遡りやすくなります。&lt;/p&gt;
+&lt;h3 id="ステップ2-404の直前ページパスの特定"&gt;ステップ2: 404の直前ページパスの特定
+&lt;/h3&gt;&lt;p&gt;次に、404エラーを引き起こした直前のページパスを特定します。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;右上の「&lt;strong&gt;ノードの編集&lt;/strong&gt;」ボタンをクリックし、ディメンションを「&lt;strong&gt;ページパスとスクリーンクラス&lt;/strong&gt;」に切り替えて、再度分析を実行します。&lt;/li&gt;
+&lt;li&gt;グラフの「&lt;strong&gt;ステップ 2&lt;/strong&gt;」に表示されたパス（例: &lt;code&gt;/post/tech-article-title/&lt;/code&gt;）を確認します。これが、ユーザーが&lt;strong&gt;壊れたリンクをクリックした直前のページ&lt;/strong&gt;です。このパスへの流入が最も多いノードが、最も有力な発生源です。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2 id="3-分析結果の活用と動的コンテンツへの対処法"&gt;3. 分析結果の活用と動的コンテンツへの対処法
+&lt;/h2&gt;&lt;p&gt;経路探索の結果、直前のページが特定の記事ページ（例: &lt;code&gt;/post/tech-article-title/&lt;/code&gt;）であることが判明した場合、以下の点が確定します。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left"&gt;項目&lt;/th&gt;
+&lt;th style="text-align: left"&gt;判明した情報（例）&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;&lt;strong&gt;発生源のページ&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: left"&gt;&lt;code&gt;/post/tech-article-title/&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left"&gt;&lt;strong&gt;問題のリンク&lt;/strong&gt;&lt;/td&gt;
+&lt;td style="text-align: left"&gt;&lt;code&gt;/archives/2025年9月/&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;この情報が静的HTMLソースに見つからない場合、問題はほぼ間違いなく&lt;strong&gt;動的な要素&lt;/strong&gt;にあります。&lt;/p&gt;
+&lt;h3 id="動的コンテンツの調査手順"&gt;動的コンテンツの調査手順
+&lt;/h3&gt;&lt;p&gt;特定されたページをブラウザで表示し、以下の手順で原因を究明します。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;開発者ツールによるDOM検索の徹底:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;ブラウザの開発者ツールを開き、「Elements (要素)」タブで &lt;strong&gt;&lt;code&gt;Ctrl + F&lt;/code&gt; または &lt;code&gt;Cmd + F&lt;/code&gt;&lt;/strong&gt; を使い、&lt;code&gt;/archives/2025年9月/&lt;/code&gt; を検索します。この検索は、JavaScriptが実行された後の**最終的なHTML構造（DOM）**を検索するため、動的に挿入されたリンクも見つけることができます。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;JavaScriptファイルの精査:&lt;/strong&gt;
+&lt;ul&gt;
+&lt;li&gt;サイトに組み込まれているカスタムJavaScriptファイル（例: &lt;code&gt;/ts/main.js&lt;/code&gt; やクライアントサイド検索用スクリプト）を開き、&lt;strong&gt;日付解析 (&lt;code&gt;.Date&lt;/code&gt;) やアーカイブ関連のリンク生成ロジック&lt;/strong&gt;を確認します。&lt;/li&gt;
+&lt;li&gt;特に、記事の公開日（例: &lt;code&gt;2025年9月&lt;/code&gt;）のようなメタデータを取得し、URLを結合している箇所が、意図せず&lt;strong&gt;日本語の月名を含むパス&lt;/strong&gt;（例: &lt;code&gt;2025年9月&lt;/code&gt;）を生成していないかを確認・修正します。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;経路探索は、**「どこ」**でエラーが起きているかを明確にする強力なツールです。この分析結果を基に、問題のページとスクリプトを詳細に調査することで、サイトの健全性を回復できます。&lt;/p&gt;</description></item><item><title>GCP移行・マルチクラウド時代の「核」となるネットワーク設計戦略：IP計画からゼロトラスト、マイクロサービス接続の鉄則まで</title><link>https://firebird-techtalktech.com/post/gcp-network/</link><pubDate>Mon, 06 Oct 2025 21:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/gcp-network/</guid><description>&lt;h2 id="gcpにおけるネットワーク戦略についてまとめた動画になります"&gt;GCPにおけるネットワーク戦略についてまとめた動画になります。
 &lt;/h2&gt;&lt;p&gt;通勤途中などラジオ感覚で利用して学習に利用してください。&lt;/p&gt;
 &lt;h3 id="gcp移行マルチクラウト時代の核となるネットワーク設計戦略ip計画からセロトラストマイクロサーヒス接続の鉄則まて"&gt;GCP移行・マルチクラウド時代の「核」となるネットワーク設計戦略：IP計画からゼロトラスト、マイクロサービス接続の鉄則まで
 &lt;/h3&gt;&lt;div class="video-wrapper"&gt;
