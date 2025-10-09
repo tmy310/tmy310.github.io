@@ -1,4 +1,141 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/git/</link><description>Recent content in Git on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Tue, 09 Sep 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link>https://firebird-techtalktech.com/post/git-filter-branch-guide/</link><pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-filter-branch-guide/</guid><description>&lt;h2 id="はじめに"&gt;はじめに
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/git/</link><description>Recent content in Git on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Thu, 09 Oct 2025 17:50:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Git開発成果をクリーンな単一コミットに凝縮！履歴を保持しつつPRを最適化する裏技</title><link>https://firebird-techtalktech.com/post/git-clean-single-commit/</link><pubDate>Thu, 09 Oct 2025 17:50:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-clean-single-commit/</guid><description>&lt;p&gt;長期間にわたるフィーチャー開発ブランチは、試行錯誤の結果として多数のWIPコミット（&lt;code&gt;WIP: 途中経過&lt;/code&gt;など）を含みがちです。本記事では、その元の開発履歴を完全に&lt;strong&gt;非破壊的&lt;/strong&gt;に保持しつつ、最終的な開発成果（修正されたファイル）だけを抜き出し、Pull Request（PR）のために&lt;strong&gt;単一のクリーンなコミット&lt;/strong&gt;として再構築する体系的な手法を解説します。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="典型的な課題パターン"&gt;典型的な課題パターン
+&lt;/h2&gt;&lt;h3 id="レビュー負荷増大を引き起こすコミットログ過多"&gt;レビュー負荷増大を引き起こす「コミットログ過多」
+&lt;/h3&gt;&lt;p&gt;PRのソースブランチが以下のような状態の場合、レビュアーは最終的な差分ではなく、開発過程のすべてのコミットを追うことになり、レビューの焦点がぼやけます。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ git log --oneline
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;a1b2c3d4 WIP: DBスキーマ変更（途中）
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;e5f6g7h8 fix: 小さなtypo修正
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;i9j0k1l2 WIP: テストコードを一部仮コメント
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;... (合計 N \&amp;gt; 30 コミット)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;この課題を解決し、**「元の履歴は保持したいが、PRはクリーンにしたい」**という相反する要求を満たすのが、以下の手法です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="段階的クリーンアップ手法"&gt;段階的クリーンアップ手法
+&lt;/h2&gt;&lt;h3 id="ステップ1-コマンドの核心理解"&gt;ステップ1: コマンドの核心理解
+&lt;/h3&gt;&lt;p&gt;この手法の鍵は、&lt;strong&gt;&lt;code&gt;git checkout &amp;lt;source_branch&amp;gt; -- .&lt;/code&gt;&lt;/strong&gt; コマンドにあります。このコマンドは、ブランチの履歴を操作するのではなく、&lt;strong&gt;指定したブランチのファイル内容を現在のワーキングツリーに物理的に上書き&lt;/strong&gt;することで、履歴を分離します。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;重要な確認ポイント：&lt;/strong&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;span class="lnt"&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# コマンド実行後のワーキングツリーの状態&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;$git&lt;/span&gt; checkout feature/old-dev -- .
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="nv"&gt;$git&lt;/span&gt; status
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Changes to be committed:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# (何も表示されない)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# Changes not staged for commit:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# (feature/old-dev と main の差分である全ファイルが表示される)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;これらの情報から、元のブランチの&lt;strong&gt;ファイル内容&lt;/strong&gt;だけが、現在のブランチの&lt;strong&gt;変更点&lt;/strong&gt;として特定できることを確認できます。&lt;/p&gt;
+&lt;h3 id="ステップ2-ベースとなるブランチの準備"&gt;ステップ2: ベースとなるブランチの準備
+&lt;/h3&gt;&lt;p&gt;コミットを統合するための新しいブランチは、必ずPRのターゲット（例: &lt;code&gt;main&lt;/code&gt;）から分岐させ、クリーンな状態からスタートします。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# PRのベースとなるブランチに移動し、最新化&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout main
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git pull origin main
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 成果を取り込むための新しいブランチを作成&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout -b feature/clean-pr-ready
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ステップ3-開発成果の非破壊的取り込み"&gt;ステップ3: 開発成果の非破壊的取り込み
+&lt;/h3&gt;&lt;p&gt;元のブランチ (&lt;code&gt;feature/old-dev&lt;/code&gt;) の&lt;strong&gt;すべてのファイル内容&lt;/strong&gt;を、現在いるブランチのワーキングツリーに上書きします。この操作は、コミット履歴を参照しません。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 元ブランチの最新の全ファイル内容をワーキングツリーに反映&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git checkout feature/old-dev -- .
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id="ステップ4-単一コミットとして記録しプッシュ"&gt;ステップ4: 単一コミットとして記録しプッシュ
+&lt;/h3&gt;&lt;p&gt;ワーキングツリーにある変更全体をステージングし、単一の新しいコミットとして記録します。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 1. すべての変更をステージング&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git add .
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 2. 履歴のない、単一のクリーンなコミットを作成&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git commit -m &lt;span class="s2"&gt;&amp;#34;feat: [Feature Name] - Final consolidated commit for review&amp;#34;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# 3. リモートにプッシュ&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git push -u origin feature/clean-pr-ready
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="よくある設定ミスと解決法"&gt;よくある設定ミスと解決法
+&lt;/h2&gt;&lt;h3 id="1-git-merge---squash-との混同"&gt;1. &lt;code&gt;git merge --squash&lt;/code&gt; との混同
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;症状：&lt;/strong&gt; 「&lt;code&gt;merge --squash&lt;/code&gt;を使えば良いのでは？」という疑問&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;原因：&lt;/strong&gt; &lt;code&gt;merge --squash&lt;/code&gt; もコミットを単一化しますが、ブランチ全体をマージする文脈で使われます。今回の手法は**「特定のファイル内容だけを取り出す」**というより汎用的なファイル操作コマンドを使用しており、元のブランチに影響を与えない分離性が特長です。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解決法：&lt;/strong&gt;
+&lt;code&gt;checkout -- .&lt;/code&gt;は、マージやリベースとは独立した、&lt;strong&gt;ファイル単位の操作&lt;/strong&gt;です。元のブランチの変更がまだマージ段階ではない、あるいはレビュー前に完全に分離したい場合に最適です。&lt;/p&gt;
+&lt;h3 id="2-コミットログなしで変更を反映した後のコンフリクト"&gt;2. コミットログなしで変更を反映した後のコンフリクト
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;症状：&lt;/strong&gt; &lt;code&gt;feature/clean-pr-ready&lt;/code&gt; を &lt;code&gt;main&lt;/code&gt; にマージする際にコンフリクトが発生する&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;原因：&lt;/strong&gt; &lt;code&gt;feature/clean-pr-ready&lt;/code&gt; の作成中にベースブランチ (&lt;code&gt;main&lt;/code&gt;) が更新されたため。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解決法：&lt;/strong&gt;
+通常のGit操作と同様に、マージ前に最新の &lt;code&gt;main&lt;/code&gt; を取り込みます。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;# rebaseでコンフリクト解消と履歴の最新化&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git fetch origin main
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git rebase origin/main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h2 id="まとめ"&gt;まとめ
+&lt;/h2&gt;&lt;p&gt;&lt;code&gt;git checkout &amp;lt;ブランチ&amp;gt; -- .&lt;/code&gt; を用いたこの「成果凝縮ワークフロー」は、元のブランチの&lt;strong&gt;開発記録としての価値&lt;/strong&gt;を損なうことなく、レビューアが確認すべき&lt;strong&gt;最終的な成果物の差分&lt;/strong&gt;を最もクリーンな形で提供します。&lt;/p&gt;
+&lt;p&gt;Gitの柔軟性を最大限に活かしたこの手法は、長期開発プロジェクトやリファクタリングにおいて、PRの質とチームの生産性を向上させるための極めて有効なデバッグワークフローとなります。&lt;/p&gt;</description></item><item><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link>https://firebird-techtalktech.com/post/git-filter-branch-guide/</link><pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-filter-branch-guide/</guid><description>&lt;h2 id="はじめに"&gt;はじめに
 &lt;/h2&gt;&lt;p&gt;Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？&lt;/p&gt;
 &lt;p&gt;今回は、そんな時に役立つ&lt;code&gt;git filter-branch&lt;/code&gt;という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。&lt;/p&gt;
 &lt;h2 id="git-filter-branchとは"&gt;git filter-branchとは？
