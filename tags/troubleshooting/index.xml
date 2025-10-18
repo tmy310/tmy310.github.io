@@ -336,7 +336,21 @@
 &lt;li&gt;&lt;strong&gt;エラーベースの権限追加&lt;/strong&gt;: 必要最小限から段階的に権限を拡張&lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;VPC-SCの設定は複雑ですが、体系的なアプローチを取ることで、効率的に問題を解決できます。特に、Cloud Loggingの活用は問題の早期発見と解決に不可欠です。&lt;/p&gt;
-&lt;p&gt;今後VPC-SC移行を予定している組織は、事前にこれらのトラブルシューティング手法を把握しておくことで、スムーズな移行を実現できるでしょう。&lt;/p&gt;</description></item><item><title>Windows ServerセキュリティBaseline適用時の注意点とトラブルシューティング完全ガイド</title><link>https://firebird-techtalktech.com/post/windows-server%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3baseline%E9%81%A9%E7%94%A8%E6%99%82%E3%81%AE%E6%B3%A8%E6%84%8F%E7%82%B9%E3%81%A8%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89/</link><pubDate>Thu, 18 Sep 2025 12:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/windows-server%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3baseline%E9%81%A9%E7%94%A8%E6%99%82%E3%81%AE%E6%B3%A8%E6%84%8F%E7%82%B9%E3%81%A8%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89/</guid><description>&lt;h2 id="はじめに"&gt;はじめに
+&lt;p&gt;今後VPC-SC移行を予定している組織は、事前にこれらのトラブルシューティング手法を把握しておくことで、スムーズな移行を実現できるでしょう。&lt;/p&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
+&lt;/style&gt;</description></item><item><title>Windows ServerセキュリティBaseline適用時の注意点とトラブルシューティング完全ガイド</title><link>https://firebird-techtalktech.com/post/windows-server%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3baseline%E9%81%A9%E7%94%A8%E6%99%82%E3%81%AE%E6%B3%A8%E6%84%8F%E7%82%B9%E3%81%A8%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89/</link><pubDate>Thu, 18 Sep 2025 12:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/windows-server%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3baseline%E9%81%A9%E7%94%A8%E6%99%82%E3%81%AE%E6%B3%A8%E6%84%8F%E7%82%B9%E3%81%A8%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89/</guid><description>&lt;h2 id="はじめに"&gt;はじめに
 &lt;/h2&gt;&lt;p&gt;GCP上でWindows Serverを運用する際、企業のセキュリティポリシーに準拠するため&lt;strong&gt;セキュリティBaseline&lt;/strong&gt;を適用することが一般的です。しかし、このBaseline適用時には多くの罠が待ち受けており、適切な準備を怠るとシステムに接続できなくなる深刻な事態に陥ることがあります。&lt;/p&gt;
 &lt;p&gt;本記事では、実際のプロジェクトで遭遇した問題事例を基に、セキュリティBaseline適用時の注意点とトラブルシューティング方法を詳細に解説します。&lt;/p&gt;
 &lt;h2 id="セキュリティbaselineとは"&gt;セキュリティBaselineとは
@@ -957,7 +971,21 @@ Baseline適用により、作成したユーザーがAdministratorsグループ�
 &lt;li&gt;✅ ロールバック機能の実装&lt;/li&gt;
 &lt;/ul&gt;
 &lt;p&gt;これらの対策を適切に実装することで、セキュリティBaselineを安全に適用し、システムの可用性を維持しながらセキュリティを強化できます。&lt;/p&gt;
-&lt;p&gt;次回は、Secret Managerとの連携による更なるセキュリティ向上について解説します。&lt;/p&gt;</description></item><item><title>【From Despair to Salvation】Recovery Record of a Developer Who Wandered for 3 Months Searching for Claude Code Tools</title><link>https://firebird-techtalktech.com/post/from-despair-to-salvationrecovery-record-of-a-developer-who-wandered-for-3-months-searching-for-claude-code-tools/</link><pubDate>Sun, 14 Sep 2025 14:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/from-despair-to-salvationrecovery-record-of-a-developer-who-wandered-for-3-months-searching-for-claude-code-tools/</guid><description>&lt;h1 id="from-despair-to-salvationrecovery-record-of-a-developer-who-wandered-for-3-months-searching-for-claude-code-tools"&gt;【From Despair to Salvation】Recovery Record of a Developer Who Wandered for 3 Months Searching for Claude Code Tools
+&lt;p&gt;次回は、Secret Managerとの連携による更なるセキュリティ向上について解説します。&lt;/p&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
+&lt;/style&gt;</description></item><item><title>【From Despair to Salvation】Recovery Record of a Developer Who Wandered for 3 Months Searching for Claude Code Tools</title><link>https://firebird-techtalktech.com/post/from-despair-to-salvationrecovery-record-of-a-developer-who-wandered-for-3-months-searching-for-claude-code-tools/</link><pubDate>Sun, 14 Sep 2025 14:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/from-despair-to-salvationrecovery-record-of-a-developer-who-wandered-for-3-months-searching-for-claude-code-tools/</guid><description>&lt;h1 id="from-despair-to-salvationrecovery-record-of-a-developer-who-wandered-for-3-months-searching-for-claude-code-tools"&gt;【From Despair to Salvation】Recovery Record of a Developer Who Wandered for 3 Months Searching for Claude Code Tools
 &lt;/h1&gt;&lt;h2 id="prologue-days-of-hell"&gt;Prologue: Days of Hell
 &lt;/h2&gt;&lt;p&gt;In June 2025, Claude Code was introduced to our company and my life changed completely.&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;But not in a good way.&lt;/strong&gt;&lt;/p&gt;
@@ -1738,4 +1766,18 @@ I failed countless times too. Learning from failure is the shortcut to growth.&l
 &lt;li&gt;&lt;a class="link" href="https://firebird-techtalktech.com/categories/efficiency/" &gt;AI Development Cost Optimization Techniques&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class="link" href="https://firebird-techtalktech.com/tags/work-life-balance/" &gt;Developer Mental Health Management Methods&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: Tool names and effects described are based on real experience, but results may vary depending on individual environments and usage.&lt;/p&gt;</description></item></channel></rss>
+&lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: Tool names and effects described are based on real experience, but results may vary depending on individual environments and usage.&lt;/p&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
+&lt;/style&gt;</description></item></channel></rss>
