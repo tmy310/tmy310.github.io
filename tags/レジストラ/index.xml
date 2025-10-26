@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>レジストラ on firebirdテクテクテクブログ</title><link>https://firebird-techtalktech.com/tags/%E3%83%AC%E3%82%B8%E3%82%B9%E3%83%88%E3%83%A9/</link><description>Recent content in レジストラ on firebirdテクテクテクブログ</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sun, 26 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/%E3%83%AC%E3%82%B8%E3%82%B9%E3%83%88%E3%83%A9/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub Pagesに独自ドメインを割り当てる手順とDNSの基礎（レジストラ/レジストリ/NSの関係）</title><link>https://firebird-techtalktech.com/post/github-pages-domain-dns-basics/</link><pubDate>Sun, 26 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/github-pages-domain-dns-basics/</guid><description>&lt;h1 id="概要"&gt;概要
+&lt;/h1&gt;&lt;p&gt;GitHub Pages に独自ドメインを割り当てるための最短手順と、レジストラ・レジストリ・権威DNS・NSレコードなどの用語関係を図解で整理。初心者でも“どこで何を設定するか”がわかるようにまとめました。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;この記事は匿名の個人メモです。 例として &lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;www.example.com&lt;/code&gt; と &lt;code&gt;username.github.io&lt;/code&gt; を使用します。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;h1 id="0-まず結論最短手順"&gt;0. まず結論（最短手順）
+&lt;/h1&gt;&lt;p&gt;GitHub Pages に独自ドメインをつなぐ最小セットはこれだけ：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;
+&lt;p&gt;GitHub（リポジトリ → &lt;em&gt;Settings → Pages&lt;/em&gt;）で Custom domain に &lt;code&gt;example.com&lt;/code&gt; を保存（&lt;code&gt;CNAME&lt;/code&gt; ファイルが自動作成される場合あり）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;DNS（権威DNSの管理画面）でレコードを追加：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Apex（&lt;code&gt;example.com&lt;/code&gt;） … A を4件&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.108.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.109.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.110.153
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;A 185.199.111.153
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;em&gt;ApexにCNAMEは置けません。&lt;/em&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;www（&lt;code&gt;www.example.com&lt;/code&gt;） … CNAME を &lt;code&gt;username.github.io&lt;/code&gt; に向ける（末尾ドット不要）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;HTTPS を有効化（GitHub Pages の &lt;em&gt;Enforce HTTPS&lt;/em&gt; をON）。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;→ 反映後、&lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;www.example.com&lt;/code&gt; のどちらでも Pages サイトに到達します。&lt;/p&gt;
+&lt;h1 id="1-用語の整理誰が何をしている"&gt;1. 用語の整理：誰が何をしている？
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;Registrant（登録者） … あなた。ドメインの所有者。&lt;/li&gt;
+&lt;li&gt;Registrar（レジストラ） … ドメインの“販売・窓口”。例：お名前.com, Route 53 Domains, Cloudflare Registrar など。&lt;/li&gt;
+&lt;li&gt;Registry（レジストリ） … TLD を運用する主体。例：&lt;code&gt;.com&lt;/code&gt; の Verisign、&lt;code&gt;.jp&lt;/code&gt; の JPRS。.com」や「.net」「.jp」などのトップレベルドメイン毎に1つのみ存在する一番上位の機関をいいます。&lt;/li&gt;
+&lt;li&gt;Authoritative DNS（権威DNS） … そのドメインの最終的な答え（A/AAAA/CNAME/MX/TXT…）を返すDNS。例：&lt;code&gt;01–04.dnsv.jp&lt;/code&gt;（お名前.com DNS）、Cloudflare DNS、Route 53 Hosted Zone など。&lt;/li&gt;
+&lt;li&gt;Recursive Resolver（再帰DNS） … 8.8.8.8 / 1.1.1.1 など。クライアントの代わりに辿って答えをキャッシュしてくれる。&lt;/li&gt;
+&lt;li&gt;NSレコード（Name Server） … 「このドメインの権威DNSはどれか」を親ゾーンに教える“委任”情報。&lt;/li&gt;
+&lt;li&gt;DSレコード … DNSSEC を使う場合、親ゾーンに登録する検証用情報。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ポイント：レジストラは必ずしも自社DNSを提供するわけではありませんが、多くは権威DNSサービスも提供しています（お名前.comの &lt;code&gt;dnsv.jp&lt;/code&gt; など）。一方、Cloudflare や Route 53 は「レジストラ機能」も「権威DNS」も提供可能です。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h1 id="2-名前解決の全体像ざっくり図解"&gt;2. 名前解決の全体像（ざっくり図解）
+&lt;/h1&gt;&lt;div class="mermaid"&gt;
+graph TD
+A[ブラウザ/OS] --&gt; B[再帰DNS]
+B --&gt; C[ルート .]
+C --&gt; D[.com（レジストリ）]
+D --&gt; E[ns*.example-dns.tld（権威DNS）]
+E --&gt; F[A/AAAA/CNAME の最終回答]
+&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;NSレコードは「どこに聞くか」を指す案内板。A/AAAA/CNAMEといった中身の答えは権威DNSが持っています。&lt;/li&gt;
+&lt;li&gt;複数のAレコードを返した場合、どのIPに接続するかはクライアント側（OS/ブラウザ）の実装次第（順番に試す・並行接続・失敗時切替など）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id="3-github-pages--独自ドメイン具体手順"&gt;3. GitHub Pages × 独自ドメイン：具体手順
+&lt;/h1&gt;&lt;h2 id="31-github-側の設定"&gt;3.1 GitHub 側の設定
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;リポジトリ → Settings → Pages → Custom domain に &lt;code&gt;example.com&lt;/code&gt; を保存。&lt;/li&gt;
+&lt;li&gt;Enforce HTTPS をON（Let’s Encrypt による証明書が自動発行）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="32-dns-側の設定権威dnsの画面"&gt;3.2 DNS 側の設定（権威DNSの画面）
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;Apex（&lt;code&gt;example.com&lt;/code&gt;）：A を4件、可能なら AAAA も4件（上記一覧を転記）&lt;/li&gt;
+&lt;li&gt;www（&lt;code&gt;www.example.com&lt;/code&gt;）：CNAME → &lt;code&gt;username.github.io&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;em&gt;ApexにCNAMEは不可&lt;/em&gt;。もし DNS が ALIAS / ANAME をサポートしているなら、それを &lt;code&gt;username.github.io&lt;/code&gt; に向けてもOK（提供事業者による）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="33-反映確認dig-例"&gt;3.3 反映確認（dig 例）
+&lt;/h2&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig NS example.com @a.gtld-servers.net +short
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig example.com A +short
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig example.com AAAA +short
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dig www.example.com CNAME +short
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h1 id="4-よくある疑問と注意点"&gt;4. よくある疑問と注意点
+&lt;/h1&gt;&lt;details&gt;
+&lt;summary&gt;Q1. Aレコードは1つでも動く？&lt;/summary&gt;
+動くことはありますが、4つ全部（`185.199.108.153–111.153`）を入れるのが実務推奨。
+&lt;/details&gt;
+&lt;details&gt;
+&lt;summary&gt;Q2. “浸透待ち”って何？&lt;/summary&gt;
+再帰DNSのキャッシュTTLが更新されるのを待つこと。数分〜数時間、場合によっては24–48時間程度。
+&lt;/details&gt;
+&lt;details&gt;
+&lt;summary&gt;Q3. `www` にも A/AAAA を入れていい？&lt;/summary&gt;
+推奨しません。 `www` は CNAME → `username.github.io` のみ。
+&lt;/details&gt;
+&lt;details&gt;
+&lt;summary&gt;Q4. Apex に CNAME を置けないのはなぜ？&lt;/summary&gt;
+DNS仕様上、ゾーンの頂点にCNAMEを置くと他レコードと両立できません。代替は A/AAAA か、DNS事業者の ALIAS/ANAME。
+&lt;/details&gt;
+&lt;details&gt;
+&lt;summary&gt;Q5. NS はどこで決まる？&lt;/summary&gt;
+レジストラの管理画面で設定し、レジストリ（例：`.com`＝Verisign）へ登録されます。
+&lt;/details&gt;
+&lt;hr&gt;
+&lt;h1 id="5-役割の違いをもう一度誤解しがちなポイント"&gt;5. 役割の違いをもう一度（誤解しがちなポイント）
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;レジストラ … レジストリに NS（＋DS） を登録する“窓口”。&lt;/li&gt;
+&lt;li&gt;レジストリ … 親ゾーンに NS（委任） を掲載。A/AAAA/CNAME等は保持しない。&lt;/li&gt;
+&lt;li&gt;権威DNS … A/AAAA/CNAME/MX/TXT…の最終回答を返すサーバー群。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h1 id="6-仕上げチェックリストコピペ用"&gt;6. 仕上げチェックリスト（コピペ用）
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; GitHub → Pages → Custom domain に &lt;code&gt;example.com&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; Enforce HTTPS ON&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; Apex に A ×4（185.199.108.153〜111.153）&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; Apex に AAAA ×4（&lt;code&gt;2606:50c0:8000::153&lt;/code&gt;〜&lt;code&gt;::8003::153&lt;/code&gt;）※対応時&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; &lt;code&gt;www&lt;/code&gt; に CNAME → &lt;code&gt;username.github.io&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; （任意）CAA &lt;code&gt;letsencrypt.org&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; &lt;code&gt;dig&lt;/code&gt; で NS / A / AAAA / CNAME を確認&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;p&gt;以上。この記事の手順をそのまま置換すれば、Hugo/静的サイトでも数分で独自ドメイン化できます。&lt;/p&gt;
+&lt;p&gt;あらためて、設定例をまじえて手順をまとめます。&lt;/p&gt;
+&lt;h1 id="7-github-pagesとお名前comの最終設定手順"&gt;7 GitHub Pagesとお名前.comの最終設定手順
+&lt;/h1&gt;&lt;h3 id="1-github-pages-側の設定"&gt;1. GitHub Pages 側の設定
+&lt;/h3&gt;&lt;ol&gt;
+&lt;li&gt;GitHubリポジトリの Settings → Pages へ移動します。&lt;/li&gt;
+&lt;li&gt;「Custom domain」にあなたの独自ドメイン（例：&lt;code&gt;example.com&lt;/code&gt;）を入力します。&lt;/li&gt;
+&lt;li&gt;「Enforce HTTPS」にチェックを入れます。&lt;/li&gt;
+&lt;li&gt;GitHubが自動的に Let&amp;rsquo;s Encrypt 証明書を発行します。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h3 id="2-お名前com側のdnsレコード設定例"&gt;2. お名前.com側のDNSレコード設定例
+&lt;/h3&gt;&lt;p&gt;お名前.comのDNSレコード設定で、以下のように登録します。&lt;br&gt;
+（TTLや優先度はデフォルト値のままで問題ありません。）&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;ホスト名&lt;/th&gt;
+&lt;th&gt;TYPE&lt;/th&gt;
+&lt;th&gt;TTL&lt;/th&gt;
+&lt;th&gt;VALUE&lt;/th&gt;
+&lt;th&gt;備考&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;NS&lt;/td&gt;
+&lt;td&gt;86400&lt;/td&gt;
+&lt;td&gt;01.dnsv.jp&lt;/td&gt;
+&lt;td&gt;ネームサーバ&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;NS&lt;/td&gt;
+&lt;td&gt;86400&lt;/td&gt;
+&lt;td&gt;02.dnsv.jp&lt;/td&gt;
+&lt;td&gt;ネームサーバ&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;NS&lt;/td&gt;
+&lt;td&gt;86400&lt;/td&gt;
+&lt;td&gt;03.dnsv.jp&lt;/td&gt;
+&lt;td&gt;ネームサーバ&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;NS&lt;/td&gt;
+&lt;td&gt;86400&lt;/td&gt;
+&lt;td&gt;04.dnsv.jp&lt;/td&gt;
+&lt;td&gt;ネームサーバ&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;185.199.108.153&lt;/td&gt;
+&lt;td&gt;GitHub Pages Aレコード&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;185.199.109.153&lt;/td&gt;
+&lt;td&gt;GitHub Pages Aレコード&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;185.199.110.153&lt;/td&gt;
+&lt;td&gt;GitHub Pages Aレコード&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;example.com&lt;/td&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;185.199.111.153&lt;/td&gt;
+&lt;td&gt;GitHub Pages Aレコード&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;a class="link" href="https://www.example.com" target="_blank" rel="noopener"
+&gt;www.example.com&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;CNAME&lt;/td&gt;
+&lt;td&gt;3600&lt;/td&gt;
+&lt;td&gt;username.github.io&lt;/td&gt;
+&lt;td&gt;GitHub Pages CNAME&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;blockquote&gt;
+&lt;p&gt;🔁 補足： &lt;code&gt;username.github.io&lt;/code&gt; の部分は、自分のGitHub Pages用URLに置き換えてください。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;hr&gt;
+&lt;h3 id="3-注意点"&gt;3. 注意点
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;設定変更後、反映までに最大で 24時間 ほどかかる場合があります。&lt;/li&gt;
+&lt;li&gt;HTTPS有効化がうまくいかない場合は、GitHub Pagesのドメイン設定を削除 → 再登録 すると解決することがあります。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;www&lt;/code&gt; サブドメインを使う場合は CNAME、ルートドメイン（例：&lt;code&gt;example.com&lt;/code&gt;）を使う場合は Aレコード を設定します。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h3 id="4-まとめ"&gt;4. まとめ
+&lt;/h3&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;項目&lt;/th&gt;
+&lt;th&gt;設定内容&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;独自ドメイン&lt;/td&gt;
+&lt;td&gt;お名前.comなどで取得&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;DNS設定&lt;/td&gt;
+&lt;td&gt;GitHub Pages推奨A/CNAMEを登録&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;HTTPS&lt;/td&gt;
+&lt;td&gt;GitHub Pagesで自動発行（Let&amp;rsquo;s Encrypt）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;所要時間&lt;/td&gt;
+&lt;td&gt;数時間〜1日で反映完了&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
+&lt;/style&gt;</description></item></channel></rss>

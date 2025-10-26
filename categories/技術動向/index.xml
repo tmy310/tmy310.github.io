@@ -222,6 +222,320 @@ padding: 12px;
 text-align: center;
 font-size: 0.9rem;
 }
+&lt;/style&gt;</description></item><item><title>🔧 dbt技術記事まとめ - 2025-10-16</title><link>https://firebird-techtalktech.com/post/dbt%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B%E3%81%BE%E3%81%A8%E3%82%81-2025-10-16/</link><pubDate>Thu, 16 Oct 2025 22:39:27 +0900</pubDate><guid>https://firebird-techtalktech.com/post/dbt%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B%E3%81%BE%E3%81%A8%E3%82%81-2025-10-16/</guid><description>&lt;h2 id="-概要"&gt;📋 概要
+&lt;/h2&gt;&lt;p&gt;dbtに関する最新技術記事を収集しました。Qiita、dev.to、技術ブログRSSから&lt;strong&gt;2件&lt;/strong&gt;の記事をピックアップしています。&lt;/p&gt;
+&lt;h3 id="-収集統計"&gt;📊 収集統計
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Qiita記事&lt;/strong&gt;: 2件&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;dev.to記事&lt;/strong&gt;: 0件&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;RSS記事&lt;/strong&gt;: 0件&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;収集日&lt;/strong&gt;: 2025-10-16&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;🧰 &lt;strong&gt;基本機能の概要&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;🧭 &lt;strong&gt;主要なコマンド&lt;/strong&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;📝 &lt;strong&gt;開発時によく使うTips&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;を整理して紹介します👇&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="-dbt-の基本機能"&gt;🧰 dbt の基本機能
+&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;機能名&lt;/th&gt;
+&lt;th&gt;説明&lt;/th&gt;
+&lt;th&gt;例&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;モデル（Models）&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;SQLファイルで変換ロジックを定義し、&lt;code&gt;dbt run&lt;/code&gt; で実行してテーブル/ビューを作成&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;models/orders.sql&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;マクロ（Macros）&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;Jinjaテンプレートで共通処理を部品化&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;{{ my_macro('arg') }}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;テスト（Tests）&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;データの品質チェック。&lt;code&gt;not_null&lt;/code&gt; や &lt;code&gt;unique&lt;/code&gt; などの汎用テストのほか、自作テストも可能&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;dbt test&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;ドキュメント生成&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;モデルやカラムの説明・依存関係グラフを自動生成&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;dbt docs generate&lt;/code&gt; / &lt;code&gt;dbt docs serve&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;依存関係管理&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;ref()&lt;/code&gt; でモデル間の依存関係を明示化&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;SELECT * FROM {{ ref('orders') }}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;環境管理&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;profiles.yml&lt;/code&gt; で接続先（BigQuery, Snowflake, Redshiftなど）を管理&lt;/td&gt;
+&lt;td&gt;開発・本番の切り替えが容易&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;スナップショット&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;過去データの履歴管理（SCD2対応）&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;dbt snapshot&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;ソース（Sources）&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;元データテーブルを明示的に定義&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;{{ source('raw', 'customers') }}&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id="-よく使う-dbt-コマンド"&gt;🧭 よく使う dbt コマンド
+&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;コマンド&lt;/th&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;th&gt;よく使う場面&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt debug&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;接続確認・環境チェック&lt;/td&gt;
+&lt;td&gt;初回セットアップ時&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt run&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;モデルを実行してテーブル/ビューを生成&lt;/td&gt;
+&lt;td&gt;本番・開発実行&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt run --select model_name&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;特定モデルだけ実行&lt;/td&gt;
+&lt;td&gt;部分的な再実行&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt test&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;定義済みのテストを実行&lt;/td&gt;
+&lt;td&gt;品質チェック&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt build&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;run + test + snapshot + seed&lt;/code&gt; をまとめて実行&lt;/td&gt;
+&lt;td&gt;本番リリース時&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt docs generate&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;ドキュメントを生成&lt;/td&gt;
+&lt;td&gt;グラフやモデル説明作成&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt docs serve&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;ローカルでドキュメントをWeb表示&lt;/td&gt;
+&lt;td&gt;依存関係の可視化&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt seed&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;CSVからテーブルを作成&lt;/td&gt;
+&lt;td&gt;マスタデータの取り込み&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt snapshot&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;スナップショット実行&lt;/td&gt;
+&lt;td&gt;履歴管理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt clean&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;キャッシュなどの不要ファイル削除&lt;/td&gt;
+&lt;td&gt;環境リセット&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;dbt deps&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;外部パッケージのインストール&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;packages.yml&lt;/code&gt; 変更時&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id="-開発でよく使う-tips"&gt;📝 開発でよく使う Tips
+&lt;/h2&gt;&lt;h3 id="1-モデルの依存関係を明示する"&gt;1. モデルの依存関係を明示する
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;-- models/customer_orders.sql
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;FROM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ref&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;orders&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;}}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;JOIN&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ref&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;customers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;}}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;c&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ON&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;o&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;customer_id&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;👉 &lt;code&gt;ref&lt;/code&gt; を使うことで、依存順に自動で実行されるようになります。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="2-ソースを明示してデータ基盤をドキュメント化"&gt;2. ソースを明示してデータ基盤をドキュメント化
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# models/src.yml&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;sources&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;raw&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;tables&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;customers&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;orders&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;FROM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;source&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;raw&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;customers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;}}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="3-カラムテストを設定"&gt;3. カラムテストを設定
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-yaml" data-lang="yaml"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c"&gt;# models/schema.yml&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="m"&gt;2&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="nt"&gt;models&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;customers&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;columns&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;id&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;tests&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;unique&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;not_null&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="nt"&gt;name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="l"&gt;email&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="nt"&gt;tests&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;- &lt;span class="l"&gt;not_null&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;👉 &lt;code&gt;dbt test&lt;/code&gt; で自動的に品質チェックが走る。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="4-テンプレート化マクロ"&gt;4. テンプレート化（マクロ）
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;-- macros/clean_email.sql
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;macro&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;clean_email&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;column_name&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;lower&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="k"&gt;trim&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="err"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;column_name&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;}}&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="err"&gt;{&lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;endmacro&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;%&lt;/span&gt;&lt;span class="err"&gt;}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-sql" data-lang="sql"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;-- models/customers_clean.sql
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="c1"&gt;&lt;/span&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;id&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;clean_email&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;email&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;}}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;as&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;email_clean&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="w"&gt;&lt;/span&gt;&lt;span class="k"&gt;FROM&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;{{&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ref&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;customers&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="err"&gt;}}&lt;/span&gt;&lt;span class="w"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;hr&gt;
+&lt;h3 id="5-モデルの依存関係をグラフで確認"&gt;5. モデルの依存関係をグラフで確認
+&lt;/h3&gt;&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dbt docs generate
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;dbt docs serve
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;→ &lt;a class="link" href="http://localhost:8080/" target="_blank" rel="noopener"
+&gt;http://localhost:8080&lt;/a&gt; にアクセスすると、DAG（依存関係グラフ）が見られます✨&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="-よく使う開発フロー例"&gt;🧪 よく使う開発フロー（例）
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;dbt debug&lt;/code&gt; で接続チェック&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dbt run --select my_model&lt;/code&gt; でモデル作成&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dbt test&lt;/code&gt; で品質確認&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;dbt docs generate &amp;amp;&amp;amp; dbt docs serve&lt;/code&gt; で可視化&lt;/li&gt;
+&lt;li&gt;本番時は &lt;code&gt;dbt build&lt;/code&gt; を実行&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr&gt;
+&lt;h2 id="-よく使われる連携"&gt;🏗️ よく使われる連携
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;BigQuery / Snowflake / Redshift / Databricks など主要DWHに対応&lt;/li&gt;
+&lt;li&gt;GitHub Actions や Prefect / Airflow でCI/CD連携可能&lt;/li&gt;
+&lt;li&gt;Looker / Tableau / Hex などのBIツールと併用されるケース多数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="-関連リンク"&gt;🔗 関連リンク
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;GitHub: &lt;a class="link" href="https://github.com/topics/dbt" target="_blank" rel="noopener"
+&gt;https://github.com/topics/dbt&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Stack Overflow: &lt;a class="link" href="https://stackoverflow.com/questions/tagged/dbt" target="_blank" rel="noopener"
+&gt;https://stackoverflow.com/questions/tagged/dbt&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;このデータモデルを実行します。今度はCREATE VIEWと表示されましたね。ちなみに&amp;ndash;full-refreshというオプションをつけている理由ですが、先程の検証で、このデータモデルは既にテーブルとして存在しているため、そのまま実行してもエラーになります。同データモデルを「完全に作り直す」ために、このオプションを使用しています。&lt;/p&gt;
+&lt;p&gt;$ dbt run &amp;ndash;models stg_orders &amp;ndash;full-refresh&lt;/p&gt;
+&lt;h2 id="-まとめ"&gt;📝 まとめ
+&lt;/h2&gt;&lt;p&gt;dbtの最新動向をお届けしました。継続的な学習と実践により、技術の理解を深めていきましょう！&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;em&gt;この記事は自動収集システムにより生成されました。記事の詳細は各リンク先をご確認ください。&lt;/em&gt;&lt;/p&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
 &lt;/style&gt;</description></item><item><title>🔧 dbt技術記事まとめ - 2025-09-29</title><link>https://firebird-techtalktech.com/post/dbt%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B%E3%81%BE%E3%81%A8%E3%82%81-2025-09-29/</link><pubDate>Mon, 29 Sep 2025 20:04:35 +0900</pubDate><guid>https://firebird-techtalktech.com/post/dbt%E6%8A%80%E8%A1%93%E8%A8%98%E4%BA%8B%E3%81%BE%E3%81%A8%E3%82%81-2025-09-29/</guid><description>&lt;h2 id="-概要"&gt;📋 概要
 &lt;/h2&gt;&lt;p&gt;dbtに関する最新技術記事を収集しました。Qiita、dev.to、技術ブログRSSから&lt;strong&gt;6件&lt;/strong&gt;の記事をピックアップしています。&lt;/p&gt;
 &lt;h3 id="-収集統計"&gt;📊 収集統計
