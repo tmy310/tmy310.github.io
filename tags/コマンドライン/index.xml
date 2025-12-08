@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>コマンドライン on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/</link><description>Recent content in コマンドライン on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Tue, 09 Sep 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/index.xml" rel="self" type="application/rss+xml"/><item><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link>https://firebird-techtalktech.com/post/git-filter-branch-guide/</link><pubDate>Tue, 09 Sep 2025 11:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-filter-branch-guide/</guid><description>&lt;h2 id="はじめに"&gt;はじめに
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>コマンドライン on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/</link><description>Recent content in コマンドライン on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sun, 07 Dec 2025 11:30:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/%E3%82%B3%E3%83%9E%E3%83%B3%E3%83%89%E3%83%A9%E3%82%A4%E3%83%B3/index.xml" rel="self" type="application/rss+xml"/><item><title>Git filter-branch完全ガイド：Gitの歴史を書き換える強力なツール</title><link>https://firebird-techtalktech.com/post/git-filter-branch-guide/</link><pubDate>Sun, 07 Dec 2025 11:30:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-filter-branch-guide/</guid><description>&lt;h2 id="はじめに"&gt;はじめに
 &lt;/h2&gt;&lt;p&gt;Gitを使っていて「あ、パスワードをコミットしてしまった！」「過去のコミットの著者名を全部変更したい」といった経験はありませんか？&lt;/p&gt;
 &lt;p&gt;今回は、そんな時に役立つ&lt;code&gt;git filter-branch&lt;/code&gt;という強力なコマンドについて解説します。このコマンドは「Gitの歴史改変ツール」とも呼べる、知る人ぞ知る上級コマンドです。&lt;/p&gt;
 &lt;h2 id="git-filter-branchとは"&gt;git filter-branchとは？
@@ -106,7 +106,7 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; --tag-name-filter cat -- --branches --tags
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h3 id="実際の使用例tmy-ss-310--tmy-310"&gt;実際の使用例：tmy-ss-310 → tmy-310
+&lt;/div&gt;&lt;h3 id="実際の使用例yamada--tmy-310"&gt;実際の使用例：yamada → tmy-310
 &lt;/h3&gt;&lt;p&gt;私が実際に使用したケースです。GitHubのユーザー名を変更したため、過去のコミット履歴も更新しました：&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
 &lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
@@ -123,13 +123,13 @@
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
 &lt;td class="lntd"&gt;
 &lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;git filter-branch -f --env-filter &lt;span class="s1"&gt;&amp;#39;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;if [ &amp;#34;$GIT_AUTHOR_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;if [ &amp;#34;$GIT_AUTHOR_NAME&amp;#34; = &amp;#34;yamada&amp;#34; ]; then
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; export GIT_AUTHOR_NAME=&amp;#34;tmy-310&amp;#34;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; export GIT_AUTHOR_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; export GIT_AUTHOR_EMAIL=&amp;#34;yamada@gmail.com&amp;#34;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;fi
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;if [ &amp;#34;$GIT_COMMITTER_NAME&amp;#34; = &amp;#34;tmy-ss-310&amp;#34; ]; then
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;if [ &amp;#34;$GIT_COMMITTER_NAME&amp;#34; = &amp;#34;yamada&amp;#34; ]; then
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; export GIT_COMMITTER_NAME=&amp;#34;tmy-310&amp;#34;
-&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; export GIT_COMMITTER_EMAIL=&amp;#34;mito.motohiro@gmail.com&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt; export GIT_COMMITTER_EMAIL=&amp;#34;yamada@gmail.com&amp;#34;
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;fi
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;&lt;span class="s1"&gt;&amp;#39;&lt;/span&gt; -- --all
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
