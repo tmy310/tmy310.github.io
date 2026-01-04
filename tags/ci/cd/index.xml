@@ -1,4 +1,153 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CI/CD on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/ci/cd/</link><description>Recent content in CI/CD on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Fri, 31 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/ci/cd/index.xml" rel="self" type="application/rss+xml"/><item><title>dbt運用トラブルあるある9選！</title><link>https://firebird-techtalktech.com/post/dbt-operational-troubleshoot-guide/</link><pubDate>Fri, 31 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/dbt-operational-troubleshoot-guide/</guid><description>&lt;h1 id="-dbt運用トラブルあるある9選ムダな残業を減らす対策ガイド"&gt;🚀 dbt運用トラブルあるある9選！ムダな残業を減らす対策ガイド
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>CI/CD on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/ci/cd/</link><description>Recent content in CI/CD on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Thu, 01 Jan 2026 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/ci/cd/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub Flow vs. トランクベース開発：チームの生産性を左右するGitワークフローの深層</title><link>https://firebird-techtalktech.com/post/git-workflow-comparison/</link><pubDate>Thu, 01 Jan 2026 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/git-workflow-comparison/</guid><description>&lt;p&gt;ソフトウェア開発において、Gitの運用ルールはチームの「血液循環」のようなものです。どのようにコードをマージし、どのタイミングでテストを行い、いつ本番へ届けるか。この「リズム」が適切でないと、どれほど個々の技術が高くてもチーム全体のパフォーマンスは停滞してしまいます。&lt;/p&gt;
+&lt;p&gt;本記事では、現代のエンジニアリングチームが直面する2つの主要な選択肢、**「GitHub Flow」&lt;strong&gt;と&lt;/strong&gt;「トランクベース開発（Trunk-Based Development）」**について、その本質的な違いと導入の判断基準を深掘りします。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="1-なぜワークフローを再考する必要があるのか"&gt;1. なぜ「ワークフロー」を再考する必要があるのか
+&lt;/h2&gt;&lt;p&gt;チーム開発が拡大するにつれ、私たちは「コードの衝突（コンフリクト）」と「リリースの停滞」という2つの大きな壁にぶつかります。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;統合の遅延:&lt;/strong&gt; 長期間放置されたブランチが、マージの際に巨大なコンフリクトを引き起こす。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;レビューのボトルネック:&lt;/strong&gt; 多くのプルリクエスト（PR）が未処理のまま残り、機能のデリバリーが遅れる。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;品質の不確実性:&lt;/strong&gt; どのコードがどの環境に反映されているのか、追跡が困難になる。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;これらの課題を解決するための「交通整理」こそが、Gitワークフローの役割です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="2-github-flow確実な品質担保と対話の重視"&gt;2. GitHub Flow：確実な品質担保と対話の重視
+&lt;/h2&gt;&lt;p&gt;GitHub Flowは、プルリクエストを軸にした「レビューファースト」な設計です。「メインブランチ（main）は常にデプロイ可能である」という原則に基づき、全ての変更は作業ブランチを経由します。&lt;/p&gt;
+&lt;h3 id="構造の可視化"&gt;構造の可視化
+&lt;/h3&gt;&lt;div class="mermaid"&gt;
+gitGraph
+commit id: "Initial"
+branch feature-login
+checkout feature-login
+commit id: "UI作成"
+commit id: "ロジック実装"
+checkout main
+merge feature-login id: "PR承認後にマージ"
+commit id: "Deploy to Prod"
+branch feature-api
+checkout feature-api
+commit id: "API連携"
+&lt;/div&gt;
+&lt;h3 id="運用の核心"&gt;運用の核心
+&lt;/h3&gt;&lt;p&gt;GitHub Flowの最大の特徴は、**「マージ前の対話」**です。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;ブランチ作成&lt;/strong&gt;: &lt;code&gt;main&lt;/code&gt;から短い寿命のブランチを作成。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;プルリクエスト（PR）&lt;/strong&gt;: 作業完了後、チームにレビューを依頼。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;コードレビュー&lt;/strong&gt;: ここでバグの発見だけでなく、設計の議論や知識共有が行われます。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;マージとデプロイ&lt;/strong&gt;: 承認後、即座に統合され、多くの場合そのまま本番へデプロイされます。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;向いているチーム:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;品質の安定性を最優先し、チーム内での教育・ナレッジシェアを重視したい。&lt;/li&gt;
+&lt;li&gt;複雑なビジネスロジックを扱っており、複数人でのチェックが欠かせない。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="3-トランクベース開発スピードと継続的統合の極致"&gt;3. トランクベース開発：スピードと継続的統合の極致
+&lt;/h2&gt;&lt;p&gt;トランクベース開発（Trunk-Based Development: TBD）は、可能な限りブランチの寿命を短くし、全ての開発者が「トランク（幹）」と呼ばれる単一のブランチに頻繁にコードを統合する手法です。&lt;/p&gt;
+&lt;h3 id="構造の可視化-1"&gt;構造の可視化
+&lt;/h3&gt;&lt;div class="mermaid"&gt;
+gitGraph
+commit id: "Start"
+commit id: "Task-A (part1)"
+commit id: "Task-B (part1)"
+commit id: "Task-A (part2)"
+commit id: "Fix"
+commit id: "Task-C (start)"
+commit id: "Task-B (done)"
+&lt;/div&gt;
+&lt;h3 id="運用の核心-1"&gt;運用の核心
+&lt;/h3&gt;&lt;p&gt;トランクベース開発では、**「統合の頻度」**が成功の鍵を握ります。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;微細なコミット&lt;/strong&gt;: 数日かかる作業も細分化し、毎日数回トランクへマージします。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;自動テストの徹底&lt;/strong&gt;: 人手によるレビューを待つ時間がないため、CI（継続的統合）による自動テストが極めて重要になります。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;フィーチャーフラグ&lt;/strong&gt;: 未完成の機能を本番コードに混ぜるため、実行時に機能のON/OFFを切り替える「フラグ」を利用します。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;&lt;strong&gt;向いているチーム:&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;リリースのリードタイムを極限まで短縮したい。&lt;/li&gt;
+&lt;li&gt;高度な自動テスト環境と、一瞬でロールバックできるデプロイパイプラインを持っている。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="4-徹底比較どちらを選ぶべきか"&gt;4. 徹底比較：どちらを選ぶべきか
+&lt;/h2&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;比較軸&lt;/th&gt;
+&lt;th&gt;GitHub Flow&lt;/th&gt;
+&lt;th&gt;トランクベース開発&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;マージ頻度&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;PRの完了ごと（1日〜数日）&lt;/td&gt;
+&lt;td&gt;極めて高い（1日に数回）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;品質担保の手段&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;人間によるコードレビュー&lt;/td&gt;
+&lt;td&gt;自動テストとCIによる検証&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;コンフリクトリスク&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;ブランチの寿命が長いほど高い&lt;/td&gt;
+&lt;td&gt;常に統合しているため低い&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;必要とされる技術&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;明快なレビューコメント能力&lt;/td&gt;
+&lt;td&gt;テスト自動化、フィーチャーフラグ管理&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;strong&gt;適したフェーズ&lt;/strong&gt;&lt;/td&gt;
+&lt;td&gt;チーム拡大期、品質重視のプロダクト&lt;/td&gt;
+&lt;td&gt;サービス成熟期、爆速リリースが求められるSaaS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;hr&gt;
+&lt;h2 id="5-現場でよくある環境別ブランチの運用"&gt;5. 現場でよくある「環境別ブランチ」の運用
+&lt;/h2&gt;&lt;p&gt;実際の現場（特に大規模なエンタープライズ開発）では、GitHub Flowをベースに環境別のブランチを組み合わせる「ハイブリッド運用」が一般的です。&lt;/p&gt;
+&lt;div class="mermaid"&gt;
+graph LR
+Feature[Feature Branch] --&gt;|PR/Review| Develop[develop branch]
+Develop --&gt;|Test passed| Staging[staging branch]
+Staging --&gt;|UAT passed| Main[main/production branch]
+&lt;/div&gt;
+&lt;p&gt;これは、GitHub Flowの「慎重さ」を物理的な環境レイヤーで補強した形です。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;develop:&lt;/strong&gt; 開発チームが日々の成果を統合する場。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;staging:&lt;/strong&gt; 本番環境と同一のデータで、性能やユーザー受け入れテスト（UAT）を行う場。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;main/production:&lt;/strong&gt; 顧客に価値を提供する、最も安定した場。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id="6-まとめワークフローは進化し続ける"&gt;6. まとめ：ワークフローは進化し続ける
+&lt;/h2&gt;&lt;p&gt;どちらのワークフローが「正解」ということはありません。大切なのは、**「現在のチームのボトルネックはどこにあるか？」**を正確に把握することです。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;レビューが滞り、リリースが遅れているなら、トランクベースの「小さな統合」を取り入れる。&lt;/li&gt;
+&lt;li&gt;バグの流出が止まらないなら、GitHub Flowの「対話型レビュー」を強化する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;ツールや手法にチームを合わせるのではなく、チームの成長に合わせてワークフローを柔軟にチューニングしていく。その繰り返しが、最高のプロダクトを生むリズムを作り出します。&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;&lt;strong&gt;次に取るべきステップ：&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;現在のチームの「PRオープンからクローズまでの平均時間」を計測してみる。&lt;/li&gt;
+&lt;li&gt;ローカル環境で自動テストを1つ追加し、マージの不安を減らす。&lt;/li&gt;
+&lt;li&gt;フィーチャーフラグの概念を学び、コードとリリースの分離を検討する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
+&lt;/style&gt;</description></item><item><title>dbt運用トラブルあるある9選！</title><link>https://firebird-techtalktech.com/post/dbt-operational-troubleshoot-guide/</link><pubDate>Fri, 31 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/dbt-operational-troubleshoot-guide/</guid><description>&lt;h1 id="-dbt運用トラブルあるある9選ムダな残業を減らす対策ガイド"&gt;🚀 dbt運用トラブルあるある9選！ムダな残業を減らす対策ガイド
 &lt;/h1&gt;&lt;p&gt;このガイドは、dbt（データビルドツール）をいじっていると、&lt;strong&gt;「あー、またやっちゃった！」&lt;/strong&gt; となりがちな&lt;strong&gt;9つの困った事例&lt;/strong&gt;と、その&lt;strong&gt;具体的な避け方・直し方&lt;/strong&gt;をまとめた、超実用的なマニュアルです。&lt;/p&gt;
 &lt;hr&gt;
 &lt;h2 id="-1-テストやりすぎてパイプラインが止まるお金がかかる"&gt;🧪 1. テストやりすぎて、パイプラインが止まる＆お金がかかる
