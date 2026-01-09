@@ -1,172 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Github on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/github/</link><description>Recent content in Github on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Thu, 08 Jan 2026 07:40:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/github/index.xml" rel="self" type="application/rss+xml"/><item><title>サブモジュール経由で発生するソースコード漏えいの落とし穴と対策</title><link>https://firebird-techtalktech.com/post/git-submodule-source-leak/</link><pubDate>Thu, 08 Jan 2026 07:40:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-submodule-source-leak/</guid><description>&lt;p&gt;TL;DR: サブモジュールは独立した Git リポジトリです。サブモジュール配下で origin を「自分が書き込める Public リポジトリ」に向けたまま push すると、その中身は即時に公開されます。さらに親リポジトリの push.recurseSubmodules や pre-push フックの実装次第では、親で git push しただけでサブモジュールが push され、意図せず漏えいが起こり得ます。&lt;/p&gt;
-&lt;p&gt;背景
-モノレポやサイト構築（Hugo など）で外部テーマ／ライブラリを submodule として取り込むのは一般的です。しかし、サブモジュールは“別リポジトリ”そのものであり、配下で git remote set-url origin &amp;hellip; を変えれば、単独で push できます。この性質と、親の push 時の挙動（push.recurseSubmodules、pre-push フック、CI スクリプト）が組み合わさると、気づかないうちに第三者の Public リポジトリへコードが押し出される危険があります。&lt;/p&gt;
-&lt;p&gt;よくある漏えいシナリオ
-flowchart TB
-A[開発者が親リポで作業] &amp;ndash;&amp;gt; B[サブモジュール内で修正]
-B &amp;ndash;&amp;gt; C[サブモジュール内の origin を自分の Public リポに変更]
-C &amp;ndash;&amp;gt; D{親で git push}
-D &amp;ndash;&amp;gt;|on-demand/フックが push| E[サブモジュールも push]
-E &amp;ndash;&amp;gt; F[Public リポに中身が公開]&lt;/p&gt;
-&lt;p&gt;トリガーA: サブモジュール内で origin を書き込み可能な Public リポジトリに設定&lt;/p&gt;
-&lt;p&gt;トリガーB: 親で git push した際に&lt;/p&gt;
-&lt;p&gt;push.recurseSubmodules=on-demand で「参照コミットがリモートに無ければサブモジュールも push」&lt;/p&gt;
-&lt;p&gt;あるいは pre-push フックが git submodule foreach などで push を試みる&lt;/p&gt;
-&lt;p&gt;すぐできる被害最小化（即時ロック）
-親リポジトリでサブモジュール push を止める:&lt;/p&gt;
-&lt;h1 id="親リポで-サブモジュールを-push-対象にしない"&gt;親リポで: サブモジュールを push 対象にしない
-&lt;/h1&gt;&lt;p&gt;git config push.recurseSubmodules no&lt;/p&gt;
-&lt;h1 id="push-のドライラン癖付け"&gt;push のドライラン癖付け
-&lt;/h1&gt;&lt;p&gt;git push &amp;ndash;dry-run origin main&lt;/p&gt;
-&lt;p&gt;各サブモジュールで push を物理的に無効化（安全策）:&lt;/p&gt;
-&lt;h1 id="ルートで実行-すべてのサブモジュールの-pushurl-を無効化"&gt;ルートで実行: すべてのサブモジュールの pushURL を無効化
-&lt;/h1&gt;&lt;h1 id="fetch-url-はそのまま"&gt;(fetch URL はそのまま)
-&lt;/h1&gt;&lt;p&gt;git config -f .gitmodules &amp;ndash;get-regexp &amp;lsquo;^submodule..*.path$&amp;rsquo; |
-while read -r _ path; do
-echo &amp;ldquo;Locking $path&amp;rdquo;
-git -C &amp;ldquo;$path&amp;rdquo; remote set-url &amp;ndash;push origin DISABLED || true
-hookdir=&amp;quot;$(git -C &amp;ldquo;$path&amp;rdquo; rev-parse &amp;ndash;git-dir)/hooks&amp;quot;
-mkdir -p &amp;ldquo;$hookdir&amp;rdquo;
-cat &amp;gt; &amp;ldquo;$hookdir/pre-push&amp;rdquo; &amp;laquo;&amp;lsquo;SH&amp;rsquo;
-#!/bin/sh
-echo &amp;ldquo;ERROR: Pushing from this submodule is disabled.&amp;rdquo; &amp;gt;&amp;amp;2
-exit 1
-SH
-chmod +x &amp;ldquo;$hookdir/pre-push&amp;rdquo;
-done&lt;/p&gt;
-&lt;p&gt;これでサブモジュール直下での git push は常に失敗し、誤操作やフック経由の push も止まります。&lt;/p&gt;
-&lt;p&gt;恒久対策（レイヤ別）&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;設定レイヤ（Git）
-親リポ: git config push.recurseSubmodules no をデフォルトに&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;サブモジュール URL の整合性: git submodule sync &amp;ndash;recursive&lt;/p&gt;
-&lt;p&gt;危険 URL のブロック（親の pre-push フック）：&lt;/p&gt;
-&lt;h1 id="githookspre-push-親リポ"&gt;.git/hooks/pre-push （親リポ）
-&lt;/h1&gt;&lt;p&gt;#!/bin/sh
-set -e
-url=$(git remote get-url &amp;ndash;push origin 2&amp;gt;/dev/null || echo &amp;ldquo;&amp;rdquo;)
-case &amp;ldquo;$url&amp;rdquo; in
-&lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:your-org/&lt;em&gt;|https://github.com/your-org/&lt;/em&gt;) ;;
-*) echo &amp;ldquo;ERROR: Blocked push to non-allowed remote: $url&amp;rdquo; &amp;gt;&amp;amp;2; exit 1;;
-esac&lt;/p&gt;
-&lt;ol start="2"&gt;
-&lt;li&gt;リポジトリレイヤ（GitHub 側）
-Private 化（フォークやミラーも）&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;Protected Branch（強制 push 禁止、PR 必須、レビュー必須）&lt;/p&gt;
-&lt;p&gt;Secret Scanning / Push Protection を有効化&lt;/p&gt;
-&lt;ol start="3"&gt;
-&lt;li&gt;
-&lt;p&gt;CI レイヤ（検知）
-GitHub Actionsで誤 push を検知・ブロック:
-name: guard-visibility
-on: [push]
-jobs:
-check:
-runs-on: ubuntu-latest
-steps:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;name: Fail if repo is public
-if: ${{ !github.event.repository.private }}
-run: |
-echo &amp;ldquo;Repository is public. Aborting.&amp;rdquo; &amp;gt;&amp;amp;2
-exit 1&lt;/li&gt;
-&lt;li&gt;uses: actions/checkout@v4&lt;/li&gt;
-&lt;li&gt;name: Allowlist push target
-run: |
-url=$(git remote get-url &amp;ndash;push origin || true)
-case &amp;ldquo;$url&amp;rdquo; in
-&lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:your-org/&lt;em&gt;|https://github.com/your-org/&lt;/em&gt;) ;;
-*) echo &amp;ldquo;Blocked remote: $url&amp;rdquo; &amp;gt;&amp;amp;2; exit 1;;
-esac&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;li&gt;
-&lt;p&gt;運用レイヤ（人の習慣）
-git remote -v／git remote get-url &amp;ndash;push origin をpush 前に確認&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;git push &amp;ndash;dry-run を毎回実行&lt;/p&gt;
-&lt;p&gt;サブモジュールに変更を加える場合は 必ずフォークを Private で作る → .gitmodules をフォーク URL に変更 → PR&lt;/p&gt;
-&lt;p&gt;兆候と検知ポイント
-git push 時に 予期しないリモート URL がログに出る（例: 第三者のテーマ作者のリポ）&lt;/p&gt;
-&lt;p&gt;pre-push / CI ログに サブモジュールでの push 成功の痕跡&lt;/p&gt;
-&lt;p&gt;GitHub の 監査ログ／Contributors に意図しない push 履歴&lt;/p&gt;
-&lt;p&gt;調査ワンライナー:&lt;/p&gt;
-&lt;h1 id="親の-push-先"&gt;親の push 先
-&lt;/h1&gt;&lt;p&gt;git remote -v | sed -n &amp;lsquo;/origin/p&amp;rsquo;&lt;/p&gt;
-&lt;h1 id="すべてのサブモジュールの-fetchpush-先一覧"&gt;すべてのサブモジュールの fetch/push 先一覧
-&lt;/h1&gt;&lt;p&gt;git config -f .gitmodules &amp;ndash;get-regexp &amp;lsquo;^submodule..*.path$&amp;rsquo; |
-while read -r _ path; do
-echo &amp;ldquo;[$path]&amp;rdquo;; git -C &amp;ldquo;$path&amp;rdquo; remote -v; echo
-done&lt;/p&gt;
-&lt;p&gt;よくある質問（FAQ）
-Q. リポジトリが Public か Private かで差はある？
-A. 公開可否と書き込み権限は別です。Public でも あなたに書き込み権限がなければ push できず、403 で止まります。逆に Public で書き込める先に向いていれば、即座に誰でも読める状態になります。
-Q. &amp;ndash;no-verify を付けても止まらないのは？
-A. &amp;ndash;no-verify は フックの実行抑止だけです。origin の向き先が第三者リポであれば素通りしてしまうため、URL ガード（pre-push 内の URL 判定）と pushURL の無効化 を合わせ技で使います。
-Q. サブモジュールの “detached HEAD” は問題？
-A. サブモジュールとしては 正常です。問題は どこに push され得るか です。&lt;/p&gt;
-&lt;p&gt;ベストプラクティス：Read‑Only 運用 + PR フロー
-結論: 外部のサブモジュールは read‑only に保ち、変更が必要になったら「別途 clone（またはフォーク）→ 修正 → 上流へ PR」。親リポには 参照コミットだけ を更新します。&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Read‑Only の基本設定（親とサブモジュール）&lt;/li&gt;
-&lt;/ol&gt;
-&lt;h1 id="親-サブモジュールを-push-対象にしない"&gt;親: サブモジュールを push 対象にしない
-&lt;/h1&gt;&lt;p&gt;git config push.recurseSubmodules no&lt;/p&gt;
-&lt;h1 id="サブモジュール側-push-を物理的に無効化誤操作防止"&gt;サブモジュール側: push を物理的に無効化（誤操作防止）
-&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; remote set-url &amp;ndash;push origin DISABLED
-cat &amp;gt; &amp;ldquo;$(git -C &lt;submodule-path&gt; rev-parse &amp;ndash;git-dir)/hooks/pre-push&amp;rdquo; &amp;laquo;&amp;lsquo;SH&amp;rsquo;
-#!/bin/sh
-echo &amp;ldquo;ERROR: Pushing from this submodule is disabled.&amp;rdquo; &amp;gt;&amp;amp;2
-exit 1
-SH
-chmod +x &amp;ldquo;$(git -C &lt;submodule-path&gt; rev-parse &amp;ndash;git-dir)/hooks/pre-push&amp;rdquo;&lt;/p&gt;
-&lt;h1 id="url-の整合を保つgitmodules--ローカルへ反映"&gt;URL の整合を保つ（.gitmodules → ローカルへ反映）
-&lt;/h1&gt;&lt;p&gt;git submodule sync &amp;ndash;recursive&lt;/p&gt;
-&lt;p&gt;.gitmodules は原典（upstream）URLのまま。サブモジュール直下では push しない運用にします。
-2) 変更が必要になったときの手順（別途 clone → PR）&lt;/p&gt;
-&lt;h1 id="1-自分の作業ディレクトリで上流のリポジトリをフォーク-or-直接-clone"&gt;1) 自分の作業ディレクトリで、上流のリポジトリをフォーク or 直接 clone
-&lt;/h1&gt;&lt;h1 id="-機微が混じる可能性があるならフォークは-private-推奨"&gt;※ 機微が混じる可能性があるならフォークは Private 推奨
-&lt;/h1&gt;&lt;h1 id="例-フォークを-clone"&gt;例: フォークを clone
-&lt;/h1&gt;&lt;p&gt;git clone &lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:&lt;you&gt;/&lt;forked-repo&gt;.git
-cd &lt;forked-repo&gt;&lt;/p&gt;
-&lt;p&gt;git remote add upstream &lt;a class="link" href="https://github.com/" target="_blank" rel="noopener"
-&gt;https://github.com/&lt;/a&gt;&lt;upstream-owner&gt;/&lt;upstream-repo&gt;.git&lt;/p&gt;
-&lt;p&gt;git checkout -b fix/your-change&lt;/p&gt;
-&lt;h1 id="-変更-"&gt;&amp;hellip; 変更 &amp;hellip;
-&lt;/h1&gt;&lt;p&gt;git commit -s -m &amp;ldquo;fix: &lt;summary&gt;&amp;rdquo;
-git push -u origin HEAD&lt;/p&gt;
-&lt;h1 id="github-で-originupstream-への-pr-を作成"&gt;GitHub で origin→upstream への PR を作成
-&lt;/h1&gt;&lt;p&gt;PR が upstream にマージ された後、親リポで参照コミットを更新します：
-cd /path/to/parent&lt;/p&gt;
-&lt;h1 id="サブモジュールで最新を取得"&gt;サブモジュールで最新を取得
-&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; fetch &amp;ndash;tags &amp;ndash;all&lt;/p&gt;
-&lt;h1 id="目的のコミットまたはタグへ移動"&gt;目的のコミット(またはタグ)へ移動
-&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; checkout &lt;merge-commit-or-tag&gt;&lt;/p&gt;
-&lt;h1 id="親にポインタ更新を記録"&gt;親にポインタ更新を記録
-&lt;/h1&gt;&lt;p&gt;git add &lt;submodule-path&gt;
-git commit -m &amp;ldquo;chore(submodule): bump &lt;name&gt; to &amp;lt;sha/tag&amp;gt;&amp;rdquo;
-git push&lt;/p&gt;
-&lt;p&gt;※ .gitmodules に branch = main を設定していれば、git submodule update &amp;ndash;remote &lt;path&gt; で「そのブランチの最新へ」上げることも可能です（明示運用推奨）。
-3) どうしても PR を待てない場合（代替案）
-オーバーレイ: 親の layouts/ / assets/ 等で上書き（Hugo などで有効）。&lt;/p&gt;
-&lt;p&gt;パッチ適用: 親レポに patches/ を置き、git apply/git am を CI/ローカルで当てる。サブモジュール自体は upstream のまま。&lt;/p&gt;
-&lt;p&gt;いずれの方法でも、サブモジュール配下からの push は不要です。&lt;/p&gt;
-&lt;p&gt;まとめ
-サブモジュールは独立リポ。origin が Public かつ書き込み可であれば即漏えい。&lt;/p&gt;
-&lt;p&gt;親の push.recurseSubmodules=no、サブモジュール pushURL 無効化、pre-push の URL Allowlist で 多層防御 を。&lt;/p&gt;
-&lt;p&gt;CI と運用ルールで最後の見張りを置いて、ヒューマンエラーを吸収する。&lt;/p&gt;
-&lt;p&gt;付録: チェックリスト（配布用）
-親: git remote -v で push 先を確認&lt;/p&gt;
-&lt;p&gt;親: git config push.recurseSubmodules が no&lt;/p&gt;
-&lt;p&gt;サブモジュール: remote -v で pushURL が DISABLED（または Private）&lt;/p&gt;
-&lt;p&gt;親 .git/hooks/pre-push に URL Allowlist 実装&lt;/p&gt;
-&lt;p&gt;GitHub: Private + Protected Branch + Secret Scanning&lt;/p&gt;
-&lt;p&gt;CI: 可視性チェック + リモート Allowlist&lt;/p&gt;
-&lt;p&gt;運用: git push &amp;ndash;dry-run を習慣化&lt;/p&gt;
-&lt;p&gt;本記事のサンプルスクリプトは 自己責任でお試しください。組織のポリシーに合わせて、許可ドメインやブランチ名、CI 条件を調整してください。&lt;/p&gt;</description></item><item><title>📰 GitHub関連ニュースダイジェスト - 2025年9月</title><link>https://firebird-techtalktech.com/post/github%E9%96%A2%E9%80%A3%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/</link><pubDate>Sat, 20 Sep 2025 02:40:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/github%E9%96%A2%E9%80%A3%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/</guid><description>&lt;h2 id="概要"&gt;概要
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Github on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/github/</link><description>Recent content in Github on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sat, 20 Sep 2025 02:40:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/github/index.xml" rel="self" type="application/rss+xml"/><item><title>📰 GitHub関連ニュースダイジェスト - 2025年9月</title><link>https://firebird-techtalktech.com/post/github%E9%96%A2%E9%80%A3%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/</link><pubDate>Sat, 20 Sep 2025 02:40:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/github%E9%96%A2%E9%80%A3%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/</guid><description>&lt;h2 id="概要"&gt;概要
 &lt;/h2&gt;&lt;p&gt;2025年9月に収集したGitHubに関する技術記事・ニュースから、重複を除いて主要な情報をダイジェスト形式でまとめています。&lt;/p&gt;
 &lt;h3 id="-編集者コメント"&gt;📝 編集者コメント
 &lt;/h3&gt;&lt;p&gt;今月のGitHub関連アップデートは、特にAI機能の大幅な進化が注目されます。GitHub Copilot エージェント機能の正式リリースにより、開発者の作業フローが根本的に変わる可能性があります。従来のコード補完から、タスク全体を自動化するエージェント型AIへの進化は、ソフトウェア開発業界にとって歴史的な転換点と言えるでしょう。&lt;/p&gt;
@@ -2187,4 +2019,172 @@ padding: 12px;
 text-align: center;
 font-size: 0.9rem;
 }
-&lt;/style&gt;</description></item></channel></rss>
+&lt;/style&gt;</description></item><item><title>サブモジュール経由で発生するソースコード漏えいの落とし穴と対策</title><link>https://firebird-techtalktech.com/post/git-submodule-source-leak/</link><pubDate>Wed, 08 Jan 2025 07:40:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/git-submodule-source-leak/</guid><description>&lt;p&gt;TL;DR: サブモジュールは独立した Git リポジトリです。サブモジュール配下で origin を「自分が書き込める Public リポジトリ」に向けたまま push すると、その中身は即時に公開されます。さらに親リポジトリの push.recurseSubmodules や pre-push フックの実装次第では、親で git push しただけでサブモジュールが push され、意図せず漏えいが起こり得ます。&lt;/p&gt;
+&lt;p&gt;背景
+モノレポやサイト構築（Hugo など）で外部テーマ／ライブラリを submodule として取り込むのは一般的です。しかし、サブモジュールは“別リポジトリ”そのものであり、配下で git remote set-url origin &amp;hellip; を変えれば、単独で push できます。この性質と、親の push 時の挙動（push.recurseSubmodules、pre-push フック、CI スクリプト）が組み合わさると、気づかないうちに第三者の Public リポジトリへコードが押し出される危険があります。&lt;/p&gt;
+&lt;p&gt;よくある漏えいシナリオ
+flowchart TB
+A[開発者が親リポで作業] &amp;ndash;&amp;gt; B[サブモジュール内で修正]
+B &amp;ndash;&amp;gt; C[サブモジュール内の origin を自分の Public リポに変更]
+C &amp;ndash;&amp;gt; D{親で git push}
+D &amp;ndash;&amp;gt;|on-demand/フックが push| E[サブモジュールも push]
+E &amp;ndash;&amp;gt; F[Public リポに中身が公開]&lt;/p&gt;
+&lt;p&gt;トリガーA: サブモジュール内で origin を書き込み可能な Public リポジトリに設定&lt;/p&gt;
+&lt;p&gt;トリガーB: 親で git push した際に&lt;/p&gt;
+&lt;p&gt;push.recurseSubmodules=on-demand で「参照コミットがリモートに無ければサブモジュールも push」&lt;/p&gt;
+&lt;p&gt;あるいは pre-push フックが git submodule foreach などで push を試みる&lt;/p&gt;
+&lt;p&gt;すぐできる被害最小化（即時ロック）
+親リポジトリでサブモジュール push を止める:&lt;/p&gt;
+&lt;h1 id="親リポで-サブモジュールを-push-対象にしない"&gt;親リポで: サブモジュールを push 対象にしない
+&lt;/h1&gt;&lt;p&gt;git config push.recurseSubmodules no&lt;/p&gt;
+&lt;h1 id="push-のドライラン癖付け"&gt;push のドライラン癖付け
+&lt;/h1&gt;&lt;p&gt;git push &amp;ndash;dry-run origin main&lt;/p&gt;
+&lt;p&gt;各サブモジュールで push を物理的に無効化（安全策）:&lt;/p&gt;
+&lt;h1 id="ルートで実行-すべてのサブモジュールの-pushurl-を無効化"&gt;ルートで実行: すべてのサブモジュールの pushURL を無効化
+&lt;/h1&gt;&lt;h1 id="fetch-url-はそのまま"&gt;(fetch URL はそのまま)
+&lt;/h1&gt;&lt;p&gt;git config -f .gitmodules &amp;ndash;get-regexp &amp;lsquo;^submodule..*.path$&amp;rsquo; |
+while read -r _ path; do
+echo &amp;ldquo;Locking $path&amp;rdquo;
+git -C &amp;ldquo;$path&amp;rdquo; remote set-url &amp;ndash;push origin DISABLED || true
+hookdir=&amp;quot;$(git -C &amp;ldquo;$path&amp;rdquo; rev-parse &amp;ndash;git-dir)/hooks&amp;quot;
+mkdir -p &amp;ldquo;$hookdir&amp;rdquo;
+cat &amp;gt; &amp;ldquo;$hookdir/pre-push&amp;rdquo; &amp;laquo;&amp;lsquo;SH&amp;rsquo;
+#!/bin/sh
+echo &amp;ldquo;ERROR: Pushing from this submodule is disabled.&amp;rdquo; &amp;gt;&amp;amp;2
+exit 1
+SH
+chmod +x &amp;ldquo;$hookdir/pre-push&amp;rdquo;
+done&lt;/p&gt;
+&lt;p&gt;これでサブモジュール直下での git push は常に失敗し、誤操作やフック経由の push も止まります。&lt;/p&gt;
+&lt;p&gt;恒久対策（レイヤ別）&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;設定レイヤ（Git）
+親リポ: git config push.recurseSubmodules no をデフォルトに&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;サブモジュール URL の整合性: git submodule sync &amp;ndash;recursive&lt;/p&gt;
+&lt;p&gt;危険 URL のブロック（親の pre-push フック）：&lt;/p&gt;
+&lt;h1 id="githookspre-push-親リポ"&gt;.git/hooks/pre-push （親リポ）
+&lt;/h1&gt;&lt;p&gt;#!/bin/sh
+set -e
+url=$(git remote get-url &amp;ndash;push origin 2&amp;gt;/dev/null || echo &amp;ldquo;&amp;rdquo;)
+case &amp;ldquo;$url&amp;rdquo; in
+&lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:your-org/&lt;em&gt;|https://github.com/your-org/&lt;/em&gt;) ;;
+*) echo &amp;ldquo;ERROR: Blocked push to non-allowed remote: $url&amp;rdquo; &amp;gt;&amp;amp;2; exit 1;;
+esac&lt;/p&gt;
+&lt;ol start="2"&gt;
+&lt;li&gt;リポジトリレイヤ（GitHub 側）
+Private 化（フォークやミラーも）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Protected Branch（強制 push 禁止、PR 必須、レビュー必須）&lt;/p&gt;
+&lt;p&gt;Secret Scanning / Push Protection を有効化&lt;/p&gt;
+&lt;ol start="3"&gt;
+&lt;li&gt;
+&lt;p&gt;CI レイヤ（検知）
+GitHub Actionsで誤 push を検知・ブロック:
+name: guard-visibility
+on: [push]
+jobs:
+check:
+runs-on: ubuntu-latest
+steps:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;name: Fail if repo is public
+if: ${{ !github.event.repository.private }}
+run: |
+echo &amp;ldquo;Repository is public. Aborting.&amp;rdquo; &amp;gt;&amp;amp;2
+exit 1&lt;/li&gt;
+&lt;li&gt;uses: actions/checkout@v4&lt;/li&gt;
+&lt;li&gt;name: Allowlist push target
+run: |
+url=$(git remote get-url &amp;ndash;push origin || true)
+case &amp;ldquo;$url&amp;rdquo; in
+&lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:your-org/&lt;em&gt;|https://github.com/your-org/&lt;/em&gt;) ;;
+*) echo &amp;ldquo;Blocked remote: $url&amp;rdquo; &amp;gt;&amp;amp;2; exit 1;;
+esac&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;運用レイヤ（人の習慣）
+git remote -v／git remote get-url &amp;ndash;push origin をpush 前に確認&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;git push &amp;ndash;dry-run を毎回実行&lt;/p&gt;
+&lt;p&gt;サブモジュールに変更を加える場合は 必ずフォークを Private で作る → .gitmodules をフォーク URL に変更 → PR&lt;/p&gt;
+&lt;p&gt;兆候と検知ポイント
+git push 時に 予期しないリモート URL がログに出る（例: 第三者のテーマ作者のリポ）&lt;/p&gt;
+&lt;p&gt;pre-push / CI ログに サブモジュールでの push 成功の痕跡&lt;/p&gt;
+&lt;p&gt;GitHub の 監査ログ／Contributors に意図しない push 履歴&lt;/p&gt;
+&lt;p&gt;調査ワンライナー:&lt;/p&gt;
+&lt;h1 id="親の-push-先"&gt;親の push 先
+&lt;/h1&gt;&lt;p&gt;git remote -v | sed -n &amp;lsquo;/origin/p&amp;rsquo;&lt;/p&gt;
+&lt;h1 id="すべてのサブモジュールの-fetchpush-先一覧"&gt;すべてのサブモジュールの fetch/push 先一覧
+&lt;/h1&gt;&lt;p&gt;git config -f .gitmodules &amp;ndash;get-regexp &amp;lsquo;^submodule..*.path$&amp;rsquo; |
+while read -r _ path; do
+echo &amp;ldquo;[$path]&amp;rdquo;; git -C &amp;ldquo;$path&amp;rdquo; remote -v; echo
+done&lt;/p&gt;
+&lt;p&gt;よくある質問（FAQ）
+Q. リポジトリが Public か Private かで差はある？
+A. 公開可否と書き込み権限は別です。Public でも あなたに書き込み権限がなければ push できず、403 で止まります。逆に Public で書き込める先に向いていれば、即座に誰でも読める状態になります。
+Q. &amp;ndash;no-verify を付けても止まらないのは？
+A. &amp;ndash;no-verify は フックの実行抑止だけです。origin の向き先が第三者リポであれば素通りしてしまうため、URL ガード（pre-push 内の URL 判定）と pushURL の無効化 を合わせ技で使います。
+Q. サブモジュールの “detached HEAD” は問題？
+A. サブモジュールとしては 正常です。問題は どこに push され得るか です。&lt;/p&gt;
+&lt;p&gt;ベストプラクティス：Read‑Only 運用 + PR フロー
+結論: 外部のサブモジュールは read‑only に保ち、変更が必要になったら「別途 clone（またはフォーク）→ 修正 → 上流へ PR」。親リポには 参照コミットだけ を更新します。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Read‑Only の基本設定（親とサブモジュール）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id="親-サブモジュールを-push-対象にしない"&gt;親: サブモジュールを push 対象にしない
+&lt;/h1&gt;&lt;p&gt;git config push.recurseSubmodules no&lt;/p&gt;
+&lt;h1 id="サブモジュール側-push-を物理的に無効化誤操作防止"&gt;サブモジュール側: push を物理的に無効化（誤操作防止）
+&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; remote set-url &amp;ndash;push origin DISABLED
+cat &amp;gt; &amp;ldquo;$(git -C &lt;submodule-path&gt; rev-parse &amp;ndash;git-dir)/hooks/pre-push&amp;rdquo; &amp;laquo;&amp;lsquo;SH&amp;rsquo;
+#!/bin/sh
+echo &amp;ldquo;ERROR: Pushing from this submodule is disabled.&amp;rdquo; &amp;gt;&amp;amp;2
+exit 1
+SH
+chmod +x &amp;ldquo;$(git -C &lt;submodule-path&gt; rev-parse &amp;ndash;git-dir)/hooks/pre-push&amp;rdquo;&lt;/p&gt;
+&lt;h1 id="url-の整合を保つgitmodules--ローカルへ反映"&gt;URL の整合を保つ（.gitmodules → ローカルへ反映）
+&lt;/h1&gt;&lt;p&gt;git submodule sync &amp;ndash;recursive&lt;/p&gt;
+&lt;p&gt;.gitmodules は原典（upstream）URLのまま。サブモジュール直下では push しない運用にします。
+2) 変更が必要になったときの手順（別途 clone → PR）&lt;/p&gt;
+&lt;h1 id="1-自分の作業ディレクトリで上流のリポジトリをフォーク-or-直接-clone"&gt;1) 自分の作業ディレクトリで、上流のリポジトリをフォーク or 直接 clone
+&lt;/h1&gt;&lt;h1 id="-機微が混じる可能性があるならフォークは-private-推奨"&gt;※ 機微が混じる可能性があるならフォークは Private 推奨
+&lt;/h1&gt;&lt;h1 id="例-フォークを-clone"&gt;例: フォークを clone
+&lt;/h1&gt;&lt;p&gt;git clone &lt;a class="link" href="mailto:git@github.com" &gt;git@github.com&lt;/a&gt;:&lt;you&gt;/&lt;forked-repo&gt;.git
+cd &lt;forked-repo&gt;&lt;/p&gt;
+&lt;p&gt;git remote add upstream &lt;a class="link" href="https://github.com/" target="_blank" rel="noopener"
+&gt;https://github.com/&lt;/a&gt;&lt;upstream-owner&gt;/&lt;upstream-repo&gt;.git&lt;/p&gt;
+&lt;p&gt;git checkout -b fix/your-change&lt;/p&gt;
+&lt;h1 id="-変更-"&gt;&amp;hellip; 変更 &amp;hellip;
+&lt;/h1&gt;&lt;p&gt;git commit -s -m &amp;ldquo;fix: &lt;summary&gt;&amp;rdquo;
+git push -u origin HEAD&lt;/p&gt;
+&lt;h1 id="github-で-originupstream-への-pr-を作成"&gt;GitHub で origin→upstream への PR を作成
+&lt;/h1&gt;&lt;p&gt;PR が upstream にマージ された後、親リポで参照コミットを更新します：
+cd /path/to/parent&lt;/p&gt;
+&lt;h1 id="サブモジュールで最新を取得"&gt;サブモジュールで最新を取得
+&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; fetch &amp;ndash;tags &amp;ndash;all&lt;/p&gt;
+&lt;h1 id="目的のコミットまたはタグへ移動"&gt;目的のコミット(またはタグ)へ移動
+&lt;/h1&gt;&lt;p&gt;git -C &lt;submodule-path&gt; checkout &lt;merge-commit-or-tag&gt;&lt;/p&gt;
+&lt;h1 id="親にポインタ更新を記録"&gt;親にポインタ更新を記録
+&lt;/h1&gt;&lt;p&gt;git add &lt;submodule-path&gt;
+git commit -m &amp;ldquo;chore(submodule): bump &lt;name&gt; to &amp;lt;sha/tag&amp;gt;&amp;rdquo;
+git push&lt;/p&gt;
+&lt;p&gt;※ .gitmodules に branch = main を設定していれば、git submodule update &amp;ndash;remote &lt;path&gt; で「そのブランチの最新へ」上げることも可能です（明示運用推奨）。
+3) どうしても PR を待てない場合（代替案）
+オーバーレイ: 親の layouts/ / assets/ 等で上書き（Hugo などで有効）。&lt;/p&gt;
+&lt;p&gt;パッチ適用: 親レポに patches/ を置き、git apply/git am を CI/ローカルで当てる。サブモジュール自体は upstream のまま。&lt;/p&gt;
+&lt;p&gt;いずれの方法でも、サブモジュール配下からの push は不要です。&lt;/p&gt;
+&lt;p&gt;まとめ
+サブモジュールは独立リポ。origin が Public かつ書き込み可であれば即漏えい。&lt;/p&gt;
+&lt;p&gt;親の push.recurseSubmodules=no、サブモジュール pushURL 無効化、pre-push の URL Allowlist で 多層防御 を。&lt;/p&gt;
+&lt;p&gt;CI と運用ルールで最後の見張りを置いて、ヒューマンエラーを吸収する。&lt;/p&gt;
+&lt;p&gt;付録: チェックリスト（配布用）
+親: git remote -v で push 先を確認&lt;/p&gt;
+&lt;p&gt;親: git config push.recurseSubmodules が no&lt;/p&gt;
+&lt;p&gt;サブモジュール: remote -v で pushURL が DISABLED（または Private）&lt;/p&gt;
+&lt;p&gt;親 .git/hooks/pre-push に URL Allowlist 実装&lt;/p&gt;
+&lt;p&gt;GitHub: Private + Protected Branch + Secret Scanning&lt;/p&gt;
+&lt;p&gt;CI: 可視性チェック + リモート Allowlist&lt;/p&gt;
+&lt;p&gt;運用: git push &amp;ndash;dry-run を習慣化&lt;/p&gt;
+&lt;p&gt;本記事のサンプルスクリプトは 自己責任でお試しください。組織のポリシーに合わせて、許可ドメインやブランチ名、CI 条件を調整してください。&lt;/p&gt;</description></item></channel></rss>
