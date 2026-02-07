@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>TP-Link on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/tp-link/</link><description>Recent content in TP-Link on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Fri, 23 Jan 2026 10:00:00 +0900</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/tp-link/index.xml" rel="self" type="application/rss+xml"/><item><title>ドコモ光からソフトバンク光へ乗り換えてわかった、TP-Linkルーターを腐らせない最強の再設定ガイド</title><link>https://firebird-techtalktech.com/post/docomo-to-softbank-hikari-tplink-reuse/</link><pubDate>Fri, 23 Jan 2026 10:00:00 +0900</pubDate><guid>https://firebird-techtalktech.com/post/docomo-to-softbank-hikari-tplink-reuse/</guid><description>&lt;p&gt;光回線の乗り換えは、通信費の節約やキャンペーンの恩恵を受けられる一方で、ユーザーを悩ませるのが「ネットワーク機器の再構築」です。&lt;/p&gt;
+&lt;p&gt;私自身、長年愛用してきた&lt;strong&gt;ドコモ光からソフトバンク光へと切り替え&lt;/strong&gt;を行いました。ドコモ光時代は、NTTホームゲートウェイ（HGW）に自分でお気に入りの高性能TP-Linkルーターを繋ぐだけのシンプルな構成で、リビングのWi-Fi環境は完璧でした。&lt;/p&gt;
+&lt;p&gt;しかし、ソフトバンク光が届いて直面したのが、あの「白い箱」こと&lt;strong&gt;光BBユニット&lt;/strong&gt;の存在です。&lt;/p&gt;
+&lt;p&gt;「せっかくリビングに設置したTP-Linkルーターを無駄にしたくない」「でも光BBユニットを繋がないと速度が出ないらしい……」&lt;/p&gt;
+&lt;p&gt;本記事では、ドコモ光からソフトバンク光へ乗り換えた私が、&lt;strong&gt;既存のTP-Linkルーターの設置場所を変えることなく、光BBユニットと共存させて通信環境を最適化した全記録&lt;/strong&gt;を公開します。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="1-ドコモ光とソフトバンク光構成の決定的な違い"&gt;1. ドコモ光とソフトバンク光、構成の決定的な違い
+&lt;/h2&gt;&lt;p&gt;まず、乗り換えユーザーが最初に知っておくべき「技術的なルール」の違いを整理します。&lt;/p&gt;
+&lt;h3 id="ドコモ光の場合これまで"&gt;ドコモ光の場合（これまで）
+&lt;/h3&gt;&lt;p&gt;ドコモ光（特に多くのプロバイダ）では、v6プラスなどのIPv6接続を利用する際、市販のTP-LinkルーターをHGWに直接繋げば、ルーター自身がIPv6の通信を処理できました。つまり、**TP-Linkが家の「王様（メインルーター）」**でした。&lt;/p&gt;
+&lt;h3 id="ソフトバンク光の場合これから"&gt;ソフトバンク光の場合（これから）
+&lt;/h3&gt;&lt;p&gt;ソフトバンク光で夜間も爆速な「IPv6高速ハイブリッド」を利用するには、&lt;strong&gt;光BBユニットを通信の最前線に置くことが事実上の必須条件&lt;/strong&gt;となります。市販のルーターだけでは、ソフトバンク独自の通信方式を処理できず、速度が伸び悩む（PPPoE接続になる）原因になります。&lt;/p&gt;
+&lt;p&gt;つまり、&lt;strong&gt;「光BBユニットが王様」になり、TP-Linkはその配下で「Wi-Fi担当の大臣」として動いてもらう&lt;/strong&gt;のが、乗り換え後の正しい姿です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="2-物語リビングのtp-linkをそのまま活かす接続戦略"&gt;2. 【物語】リビングのTP-Linkを「そのまま」活かす接続戦略
+&lt;/h2&gt;&lt;p&gt;私の場合、リビングにこだわりのTP-Linkルーターを配置し、そこから全部屋にWi-Fiを飛ばしていました。この「接続ポイント」を変えずに、新しく来た光BBユニットをどう組み込むかが課題でした。&lt;/p&gt;
+&lt;h3 id="採用した接続ルート"&gt;採用した接続ルート
+&lt;/h3&gt;&lt;p&gt;物理的な配置を工夫し、以下の順序で繋ぎました。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;ONU / HGW（玄関や情報ボックス）&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;↓（既存の壁内配線を利用）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;光BBユニット（ルーターモード）&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;↓（光BBユニットの黄色いポートから接続）&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TP-Linkルーター（リビングに鎮座・ブリッジモード）&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;ポイントは、**「光BBユニットをHGWのすぐ隣に置き、そこからリビングのTP-Linkまでを有線で繋ぐ」**ことです。これにより、TP-Linkの設置場所（リビングの特等席）を動かさずに済みました。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="3-なぜtp-linkをブリッジモードに変える必要があるのか"&gt;3. なぜTP-Linkを「ブリッジモード」に変える必要があるのか
+&lt;/h2&gt;&lt;p&gt;ドコモ光時代、TP-Linkは「ルーターモード」で動いていたはずです。しかし、ソフトバンク光の光BBユニットの後ろに繋ぐなら、必ず**「ブリッジ（アクセスポイント）モード」**への切り替えが必要です。&lt;/p&gt;
+&lt;p&gt;これを忘れると、いわゆる**「二重ルーター」**状態になり、以下のような悲劇が起こります。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;リビングのWi-Fiが頻繁に切れる:&lt;/strong&gt; 2つのルーターが互いに「自分が仕切る！」と喧嘩し、通信が不安定になります。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;スマホのバッテリー消費が早まる:&lt;/strong&gt; 不安定な通信を維持しようとスマホが頑張ってしまうためです。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;管理画面に入れない:&lt;/strong&gt; HGW（&lt;code&gt;192.168.1.1&lt;/code&gt;）と光BBユニット（&lt;code&gt;192.168.3.1&lt;/code&gt;）、さらにTP-LinkのデフォルトIPが混在し、どこに繋がっているか分からなくなります。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="tp-linkの設定を大臣モードへ"&gt;TP-Linkの設定を「大臣」モードへ
+&lt;/h3&gt;&lt;p&gt;TP-Linkルーターの背面スイッチ（または設定画面の動作モード）を「AP（アクセスポイント）」または「ブリッジ」に切り替えましょう。これにより、ルーティングは光BBユニットが一括管理し、TP-Linkは「強力な電波を発射する」という得意分野に専念できるようになります。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="4-実践ソフトバンク光tp-link-最適化ステップ"&gt;4. 実践！ソフトバンク光×TP-Link 最適化ステップ
+&lt;/h2&gt;&lt;h3 id="ステップ1光bbユニットのipv6高速ハイブリッドを確認"&gt;ステップ1：光BBユニットの「IPv6高速ハイブリッド」を確認
+&lt;/h3&gt;&lt;p&gt;まず、光BBユニット単体でネットに繋ぎ、&lt;a class="link" href="https://ybb.softbank.jp/support/connect/adsl/check/" target="_blank" rel="noopener"
+&gt;ソフトバンクの速度確認サイト&lt;/a&gt;などで「IPv6で接続中」と出ることを確認します。これが全ての基礎です。&lt;/p&gt;
+&lt;h3 id="ステップ2tp-linkの無線チャンネル調整"&gt;ステップ2：TP-Linkの無線チャンネル調整
+&lt;/h3&gt;&lt;p&gt;リビングのTP-Linkと、光BBユニットの両方からWi-Fiが出ていると、電波干渉が起きます。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;推奨:&lt;/strong&gt; 光BBユニット側のWi-Fiは管理画面（&lt;code&gt;192.168.3.1&lt;/code&gt;）から「オフ」にする。&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;理由:&lt;/strong&gt; TP-Linkの方がアンテナ性能が高いため、中途半端な電波を2つ出すより、強力な1つに絞る方が安定します。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="ステップ3hgwntt機器の管理画面アクセス問題"&gt;ステップ3：HGW（NTT機器）の管理画面アクセス問題
+&lt;/h3&gt;&lt;p&gt;ドコモ光時代は簡単に開けた &lt;code&gt;192.168.1.1&lt;/code&gt; ですが、ソフトバンク光環境（TP-Link経由）だと開けないことがあります。
+これは、光BBユニットが作る「&lt;code&gt;192.168.3.x&lt;/code&gt;」というネットワークの中にいるため、外側の「&lt;code&gt;192.168.1.x&lt;/code&gt;」が見えなくなるからです。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;解決策:&lt;/strong&gt; 設定を変えたい時だけ、PCをLANケーブルで直接HGWに繋ぐのが最もストレスのない方法です。日常的にHGWの設定を変えることはないので、これで十分です。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="5-ドコモ光時代よりも快適になったのか実測レビュー"&gt;5. ドコモ光時代よりも快適になったのか？（実測レビュー）
+&lt;/h2&gt;&lt;p&gt;結論から言うと、&lt;strong&gt;「夜間の安定感」はソフトバンク光＋光BBユニット＋TP-Link（APモード）の組み合わせが勝りました。&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;ドコモ光時代:&lt;/strong&gt; プロバイダによっては夜間に数Mbpsまで落ちることがありましたが、&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;現在:&lt;/strong&gt; 常時200Mbps〜500Mbpsをキープ。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;これは、TP-Linkの優れたWi-Fi性能を活かしつつ、ソフトバンクの「IPv6高速ハイブリッド」という太いパイプを通っているおかげです。既存のルーターを捨てずに、役割を変えて再雇用した作戦は大成功でした。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h2 id="6-まとめ乗り換えユーザーへのアドバイス"&gt;6. まとめ：乗り換えユーザーへのアドバイス
+&lt;/h2&gt;&lt;p&gt;ドコモ光で使い慣れたTP-Linkルーターは、ソフトバンク光でも最高のパートナーになります。ただし、以下の3点だけは死守してください。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;strong&gt;「光BBユニット」を必ず上流（HGWの直後）に入れること。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;TP-Linkは「ブリッジモード」に切り替えて、二重ルーターを避けること。&lt;/strong&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;LANケーブルはドコモ光時代のものを流用せず、できれば「CAT6A」へ新調すること。&lt;/strong&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;光回線の乗り換えは、単なる契約の切り替えではなく、自宅のネットワークを「アップグレード」する絶好の機会です。この記事の構成を参考に、ぜひあなたも「最強のリビングWi-Fi環境」を再構築してみてください。&lt;/p&gt;
+&lt;hr&gt;
+&lt;h3 id="付録乗り換え時のネットワークチェックリスト"&gt;付録：乗り換え時のネットワーク・チェックリスト
+&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; 光BBユニットの「インターネット回線」ランプは緑か？&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; TP-Linkの動作モード切り替えスイッチは「AP」側になっているか？&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; リビングのPCから &lt;code&gt;ping 8.8.8.8&lt;/code&gt; を叩いて応答速度（ms）は安定しているか？&lt;/li&gt;
+&lt;li&gt;&lt;input disabled="" type="checkbox"&gt; （重要）ドコモ光の旧ルーター返却品に、自分のTP-Linkを間違えて混ぜていないか？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;今後もこうしたリアルなデジタルライフの改善記録を発信していきます。&lt;/p&gt;
+&lt;div class="ad-container ad-briefs_bottom"&gt;&lt;a href="//af.moshimo.com/af/c/click?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" rel="nofollow" referrerpolicy="no-referrer-when-downgrade" attributionsrc&gt;&lt;img src="//image.moshimo.com/af-img/0032/000000001220.gif" width="468" height="60" style="border:none;"&gt;&lt;/a&gt;&lt;img src="//i.moshimo.com/af/i/impression?a_id=5207614&amp;p_id=54&amp;pc_id=54&amp;pl_id=1220" width="1" height="1" style="border:none;" loading="lazy"&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.ad-container { margin: 16px 0; }
+.ad-placeholder {
+background: var(--card-background);
+border: 1px dashed var(--card-border-color);
+color: var(--card-text-color-secondary);
+border-radius: 8px;
+padding: 12px;
+text-align: center;
+font-size: 0.9rem;
+}
+&lt;/style&gt;</description></item></channel></rss>
