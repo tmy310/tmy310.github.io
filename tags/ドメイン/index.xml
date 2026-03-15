@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ドメイン on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3/</link><description>Recent content in ドメイン on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><lastBuildDate>Sun, 26 Oct 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://firebird-techtalktech.com/tags/%E3%83%89%E3%83%A1%E3%82%A4%E3%83%B3/index.xml" rel="self" type="application/rss+xml"/><item><title>GitHub Pagesに独自ドメインを割り当てる手順とDNSの基礎（レジストラ/レジストリ/NSの関係）</title><link>https://firebird-techtalktech.com/post/github-pages-domain-dns-basics/</link><pubDate>Sun, 26 Oct 2025 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/post/github-pages-domain-dns-basics/</guid><description>&lt;h1 id="概要"&gt;概要
 &lt;/h1&gt;&lt;p&gt;GitHub Pages に独自ドメインを割り当てるための最短手順と、レジストラ・レジストリ・権威DNS・NSレコードなどの用語関係を図解で整理。初心者でも“どこで何を設定するか”がわかるようにまとめました。&lt;/p&gt;
 &lt;blockquote&gt;
-&lt;p&gt;この記事は匿名の個人メモです。 例として &lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;www.example.com&lt;/code&gt; と &lt;code&gt;username.github.io&lt;/code&gt; を使用します。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;この記事は匿名の個人メモです。 例として &lt;code&gt;example.com&lt;/code&gt; / &lt;code&gt;www.example.com&lt;/code&gt; と &lt;code&gt;username.github.io&lt;/code&gt; を使用します。&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;h1 id="0-まず結論最短手順"&gt;0. まず結論（最短手順）
 &lt;/h1&gt;&lt;p&gt;GitHub Pages に独自ドメインをつなぐ最小セットはこれだけ：&lt;/p&gt;
 &lt;ol&gt;
@@ -50,7 +51,8 @@
 &lt;li&gt;DSレコード … DNSSEC を使う場合、親ゾーンに登録する検証用情報。&lt;/li&gt;
 &lt;/ul&gt;
 &lt;blockquote&gt;
-&lt;p&gt;ポイント：レジストラは必ずしも自社DNSを提供するわけではありませんが、多くは権威DNSサービスも提供しています（お名前.comの &lt;code&gt;dnsv.jp&lt;/code&gt; など）。一方、Cloudflare や Route 53 は「レジストラ機能」も「権威DNS」も提供可能です。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;ポイント：レジストラは必ずしも自社DNSを提供するわけではありませんが、多くは権威DNSサービスも提供しています（お名前.comの &lt;code&gt;dnsv.jp&lt;/code&gt; など）。一方、Cloudflare や Route 53 は「レジストラ機能」も「権威DNS」も提供可能です。&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;hr&gt;
 &lt;h1 id="2-名前解決の全体像ざっくり図解"&gt;2. 名前解決の全体像（ざっくり図解）
 &lt;/h1&gt;&lt;div class="mermaid"&gt;
@@ -226,7 +228,8 @@ DNS仕様上、ゾーンの頂点にCNAMEを置くと他レコードと両立で
 &lt;/tbody&gt;
 &lt;/table&gt;
 &lt;blockquote&gt;
-&lt;p&gt;🔁 補足： &lt;code&gt;username.github.io&lt;/code&gt; の部分は、自分のGitHub Pages用URLに置き換えてください。&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;🔁 補足： &lt;code&gt;username.github.io&lt;/code&gt; の部分は、自分のGitHub Pages用URLに置き換えてください。&lt;/p&gt;
+&lt;/blockquote&gt;
 &lt;hr&gt;
 &lt;h3 id="3-注意点"&gt;3. 注意点
 &lt;/h3&gt;&lt;ul&gt;

@@ -1,5 +1,5 @@
-<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="概要 現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\n"><title>🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト</title><link rel=canonical href=https://firebird-techtalktech.com/post/network-security-design-guide/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト"><meta property='og:description' content="概要 現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\n"><meta property='og:url' content='https://firebird-techtalktech.com/post/network-security-design-guide/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='author-created'><meta property='article:tag' content='defense'><meta property='article:tag' content='firewall'><meta property='article:tag' content='gcp'><meta property='article:tag' content='network'><meta property='article:tag' content='python'><meta property='article:tag' content='security'><meta property='article:tag' content='testing'><meta property='article:tag' content='zerotrust'><meta property='article:published_time' content='2025-12-26T00:34:00+09:00'><meta property='article:modified_time' content='2025-12-26T00:34:00+09:00'><meta name=twitter:title content="🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト"><meta name=twitter:description content="概要 現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\n"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor \/ LB \/ IAP で構築する多層防御とゼロトラスト","description":"\u003ch2 id=\u0022概要\u0022\u003e概要\n\u003c\/h2\u003e\u003cp\u003e現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\u003c\/p\u003e","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-12-26T00:34:00\u002b09:00","dateModified":"2025-12-26T00:34:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/network-security-design-guide\/","wordCount":"2613","keywords":["author-created","defense","firewall","gcp","network","python","security","testing","zerotrust"]}</script><meta name=description content="概要
-現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_d7c67b01a0ed7653.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="概要 現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\n"><title>🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト</title><link rel=canonical href=https://firebird-techtalktech.com/post/network-security-design-guide/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト"><meta property='og:description' content="概要 現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\n"><meta property='og:url' content='https://firebird-techtalktech.com/post/network-security-design-guide/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='author-created'><meta property='article:tag' content='defense'><meta property='article:tag' content='firewall'><meta property='article:tag' content='gcp'><meta property='article:tag' content='network'><meta property='article:tag' content='python'><meta property='article:tag' content='security'><meta property='article:tag' content='testing'><meta property='article:tag' content='zerotrust'><meta property='article:published_time' content='2025-12-26T00:34:00+09:00'><meta property='article:modified_time' content='2025-12-26T00:34:00+09:00'><meta name=twitter:title content="🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト"><meta name=twitter:description content="概要 現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\n"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor \/ LB \/ IAP で構築する多層防御とゼロトラスト","description":"\u003ch2 id=\u0022概要\u0022\u003e概要\n\u003c\/h2\u003e\u003cp\u003e現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。\u003c\/p\u003e","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-12-26T00:34:00\u002b09:00","dateModified":"2025-12-26T00:34:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/network-security-design-guide\/","wordCount":"2613","keywords":["author-created","defense","firewall","gcp","network","python","security","testing","zerotrust"]}</script><meta name=description content="概要
+現代のネットワークセキュリティは、従来の境界防御から多層防御・ゼロトラストアーキテクチャへと進化しています。本記事では、GCPにおける実践的なネットワークセキュリティ設計パターン、ファイアウォールルールの体系的設計、ゼロトラストの実装手法について詳しく解説します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
 <button type=submit class=search-button>
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/ class=nav-link>最新記事</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
 <span class=hamburger></span>
@@ -78,28 +78,28 @@
 </span><span class=lnt>24
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Internet → DMZ (HTTPSのみ)</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create allow-dmz-https <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>1000</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>dmz <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --allow<span class=o>=</span>tcp:443
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>1000</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>dmz <span class=se>\
+</span></span></span><span class=line><span class=cl>    --allow<span class=o>=</span>tcp:443
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># HTTP→HTTPS リダイレクトのみ</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create allow-dmz-http-redirect <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>1001</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>dmz <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --allow<span class=o>=</span>tcp:80
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>1001</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>dmz <span class=se>\
+</span></span></span><span class=line><span class=cl>    --allow<span class=o>=</span>tcp:80
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 他全てのポートをブロック</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create deny-dmz-all <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>65534</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>dmz <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --action<span class=o>=</span>DENY <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --rules<span class=o>=</span>all
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>65534</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>dmz <span class=se>\
+</span></span></span><span class=line><span class=cl>    --action<span class=o>=</span>DENY <span class=se>\
+</span></span></span><span class=line><span class=cl>    --rules<span class=o>=</span>all
 </span></span></code></pre></td></tr></table></div></div><h3 id=layer-2-application-layer>Layer 2: Application Layer</h3><p><strong>目的</strong>: アプリケーション固有の脅威対策</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -136,20 +136,20 @@
 </span><span class=lnt>16
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># DMZ → Application (認証済み通信)</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create allow-dmz-to-app <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>1000</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-tags<span class=o>=</span>dmz <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>application <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --allow<span class=o>=</span>tcp:8080,tcp:8443
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>1000</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-tags<span class=o>=</span>dmz <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>application <span class=se>\
+</span></span></span><span class=line><span class=cl>    --allow<span class=o>=</span>tcp:8080,tcp:8443
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 直接外部アクセスを完全ブロック</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create deny-app-external <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>999</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>application <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --action<span class=o>=</span>DENY <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --rules<span class=o>=</span>all
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>999</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>application <span class=se>\
+</span></span></span><span class=line><span class=cl>    --action<span class=o>=</span>DENY <span class=se>\
+</span></span></span><span class=line><span class=cl>    --rules<span class=o>=</span>all
 </span></span></code></pre></td></tr></table></div></div><h3 id=layer-3-data-layer>Layer 3: Data Layer</h3><p><strong>目的</strong>: データへの最終防御線</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -186,20 +186,20 @@
 </span><span class=lnt>16
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Application → Database (最小権限)</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create allow-app-to-db <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>1000</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-tags<span class=o>=</span>application <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>database <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --allow<span class=o>=</span>tcp:5432,tcp:3306
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>1000</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-tags<span class=o>=</span>application <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>database <span class=se>\
+</span></span></span><span class=line><span class=cl>    --allow<span class=o>=</span>tcp:5432,tcp:3306
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 全外部アクセス拒否</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create deny-db-all <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --direction<span class=o>=</span>INGRESS <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>999</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-tags<span class=o>=</span>database <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --action<span class=o>=</span>DENY <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --rules<span class=o>=</span>all
+</span></span></span><span class=line><span class=cl>    --direction<span class=o>=</span>INGRESS <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>999</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --source-ranges<span class=o>=</span>0.0.0.0/0 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-tags<span class=o>=</span>database <span class=se>\
+</span></span></span><span class=line><span class=cl>    --action<span class=o>=</span>DENY <span class=se>\
+</span></span></span><span class=line><span class=cl>    --rules<span class=o>=</span>all
 </span></span></code></pre></td></tr></table></div></div><h2 id=ゼロトラストアーキテクチャ実装>ゼロトラストアーキテクチャ実装</h2><h3 id=ゼロトラストの基本原則>ゼロトラストの基本原則</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -240,18 +240,18 @@
 </span><span class=lnt>14
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># IAP有効化</span>
 </span></span><span class=line><span class=cl>gcloud iap web <span class=nb>enable</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --resource-type<span class=o>=</span>backend-services <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --service<span class=o>=</span>web-app-backend
+</span></span></span><span class=line><span class=cl>    --resource-type<span class=o>=</span>backend-services <span class=se>\
+</span></span></span><span class=line><span class=cl>    --service<span class=o>=</span>web-app-backend
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># OAuth設定</span>
 </span></span><span class=line><span class=cl>gcloud iap oauth-brands create <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --application_title<span class=o>=</span><span class=s2>&#34;Corporate Web App&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --support_email<span class=o>=</span><span class=s2>&#34;security@company.com&#34;</span>
+</span></span></span><span class=line><span class=cl>    --application_title<span class=o>=</span><span class=s2>&#34;Corporate Web App&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --support_email<span class=o>=</span><span class=s2>&#34;security@company.com&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># アクセス制御</span>
 </span></span><span class=line><span class=cl>gcloud projects add-iam-policy-binding PROJECT_ID <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --member<span class=o>=</span><span class=s2>&#34;user:employee@company.com&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --role<span class=o>=</span><span class=s2>&#34;roles/iap.httpsResourceAccessor&#34;</span>
+</span></span></span><span class=line><span class=cl>    --member<span class=o>=</span><span class=s2>&#34;user:employee@company.com&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --role<span class=o>=</span><span class=s2>&#34;roles/iap.httpsResourceAccessor&#34;</span>
 </span></span></code></pre></td></tr></table></div></div><h3 id=beyondcorp実装例>BeyondCorp実装例</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -328,22 +328,22 @@
 </span><span class=lnt>18
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Security Policy作成</span>
 </span></span><span class=line><span class=cl>gcloud compute security-policies create web-app-policy <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --description<span class=o>=</span><span class=s2>&#34;DDoS protection for web application&#34;</span>
+</span></span></span><span class=line><span class=cl>    --description<span class=o>=</span><span class=s2>&#34;DDoS protection for web application&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># Rate limiting rule</span>
 </span></span><span class=line><span class=cl>gcloud compute security-policies rules create <span class=m>1000</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --security-policy<span class=o>=</span>web-app-policy <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --expression<span class=o>=</span><span class=s2>&#34;true&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --action<span class=o>=</span><span class=s2>&#34;rate-based-ban&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --rate-limit-threshold-count<span class=o>=</span><span class=m>100</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --rate-limit-threshold-interval-sec<span class=o>=</span><span class=m>60</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --ban-duration-sec<span class=o>=</span><span class=m>600</span>
+</span></span></span><span class=line><span class=cl>    --security-policy<span class=o>=</span>web-app-policy <span class=se>\
+</span></span></span><span class=line><span class=cl>    --expression<span class=o>=</span><span class=s2>&#34;true&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --action<span class=o>=</span><span class=s2>&#34;rate-based-ban&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --rate-limit-threshold-count<span class=o>=</span><span class=m>100</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --rate-limit-threshold-interval-sec<span class=o>=</span><span class=m>60</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --ban-duration-sec<span class=o>=</span><span class=m>600</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># Geo blocking</span>
 </span></span><span class=line><span class=cl>gcloud compute security-policies rules create <span class=m>2000</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --security-policy<span class=o>=</span>web-app-policy <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --expression<span class=o>=</span><span class=s2>&#34;origin.region_code == &#39;CN&#39;&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --action<span class=o>=</span><span class=s2>&#34;deny-403&#34;</span>
+</span></span></span><span class=line><span class=cl>    --security-policy<span class=o>=</span>web-app-policy <span class=se>\
+</span></span></span><span class=line><span class=cl>    --expression<span class=o>=</span><span class=s2>&#34;origin.region_code == &#39;CN&#39;&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --action<span class=o>=</span><span class=s2>&#34;deny-403&#34;</span>
 </span></span></code></pre></td></tr></table></div></div><h3 id=内部脅威対策>内部脅威対策</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -436,14 +436,14 @@
 </span><span class=lnt>10
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># VPC Flow Logs有効化</span>
 </span></span><span class=line><span class=cl>gcloud compute networks subnets update app-subnet <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --enable-flow-logs <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --logging-flow-sampling<span class=o>=</span>1.0 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --logging-aggregation-interval<span class=o>=</span>interval-1-min
+</span></span></span><span class=line><span class=cl>    --enable-flow-logs <span class=se>\
+</span></span></span><span class=line><span class=cl>    --logging-flow-sampling<span class=o>=</span>1.0 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --logging-aggregation-interval<span class=o>=</span>interval-1-min
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># BigQuery エクスポート</span>
 </span></span><span class=line><span class=cl>gcloud logging sinks create security-analysis <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    bigquery.googleapis.com/projects/PROJECT_ID/datasets/security_logs <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --log-filter<span class=o>=</span><span class=s1>&#39;resource.type=&#34;gce_subnetwork&#34;&#39;</span>
+</span></span></span><span class=line><span class=cl>    bigquery.googleapis.com/projects/PROJECT_ID/datasets/security_logs <span class=se>\
+</span></span></span><span class=line><span class=cl>    --log-filter<span class=o>=</span><span class=s1>&#39;resource.type=&#34;gce_subnetwork&#34;&#39;</span>
 </span></span></code></pre></td></tr></table></div></div><h3 id=siem統合>SIEM統合</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -621,25 +621,25 @@
 </span><span class=lnt>19
 </span><span class=lnt>20
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=cp>#!/bin/bash
-</span></span></span><span class=line><span class=cl><span class=cp></span><span class=c1># セキュリティインシデント自動対応</span>
+</span></span></span><span class=line><span class=cl><span class=c1># セキュリティインシデント自動対応</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 1. 異常な通信を検知</span>
 </span></span><span class=line><span class=cl><span class=nv>suspicious_ip</span><span class=o>=</span><span class=s2>&#34;</span><span class=nv>$1</span><span class=s2>&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 2. 緊急ブロック実行</span>
 </span></span><span class=line><span class=cl>gcloud compute firewall-rules create emergency-block-<span class=k>$(</span>date +%s<span class=k>)</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --source-ranges<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$suspicious_ip</span><span class=s2>/32&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --action<span class=o>=</span>DENY <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --rules<span class=o>=</span>all <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --priority<span class=o>=</span><span class=m>1</span>
+</span></span></span><span class=line><span class=cl>    --source-ranges<span class=o>=</span><span class=s2>&#34;</span><span class=nv>$suspicious_ip</span><span class=s2>/32&#34;</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    --action<span class=o>=</span>DENY <span class=se>\
+</span></span></span><span class=line><span class=cl>    --rules<span class=o>=</span>all <span class=se>\
+</span></span></span><span class=line><span class=cl>    --priority<span class=o>=</span><span class=m>1</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 3. インシデントチームに通知</span>
 </span></span><span class=line><span class=cl>curl -X POST <span class=s2>&#34;</span><span class=nv>$SLACK_WEBHOOK</span><span class=s2>&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    -d <span class=s2>&#34;{&#39;text&#39;:&#39;Security incident detected: </span><span class=nv>$suspicious_ip</span><span class=s2> blocked&#39;}&#34;</span>
+</span></span></span><span class=line><span class=cl>    -d <span class=s2>&#34;{&#39;text&#39;:&#39;Security incident detected: </span><span class=nv>$suspicious_ip</span><span class=s2> blocked&#39;}&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 4. 詳細調査データ収集</span>
 </span></span><span class=line><span class=cl>gcloud logging <span class=nb>read</span> <span class=s2>&#34;resource.type=\&#34;gce_instance\&#34; AND \&#34;</span><span class=nv>$suspicious_ip</span><span class=s2>\&#34;&#34;</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --limit<span class=o>=</span><span class=m>100</span> --format<span class=o>=</span>json &gt; incident_logs.json
+</span></span></span><span class=line><span class=cl>    --limit<span class=o>=</span><span class=m>100</span> --format<span class=o>=</span>json &gt; incident_logs.json
 </span></span></code></pre></td></tr></table></div></div><h2 id=パフォーマンスとセキュリティのバランス>パフォーマンスとセキュリティのバランス</h2><h3 id=セキュリティ設定の最適化>セキュリティ設定の最適化</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -748,7 +748,7 @@
 <a href=/tags/python/>Python</a>
 <a href=/tags/security/>Security</a>
 <a href=/tags/testing/>Testing</a>
-<a href=/tags/zerotrust/>Zerotrust</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/%E9%87%91%E8%9E%8D%E9%AB%98%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E5%90%91%E3%81%91%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E8%A8%88-pci-dss%E6%BA%96%E6%8B%A0/><div class=article-details><h2 class=article-title>🏦 金融・高セキュリティ向けネットワーク設計 - PCI DSS準拠</h2></div></a></article><article><a href=/post/cloud-workstations-secure-architecture/><div class=article-details><h2 class=article-title>Google Cloud Workstationsによるセキュアな開発環境アーキテクチャの設計</h2></div></a></article><article><a href=/post/kcm-installation-comprehensive-guide/><div class=article-details><h2 class=article-title>Keeper Connection Manager (KCM) インストール・設定ガイド - Google Cloud Platform版</h2></div></a></article><article><a href=/post/vpc-service-controls-troubleshooting/><div class=article-details><h2 class=article-title>VPC Service Controls Enforced Mode移行時のトラブルシューティング完全ガイド</h2></div></a></article><article><a href=/post/windows-server%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3baseline%E9%81%A9%E7%94%A8%E6%99%82%E3%81%AE%E6%B3%A8%E6%84%8F%E7%82%B9%E3%81%A8%E3%83%88%E3%83%A9%E3%83%96%E3%83%AB%E3%82%B7%E3%83%A5%E3%83%BC%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0%E5%AE%8C%E5%85%A8%E3%82%AC%E3%82%A4%E3%83%89/><div class=article-details><h2 class=article-title>Windows ServerセキュリティBaseline適用時の注意点とトラブルシューティング完全ガイド</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+<a href=/tags/zerotrust/>Zerotrust</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/%E9%87%91%E8%9E%8D%E9%AB%98%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E5%90%91%E3%81%91%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E8%A8%88-pci-dss%E6%BA%96%E6%8B%A0/><div class=article-details><h2 class=article-title>🏦 金融・高セキュリティ向けネットワーク設計 - PCI DSS準拠</h2></div></a></article><article><a href=/post/cloud-workstations-secure-architecture/><div class=article-details><h2 class=article-title>Google Cloud Workstationsによるセキュアな開発環境アーキテクチャの設計</h2></div></a></article><article><a href=/post/kcm-installation-comprehensive-guide/><div class=article-details><h2 class=article-title>Keeper Connection Manager (KCM) インストール・設定ガイド - Google Cloud Platform版</h2></div></a></article><article><a href=/post/vpc-service-controls-troubleshooting/><div class=article-details><h2 class=article-title>VPC Service Controls Enforced Mode移行時のトラブルシューティング完全ガイド</h2></div></a></article><article><a href=/post/gcp-windows-vm%E3%81%A7%E3%81%AE%E6%B0%B8%E7%B6%9A%E3%83%A6%E3%83%BC%E3%82%B6%E3%83%BC%E7%AE%A1%E7%90%86%E3%81%A8secret-manager%E9%80%A3%E6%90%BA%E3%81%AB%E3%82%88%E3%82%8B%E3%82%BB%E3%82%AD%E3%83%A5%E3%82%A2%E3%81%AA%E8%AA%8D%E8%A8%BC%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A0/><div class=article-details><h2 class=article-title>GCP Windows VMでの永続ユーザー管理とSecret Manager連携によるセキュアな認証システム</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
 2025 -
 2026 トミー</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
 <button class="pswp__button pswp__button--share" title=Share></button>
@@ -769,9 +769,9 @@
 <span class=tag-count>8</span>
 </a><a href=/tags/css/ class=tag-link>CSS
 <span class=tag-count>7</span>
-</a><a href=/tags/devops/ class=tag-link>DevOps
+</a><a href=/tags/devops/ class=tag-link>Devops
 <span class=tag-count>7</span>
 </a><a href=/tags/grpc/ class=tag-link>GRPC
 <span class=tag-count>7</span>
 </a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
-<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (9)</a></li><li><a href=/archives/#2025>2025年 (98)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (10)</a></li><li><a href=/archives/#2025>2025年 (97)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

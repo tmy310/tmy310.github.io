@@ -1,4 +1,4 @@
-<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><title>【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記</title><link rel=canonical href=https://firebird-techtalktech.com/post/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記"><meta property='og:description' content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Protocol Buffer'><meta property='article:tag' content='gRPC'><meta property='article:tag' content='本番障害'><meta property='article:tag' content='破壊的変更'><meta property='article:tag' content='マイクロサービス'><meta property='article:tag' content='障害対応'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2025-09-14T14:30:00+09:00'><meta property='article:modified_time' content='2025-09-14T14:30:00+09:00'><meta name=twitter:title content="【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記"><meta name=twitter:description content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記","description":"Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-14T14:30:00\u002b09:00","dateModified":"2025-09-14T14:30:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98\/","wordCount":"6892","keywords":["Protocol Buffer","gRPC","本番障害","破壊的変更","マイクロサービス","障害対応","author-created"]}</script><meta name=description content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_d7c67b01a0ed7653.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><title>【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記</title><link rel=canonical href=https://firebird-techtalktech.com/post/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記"><meta property='og:description' content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Protocol Buffer'><meta property='article:tag' content='gRPC'><meta property='article:tag' content='本番障害'><meta property='article:tag' content='破壊的変更'><meta property='article:tag' content='マイクロサービス'><meta property='article:tag' content='障害対応'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2025-09-14T14:30:00+09:00'><meta property='article:modified_time' content='2025-09-14T14:30:00+09:00'><meta name=twitter:title content="【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記"><meta name=twitter:description content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記","description":"Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-14T14:30:00\u002b09:00","dateModified":"2025-09-14T14:30:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98\/","wordCount":"6892","keywords":["Protocol Buffer","gRPC","本番障害","破壊的変更","マイクロサービス","障害対応","author-created"]}</script><meta name=description content="Protocol Bufferの破壊的変更を軽く考えて実施した結果、マイクロサービス全体が停止。72時間の地獄の復旧作業から学んだ段階的変更管理の重要性を生々しく記録します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
 <button type=submit class=search-button>
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/ class=nav-link>最新記事</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
 <span class=hamburger></span>
@@ -17,14 +17,14 @@
 </span><span class=lnt>8
 </span><span class=lnt>9
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto (v1.5.0) - 変更前
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>         <span class=c1>// ← これを削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// ← これも削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span> <span class=c1>// ← これも削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>         <span class=c1>// ← これを削除予定
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// ← これも削除予定
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span> <span class=c1>// ← これも削除予定
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p><strong>削除理由：</strong></p><ul><li><code>age</code>: プライバシー要件により廃止</li><li><code>department</code>: 新しいプロフィールシステムに統合済み</li><li><code>legacy_format</code>: 旧システム用で現在未使用</li></ul><p>「誰も使ってないフィールドだし、さくっと削除しちゃお」</p><h3 id=致命的な判断いきなりの削除実行>致命的な判断：いきなりの削除実行</h3><p><strong>午後4時35分 - 運命の commit</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -39,12 +39,12 @@
 </span><span class=lnt>6
 </span><span class=lnt>7
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto (v2.0.0) - 変更後
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// age, department, legacy_format を完全削除
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// age, department, legacy_format を完全削除
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p>「よし、これでスッキリした！」</p><h3 id=午後4時50分最初の異変>午後4時50分：最初の異変</h3><p>Slack に最初のアラートが。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -99,16 +99,16 @@
 </span><span class=lnt>10
 </span><span class=lnt>11
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto (v2.0.1) - 緊急パッチ版
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 緊急復旧：削除したフィールドを復活
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>         <span class=c1>// 緊急復旧
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// 緊急復旧  
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span> <span class=c1>// 緊急復旧
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 緊急復旧：削除したフィールドを復活
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>         <span class=c1>// 緊急復旧
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// 緊急復旧  
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span> <span class=c1>// 緊急復旧
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p><strong>午後11時30分 - デプロイ実行</strong></p><p><strong>結果：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -135,10 +135,10 @@
 </span><span class=lnt>4
 </span><span class=lnt>5
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-sql data-lang=sql><span class=line><span class=cl><span class=c1>-- analytics データベース  
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>SELECT</span><span class=w> </span><span class=n>user_id</span><span class=p>,</span><span class=w> </span><span class=n>age</span><span class=p>,</span><span class=w> </span><span class=n>department</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>user_analytics</span><span class=w> 
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=k>WHERE</span><span class=w> </span><span class=n>created_at</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=s1>&#39;2025-08-23 16:30:00&#39;</span><span class=p>;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=k>SELECT</span><span class=w> </span><span class=n>user_id</span><span class=p>,</span><span class=w> </span><span class=n>age</span><span class=p>,</span><span class=w> </span><span class=n>department</span><span class=w> </span><span class=k>FROM</span><span class=w> </span><span class=n>user_analytics</span><span class=w> 
+</span></span></span><span class=line><span class=cl><span class=k>WHERE</span><span class=w> </span><span class=n>created_at</span><span class=w> </span><span class=o>&gt;</span><span class=w> </span><span class=s1>&#39;2025-08-23 16:30:00&#39;</span><span class=p>;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=c1>-- 結果: 3時間分のデータで age と department が NULL
+</span></span></span><span class=line><span class=cl><span class=c1>-- 結果: 3時間分のデータで age と department が NULL
 </span></span></span></code></pre></td></tr></table></div></div><p>「3時間で30万件のデータが破損&mldr;これどうやって修復するんだ&mldr;」</p><h3 id=修復戦略の検討>修復戦略の検討</h3><p><strong>選択肢1: バックアップからの復旧</strong></p><ul><li>影響：3時間分のデータロス</li><li>作業時間：6-8時間</li><li>リスク：中</li></ul><p><strong>選択肢2: 手動データ補完</strong></p><ul><li>影響：データロスなし</li><li>作業時間：20-30時間</li><li>リスク：高（人的ミス）</li></ul><p><strong>選択肢3: 機械学習による補完</strong></p><ul><li>影響：推定値での補完</li><li>作業時間：10-15時間</li><li>リスク：中（推定誤差）</li></ul><h3 id=午前11時修復戦略の決定>午前11時：修復戦略の決定</h3><p>チームで協議の結果、<strong>組み合わせ戦略</strong>を採用。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -160,8 +160,8 @@
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 分析データの ML補完</span>
 </span></span><span class=line><span class=cl>python ml_data_restoration.py <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>  --missing-fields age,department <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>  --time-range <span class=s2>&#34;2025-08-23 16:30 - 19:30&#34;</span>
+</span></span></span><span class=line><span class=cl>  --missing-fields age,department <span class=se>\
+</span></span></span><span class=line><span class=cl>  --time-range <span class=s2>&#34;2025-08-23 16:30 - 19:30&#34;</span>
 </span></span><span class=line><span class=cl>  
 </span></span><span class=line><span class=cl><span class=c1># ログデータの手動修復  </span>
 </span></span><span class=line><span class=cl>./manual_log_fix.sh user-service <span class=m>20250823</span>
@@ -241,22 +241,22 @@
 </span><span class=lnt>18
 </span><span class=lnt>19
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## 破壊的変更チェックリスト
-</span></span></span><span class=line><span class=cl><span class=gu></span>
+</span></span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 事前調査  
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 影響範囲の完全な調査完了
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 影響範囲の完全な調査完了
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 依存サービスリストの作成  
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 既存クライアントの特定
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> ロールバック戦略の策定
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> データ移行計画の作成
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### リスク評価
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> ビジネスインパクト評価
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> ビジネスインパクト評価
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 技術的リスク評価  
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 復旧時間見積もり
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 代替案の検討
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 承認プロセス
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> テックリード承認
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> テックリード承認
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> CTO承認  
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> ビジネス側承認
 </span></span></code></pre></td></tr></table></div></div><h4 id=phase-1-非推奨マーク新api追加>Phase 1: 非推奨マーク・新API追加</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -275,20 +275,20 @@
 </span><span class=lnt>14
 </span><span class=lnt>15
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// 新しいアプローチ（段階的変更）
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 段階1：非推奨マーク（削除予定を明示）
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span>         <span class=c1>// 削除予定: 2025-12-31
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 削除予定: 2025-12-31
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 削除予定: 2025-12-31
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 新フィールド追加
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span>      <span class=c1>// age の代替
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span>    <span class=c1>// department の代替  
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 段階1：非推奨マーク（削除予定を明示）
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span>         <span class=c1>// 削除予定: 2025-12-31
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 削除予定: 2025-12-31
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 削除予定: 2025-12-31
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 新フィールド追加
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span>      <span class=c1>// age の代替
+</span></span></span><span class=line><span class=cl>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span>    <span class=c1>// department の代替  
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p><strong>Phase 1での運用：</strong></p><ul><li>期間：3ヶ月</li><li>監視：非推奨API使用状況の継続監視</li><li>通知：依存チームへの移行案内</li><li>サポート：移行支援の提供</li></ul><h4 id=phase-2-移行促進期間>Phase 2: 移行促進期間</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -304,19 +304,19 @@
 </span><span class=lnt>13
 </span><span class=lnt>14
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// Phase 2: 移行期間中の設定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 段階2：警告レベル引き上げ
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span>         <span class=c1>// 警告：2025-11-30削除
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 警告：2025-11-30削除
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 警告：2025-11-30削除
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 段階2：警告レベル引き上げ
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span>         <span class=c1>// 警告：2025-11-30削除
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 警告：2025-11-30削除
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>6</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span> <span class=c1>// 警告：2025-11-30削除
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p><strong>Phase 2での運用：</strong></p><ul><li>期間：2ヶ月</li><li>目標：非推奨API使用率 &lt; 10%</li><li>警告：ログレベルでの警告出力強化</li><li>支援：移行が困難なチームへの個別支援</li></ul><h4 id=phase-3-削除実行>Phase 3: 削除実行</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -330,17 +330,17 @@
 </span><span class=lnt>11
 </span><span class=lnt>12
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// Phase 3: 安全な削除
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 削除済みフィールドの番号を予約
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>6</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>,</span> <span class=s>&#34;department&#34;</span><span class=p>,</span> <span class=s>&#34;legacy_format&#34;</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 削除済みフィールドの番号を予約
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>,</span> <span class=mi>6</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>,</span> <span class=s>&#34;department&#34;</span><span class=p>,</span> <span class=s>&#34;legacy_format&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p><strong>Phase 3での運用：</strong></p><ul><li>実施時期：非推奨API使用率 &lt; 5% を確認後</li><li>メジャーバージョンアップとして実施</li><li>reserved による番号保護</li><li>詳細なリリースノート作成</li></ul><h3 id=自動化ツールの導入>自動化ツールの導入</h3><p>手動プロセスだけでは限界があるため、自動化ツールも導入しました。</p><h4 id=破壊的変更検出ツール>破壊的変更検出ツール</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -365,9 +365,9 @@
 </span><span class=lnt>22
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Proto互換性チェック  </span>
 </span></span><span class=line><span class=cl>proto-compatibility-check <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>  --old-proto user_service_v1.proto <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>  --new-proto user_service_v2.proto <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>  --strict-mode
+</span></span></span><span class=line><span class=cl>  --old-proto user_service_v1.proto <span class=se>\
+</span></span></span><span class=line><span class=cl>  --new-proto user_service_v2.proto <span class=se>\
+</span></span></span><span class=line><span class=cl>  --strict-mode
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 出力例</span>
 </span></span><span class=line><span class=cl>❌ BREAKING CHANGE DETECTED:
@@ -433,19 +433,19 @@
 </span><span class=lnt>14
 </span><span class=lnt>15
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## 破壊的変更管理ダッシュボード
-</span></span></span><span class=line><span class=cl><span class=gu></span>
+</span></span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 現在のステータス
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> Phase 1 (非推奨マーク): user_service v2.1.0
+</span></span></span><span class=line><span class=cl><span class=k>-</span> Phase 1 (非推奨マーク): user_service v2.1.0
 </span></span><span class=line><span class=cl><span class=k>-</span> 削除予定日: 2025-12-31
 </span></span><span class=line><span class=cl><span class=k>-</span> 残り日数: 108日
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 移行進捗  
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> user_service.User.age使用率: 23% ↓ (目標: &lt;10%)
+</span></span></span><span class=line><span class=cl><span class=k>-</span> user_service.User.age使用率: 23% ↓ (目標: &lt;10%)
 </span></span><span class=line><span class=cl><span class=k>-</span> user_service.User.department使用率: 15% ↓ (目標: &lt;10%)
 </span></span><span class=line><span class=cl><span class=k>-</span> user_service.User.legacy_format使用率: 3% ✅ (目標達成)
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### アラート
-</span></span></span><span class=line><span class=cl><span class=gu></span>⚠️  payment-service: age フィールド使用量が増加中
+</span></span></span><span class=line><span class=cl>⚠️  payment-service: age フィールド使用量が増加中
 </span></span><span class=line><span class=cl>✅ notification-service: department フィールド移行完了
 </span></span></code></pre></td></tr></table></div></div><h2 id=第八章新プロセスの効果と学び>第八章：新プロセスの効果と学び</h2><h3 id=初回適用success-story>初回適用：success story</h3><p>新プロセスを初めて適用したのは、3ヶ月後の order-service の変更でした。</p><p><strong>変更内容：</strong></p><ul><li><code>payment_method</code> フィールドの削除</li><li>新しい <code>payment_info</code> 構造体への移行</li></ul><p><strong>結果：</strong></p><ul><li>計画期間：6ヶ月</li><li>実際の削除実行：無事故で完了</li><li>ダウンタイム：0分</li><li>ビジネスインパクト：なし</li></ul><p>「やっと正しいやり方を覚えた&mldr;」</p><h3 id=チーム文化の変化>チーム文化の変化</h3><p>この障害を境に、チーム全体の意識が劇的に変わりました。</p><p><strong>Before（障害前）:</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
@@ -502,27 +502,27 @@
 </span><span class=lnt>25
 </span><span class=lnt>26
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## Phase 0: 事前準備（必須）
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 破壊的変更影響調査完了
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 破壊的変更影響調査完了
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 依存サービス一覧作成（最低10サービス調査）  
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 既存クライアント使用状況調査
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> ビジネス影響度評価（売上・顧客への影響）
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> テックリード・CTO承認取得
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 1: 非推奨化（3ヶ月以上）
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> deprecated マーク追加
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> deprecated マーク追加
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 代替手段の提供
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 移行ガイド作成・共有
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 使用状況監視開始  
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 定期的な移行状況レポート
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 2: 移行促進（2ヶ月以上）
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 使用率50%以下を確認
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 使用率50%以下を確認
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 警告レベル引き上げ
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 個別チーム移行支援  
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 削除予定日の明確化・通知
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 3: 削除実行
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 使用率5%以下を確認
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 使用率5%以下を確認
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> メジャーバージョンアップとして実施
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> reserved設定でフィールド保護
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 復旧チーム待機での実行（平日午前中）
@@ -555,9 +555,9 @@
 <span class=tag-count>8</span>
 </a><a href=/tags/css/ class=tag-link>CSS
 <span class=tag-count>7</span>
-</a><a href=/tags/devops/ class=tag-link>DevOps
+</a><a href=/tags/devops/ class=tag-link>Devops
 <span class=tag-count>7</span>
 </a><a href=/tags/grpc/ class=tag-link>GRPC
 <span class=tag-count>7</span>
 </a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
-<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (9)</a></li><li><a href=/archives/#2025>2025年 (98)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (10)</a></li><li><a href=/archives/#2025>2025年 (97)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

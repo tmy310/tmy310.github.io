@@ -1,4 +1,4 @@
-<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><title>CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化</title><link rel=canonical href=https://firebird-techtalktech.com/post/css%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80%E7%AC%AC9%E5%9B%9E%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96-%E9%AB%98%E9%80%9F%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%A8%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%9C%80%E9%81%A9%E5%8C%96/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化"><meta property='og:description' content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/css%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80%E7%AC%AC9%E5%9B%9E%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96-%E9%AB%98%E9%80%9F%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%A8%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%9C%80%E9%81%A9%E5%8C%96/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='CSS'><meta property='article:tag' content='パフォーマンス最適化'><meta property='article:tag' content='Critical CSS'><meta property='article:tag' content='画像最適化'><meta property='article:tag' content='レンダリング最適化'><meta property='article:tag' content='Web Vitals'><meta property='article:published_time' content='2025-09-13T20:00:00+09:00'><meta property='article:modified_time' content='2025-09-13T20:00:00+09:00'><meta name=twitter:title content="CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化"><meta name=twitter:description content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化","description":"CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-13T20:00:00\u002b09:00","dateModified":"2025-09-13T20:00:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/css%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80%E7%AC%AC9%E5%9B%9E%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96-%E9%AB%98%E9%80%9F%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%A8%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%9C%80%E9%81%A9%E5%8C%96\/","wordCount":"4325","keywords":["CSS","パフォーマンス最適化","Critical CSS","画像最適化","レンダリング最適化","Web Vitals"]}</script><meta name=description content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_d7c67b01a0ed7653.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><title>CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化</title><link rel=canonical href=https://firebird-techtalktech.com/post/css%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80%E7%AC%AC9%E5%9B%9E%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96-%E9%AB%98%E9%80%9F%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%A8%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%9C%80%E9%81%A9%E5%8C%96/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化"><meta property='og:description' content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/css%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80%E7%AC%AC9%E5%9B%9E%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96-%E9%AB%98%E9%80%9F%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%A8%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%9C%80%E9%81%A9%E5%8C%96/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='CSS'><meta property='article:tag' content='パフォーマンス最適化'><meta property='article:tag' content='Critical CSS'><meta property='article:tag' content='画像最適化'><meta property='article:tag' content='レンダリング最適化'><meta property='article:tag' content='Web Vitals'><meta property='article:published_time' content='2025-09-13T20:00:00+09:00'><meta property='article:modified_time' content='2025-09-13T20:00:00+09:00'><meta name=twitter:title content="CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化"><meta name=twitter:description content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"CSS実践入門第9回：パフォーマンス最適化 - 高速読み込みとレンダリング最適化","description":"CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-13T20:00:00\u002b09:00","dateModified":"2025-09-13T20:00:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/css%E5%AE%9F%E8%B7%B5%E5%85%A5%E9%96%80%E7%AC%AC9%E5%9B%9E%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E6%9C%80%E9%81%A9%E5%8C%96-%E9%AB%98%E9%80%9F%E8%AA%AD%E3%81%BF%E8%BE%BC%E3%81%BF%E3%81%A8%E3%83%AC%E3%83%B3%E3%83%80%E3%83%AA%E3%83%B3%E3%82%B0%E6%9C%80%E9%81%A9%E5%8C%96\/","wordCount":"4325","keywords":["CSS","パフォーマンス最適化","Critical CSS","画像最適化","レンダリング最適化","Web Vitals"]}</script><meta name=description content="CSS・フロントエンドのパフォーマンス最適化手法を詳しく解説。Critical CSS、画像最適化、レンダリングブロッキングの回避など、高速なWebサイトを実現するテクニックを紹介します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
 <button type=submit class=search-button>
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/ class=nav-link>最新記事</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
 <span class=hamburger></span>
@@ -238,22 +238,22 @@
 </span><span class=lnt>57
 </span><span class=lnt>58
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// Critical CSS 抽出ツール（Node.js）
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>critical</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;critical&#39;</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>critical</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;critical&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>path</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;path&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kr>async</span> <span class=kd>function</span> <span class=nx>generateCriticalCSS</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>try</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kr>await</span> <span class=nx>critical</span><span class=p>.</span><span class=nx>generate</span><span class=p>({</span>
 </span></span><span class=line><span class=cl>            <span class=c1>// ベースとなるHTML
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>base</span><span class=o>:</span> <span class=s1>&#39;dist/&#39;</span><span class=p>,</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>base</span><span class=o>:</span> <span class=s1>&#39;dist/&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>src</span><span class=o>:</span> <span class=s1>&#39;index.html&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>dest</span><span class=o>:</span> <span class=s1>&#39;index-critical.html&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// CSS ファイル
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>css</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;css/main.css&#39;</span><span class=p>],</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>css</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;css/main.css&#39;</span><span class=p>],</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// ビューポートサイズ
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>dimensions</span><span class=o>:</span> <span class=p>[</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>dimensions</span><span class=o>:</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>                <span class=p>{</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>height</span><span class=o>:</span> <span class=mi>900</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>width</span><span class=o>:</span> <span class=mi>1300</span>
@@ -265,21 +265,21 @@
 </span></span><span class=line><span class=cl>            <span class=p>],</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 抽出設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>penthouse</span><span class=o>:</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>penthouse</span><span class=o>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>blockJSRequests</span><span class=o>:</span> <span class=kc>false</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=p>},</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// インライン挿入
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>inline</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>inline</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 元のCSS削除
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>extract</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>extract</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 最小化
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>minify</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>minify</span><span class=o>:</span> <span class=kc>true</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 無視するCSS
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>ignore</span><span class=o>:</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>ignore</span><span class=o>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>atrule</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;@font-face&#39;</span><span class=p>],</span>
 </span></span><span class=line><span class=cl>                <span class=nx>rule</span><span class=o>:</span> <span class=p>[</span><span class=sr>/some-unused-class/</span><span class=p>],</span>
 </span></span><span class=line><span class=cl>                <span class=nx>decl</span><span class=o>:</span> <span class=p>(</span><span class=nx>node</span><span class=p>,</span> <span class=nx>value</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
@@ -537,7 +537,7 @@
 </span></span><span class=line><span class=cl>        <span class=nx>img</span><span class=p>.</span><span class=nx>classList</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=s1>&#39;lazy-image&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// 低品質プレースホルダー
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=nx>img</span><span class=p>.</span><span class=nx>dataset</span><span class=p>.</span><span class=nx>placeholder</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nx>img</span><span class=p>.</span><span class=nx>dataset</span><span class=p>.</span><span class=nx>placeholder</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=nx>img</span><span class=p>.</span><span class=nx>src</span> <span class=o>=</span> <span class=nx>img</span><span class=p>.</span><span class=nx>dataset</span><span class=p>.</span><span class=nx>placeholder</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>options</span><span class=p>.</span><span class=nx>enableBlur</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>img</span><span class=p>.</span><span class=nx>classList</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=s1>&#39;lazy-blur&#39;</span><span class=p>);</span>
@@ -562,7 +562,7 @@
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=k>try</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=c1>// 画像プリロード
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=kr>const</span> <span class=nx>imageLoader</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Image</span><span class=p>();</span>
+</span></span></span><span class=line><span class=cl>            <span class=kr>const</span> <span class=nx>imageLoader</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Image</span><span class=p>();</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nx>srcset</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>imageLoader</span><span class=p>.</span><span class=nx>srcset</span> <span class=o>=</span> <span class=nx>srcset</span><span class=p>;</span>
@@ -570,19 +570,19 @@
 </span></span><span class=line><span class=cl>            <span class=nx>imageLoader</span><span class=p>.</span><span class=nx>src</span> <span class=o>=</span> <span class=nx>src</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 画像読み込み完了を待つ
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=kr>await</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>((</span><span class=nx>resolve</span><span class=p>,</span> <span class=nx>reject</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=kr>await</span> <span class=k>new</span> <span class=nb>Promise</span><span class=p>((</span><span class=nx>resolve</span><span class=p>,</span> <span class=nx>reject</span><span class=p>)</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>imageLoader</span><span class=p>.</span><span class=nx>onload</span> <span class=o>=</span> <span class=nx>resolve</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>                <span class=nx>imageLoader</span><span class=p>.</span><span class=nx>onerror</span> <span class=o>=</span> <span class=nx>reject</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=p>});</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 画像を適用
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=p>(</span><span class=nx>srcset</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nx>srcset</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>img</span><span class=p>.</span><span class=nx>srcset</span> <span class=o>=</span> <span class=nx>srcset</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=p>}</span>
 </span></span><span class=line><span class=cl>            <span class=nx>img</span><span class=p>.</span><span class=nx>src</span> <span class=o>=</span> <span class=nx>src</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// ロード完了時の処理
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>img</span><span class=p>.</span><span class=nx>onload</span> <span class=o>=</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>img</span><span class=p>.</span><span class=nx>onload</span> <span class=o>=</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>img</span><span class=p>.</span><span class=nx>classList</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=s1>&#39;loaded&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>                <span class=nx>img</span><span class=p>.</span><span class=nx>classList</span><span class=p>.</span><span class=nx>remove</span><span class=p>(</span><span class=s1>&#39;lazy-blur&#39;</span><span class=p>,</span> <span class=s1>&#39;image-skeleton&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>            <span class=p>};</span>
@@ -595,7 +595,7 @@
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 初期化
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;DOMContentLoaded&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;DOMContentLoaded&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>new</span> <span class=nx>LazyImageLoader</span><span class=p>({</span>
 </span></span><span class=line><span class=cl>        <span class=nx>rootMargin</span><span class=o>:</span> <span class=s1>&#39;100px 0px&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>        <span class=nx>enableBlur</span><span class=o>:</span> <span class=kc>true</span>
@@ -833,7 +833,7 @@
 </span><span class=lnt>50
 </span><span class=lnt>51
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// PurgeCSS 設定例
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>purgecss</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;@fullhuman/postcss-purgecss&#39;</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>purgecss</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;@fullhuman/postcss-purgecss&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=nx>module</span><span class=p>.</span><span class=nx>exports</span> <span class=o>=</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nx>plugins</span><span class=o>:</span> <span class=p>[</span>
@@ -845,7 +845,7 @@
 </span></span><span class=line><span class=cl>            <span class=p>],</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 保持するクラス（動的に生成される）
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>safelist</span><span class=o>:</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>safelist</span><span class=o>:</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>standard</span><span class=o>:</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>                    <span class=s1>&#39;active&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>                    <span class=s1>&#39;disabled&#39;</span><span class=p>,</span>
@@ -858,7 +858,7 @@
 </span></span><span class=line><span class=cl>            <span class=p>},</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// カスタム抽出器
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>extractors</span><span class=o>:</span> <span class=p>[</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>extractors</span><span class=o>:</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>                <span class=p>{</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>extractor</span><span class=o>:</span> <span class=nx>content</span> <span class=p>=&gt;</span> <span class=nx>content</span><span class=p>.</span><span class=nx>match</span><span class=p>(</span><span class=sr>/[\w-/:]+(?&lt;!:)/g</span><span class=p>)</span> <span class=o>||</span> <span class=p>[],</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>extensions</span><span class=o>:</span> <span class=p>[</span><span class=s1>&#39;html&#39;</span><span class=p>,</span> <span class=s1>&#39;js&#39;</span><span class=p>,</span> <span class=s1>&#39;vue&#39;</span><span class=p>]</span>
@@ -866,12 +866,12 @@
 </span></span><span class=line><span class=cl>            <span class=p>],</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1>// 削除しないセレクター
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=nx>rejected</span><span class=o>:</span> <span class=kc>false</span><span class=p>,</span>
+</span></span></span><span class=line><span class=cl>            <span class=nx>rejected</span><span class=o>:</span> <span class=kc>false</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>printRejected</span><span class=o>:</span> <span class=kc>false</span>
 </span></span><span class=line><span class=cl>        <span class=p>}),</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// CSS 最小化
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;cssnano&#39;</span><span class=p>)({</span>
+</span></span></span><span class=line><span class=cl>        <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;cssnano&#39;</span><span class=p>)({</span>
 </span></span><span class=line><span class=cl>            <span class=nx>preset</span><span class=o>:</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>                <span class=s1>&#39;default&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>                <span class=p>{</span>
@@ -967,7 +967,7 @@
 </span><span class=lnt>50
 </span><span class=lnt>51
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// CSS の動的読み込み
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>CSSLoader</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=kr>class</span> <span class=nx>CSSLoader</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kr>static</span> <span class=nx>loadedStylesheets</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Set</span><span class=p>();</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=kr>static</span> <span class=kr>async</span> <span class=nx>loadCSS</span><span class=p>(</span><span class=nx>href</span><span class=p>,</span> <span class=nx>media</span> <span class=o>=</span> <span class=s1>&#39;all&#39;</span><span class=p>)</span> <span class=p>{</span>
@@ -993,7 +993,7 @@
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=c1>// コンポーネント使用時の CSS 読み込み
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kr>static</span> <span class=kr>async</span> <span class=nx>loadComponentCSS</span><span class=p>(</span><span class=nx>componentName</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>    <span class=kr>static</span> <span class=kr>async</span> <span class=nx>loadComponentCSS</span><span class=p>(</span><span class=nx>componentName</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kr>const</span> <span class=nx>cssMap</span> <span class=o>=</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=s1>&#39;modal&#39;</span><span class=o>:</span> <span class=s1>&#39;/css/components/modal.css&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=s1>&#39;carousel&#39;</span><span class=o>:</span> <span class=s1>&#39;/css/components/carousel.css&#39;</span><span class=p>,</span>
@@ -1008,13 +1008,13 @@
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 使用例
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>ModalComponent</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=kr>class</span> <span class=nx>ModalComponent</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kr>async</span> <span class=nx>show</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=c1>// モーダル表示前に CSS を読み込み
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kr>await</span> <span class=nx>CSSLoader</span><span class=p>.</span><span class=nx>loadComponentCSS</span><span class=p>(</span><span class=s1>&#39;modal&#39;</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl>        <span class=kr>await</span> <span class=nx>CSSLoader</span><span class=p>.</span><span class=nx>loadComponentCSS</span><span class=p>(</span><span class=s1>&#39;modal&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// モーダル表示処理
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>this</span><span class=p>.</span><span class=nx>element</span><span class=p>.</span><span class=nx>classList</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=s1>&#39;modal--active&#39;</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>element</span><span class=p>.</span><span class=nx>classList</span><span class=p>.</span><span class=nx>add</span><span class=p>(</span><span class=s1>&#39;modal--active&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span></code></pre></td></tr></table></div></div><h2 id=5-javascript-最適化>5. JavaScript 最適化</h2><h3 id=コード分割と遅延読み込み>コード分割と遅延読み込み</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -1088,7 +1088,7 @@
 </span><span class=lnt>69
 </span><span class=lnt>70
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// 動的インポートによるコード分割
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>ComponentLoader</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=kr>class</span> <span class=nx>ComponentLoader</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=kr>static</span> <span class=nx>componentCache</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>Map</span><span class=p>();</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=kr>static</span> <span class=kr>async</span> <span class=nx>loadComponent</span><span class=p>(</span><span class=nx>name</span><span class=p>)</span> <span class=p>{</span>
@@ -1118,7 +1118,7 @@
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// Intersection Observer で必要時に読み込み
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>class</span> <span class=nx>LazyComponentLoader</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=kr>class</span> <span class=nx>LazyComponentLoader</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nx>constructor</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>componentObserver</span> <span class=o>=</span> <span class=k>new</span> <span class=nx>IntersectionObserver</span><span class=p>(</span>
 </span></span><span class=line><span class=cl>            <span class=k>this</span><span class=p>.</span><span class=nx>handleComponentIntersection</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>),</span>
@@ -1154,7 +1154,7 @@
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 初期化
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;DOMContentLoaded&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;DOMContentLoaded&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>new</span> <span class=nx>LazyComponentLoader</span><span class=p>();</span>
 </span></span><span class=line><span class=cl><span class=p>});</span>
 </span></span></code></pre></td></tr></table></div></div><h3 id=service-worker-による-キャッシュ最適化>Service Worker による キャッシュ最適化</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -1216,7 +1216,7 @@
 </span><span class=lnt>57
 </span><span class=lnt>58
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// service-worker.js
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>CACHE_NAME</span> <span class=o>=</span> <span class=s1>&#39;site-cache-v1&#39;</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>CACHE_NAME</span> <span class=o>=</span> <span class=s1>&#39;site-cache-v1&#39;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>STATIC_CACHE_URLS</span> <span class=o>=</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>    <span class=s1>&#39;/&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>    <span class=s1>&#39;/css/critical.css&#39;</span><span class=p>,</span>
@@ -1225,7 +1225,7 @@
 </span></span><span class=line><span class=cl><span class=p>];</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// インストール時の処理
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>self</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;install&#39;</span><span class=p>,</span> <span class=nx>event</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=nx>self</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;install&#39;</span><span class=p>,</span> <span class=nx>event</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nx>event</span><span class=p>.</span><span class=nx>waitUntil</span><span class=p>(</span>
 </span></span><span class=line><span class=cl>        <span class=nx>caches</span><span class=p>.</span><span class=nx>open</span><span class=p>(</span><span class=nx>CACHE_NAME</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>            <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>cache</span> <span class=p>=&gt;</span> <span class=nx>cache</span><span class=p>.</span><span class=nx>addAll</span><span class=p>(</span><span class=nx>STATIC_CACHE_URLS</span><span class=p>))</span>
@@ -1234,9 +1234,9 @@
 </span></span><span class=line><span class=cl><span class=p>});</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// フェッチ時の処理
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nx>self</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;fetch&#39;</span><span class=p>,</span> <span class=nx>event</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=nx>self</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;fetch&#39;</span><span class=p>,</span> <span class=nx>event</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=c1>// CSS・JS・画像の キャッシュ戦略
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=k>if</span> <span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>request</span><span class=p>.</span><span class=nx>destination</span> <span class=o>===</span> <span class=s1>&#39;style&#39;</span> <span class=o>||</span> 
+</span></span></span><span class=line><span class=cl>    <span class=k>if</span> <span class=p>(</span><span class=nx>event</span><span class=p>.</span><span class=nx>request</span><span class=p>.</span><span class=nx>destination</span> <span class=o>===</span> <span class=s1>&#39;style&#39;</span> <span class=o>||</span> 
 </span></span><span class=line><span class=cl>        <span class=nx>event</span><span class=p>.</span><span class=nx>request</span><span class=p>.</span><span class=nx>destination</span> <span class=o>===</span> <span class=s1>&#39;script&#39;</span> <span class=o>||</span> 
 </span></span><span class=line><span class=cl>        <span class=nx>event</span><span class=p>.</span><span class=nx>request</span><span class=p>.</span><span class=nx>destination</span> <span class=o>===</span> <span class=s1>&#39;image&#39;</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        
@@ -1262,7 +1262,7 @@
 </span></span><span class=line><span class=cl><span class=p>});</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// メインスレッドでの Service Worker 登録
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>if</span> <span class=p>(</span><span class=s1>&#39;serviceWorker&#39;</span> <span class=k>in</span> <span class=nx>navigator</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=k>if</span> <span class=p>(</span><span class=s1>&#39;serviceWorker&#39;</span> <span class=k>in</span> <span class=nx>navigator</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nb>window</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;load&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=nx>navigator</span><span class=p>.</span><span class=nx>serviceWorker</span><span class=p>.</span><span class=nx>register</span><span class=p>(</span><span class=s1>&#39;/service-worker.js&#39;</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>            <span class=p>.</span><span class=nx>then</span><span class=p>(</span><span class=nx>registration</span> <span class=p>=&gt;</span> <span class=p>{</span>
@@ -1401,14 +1401,14 @@
 </span><span class=lnt>126
 </span><span class=lnt>127
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// Core Web Vitals の測定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>import</span> <span class=p>{</span><span class=nx>getLCP</span><span class=p>,</span> <span class=nx>getFID</span><span class=p>,</span> <span class=nx>getCLS</span><span class=p>,</span> <span class=nx>getFCP</span><span class=p>,</span> <span class=nx>getTTFB</span><span class=p>}</span> <span class=nx>from</span> <span class=s1>&#39;web-vitals&#39;</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl><span class=kr>import</span> <span class=p>{</span><span class=nx>getLCP</span><span class=p>,</span> <span class=nx>getFID</span><span class=p>,</span> <span class=nx>getCLS</span><span class=p>,</span> <span class=nx>getFCP</span><span class=p>,</span> <span class=nx>getTTFB</span><span class=p>}</span> <span class=nx>from</span> <span class=s1>&#39;web-vitals&#39;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=kr>class</span> <span class=nx>PerformanceMonitor</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=nx>constructor</span><span class=p>(</span><span class=nx>options</span> <span class=o>=</span> <span class=p>{})</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>options</span> <span class=o>=</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=nx>reportEndpoint</span><span class=o>:</span> <span class=s1>&#39;/api/performance&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>sampleRate</span><span class=o>:</span> <span class=mf>0.1</span><span class=p>,</span> <span class=c1>// 10%のサンプリング
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=p>...</span><span class=nx>options</span>
+</span></span></span><span class=line><span class=cl>            <span class=p>...</span><span class=nx>options</span>
 </span></span><span class=line><span class=cl>        <span class=p>};</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>metrics</span> <span class=o>=</span> <span class=p>{};</span>
@@ -1417,19 +1417,19 @@
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=nx>init</span><span class=p>()</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=c1>// サンプリング判定
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=nb>Math</span><span class=p>.</span><span class=nx>random</span><span class=p>()</span> <span class=o>&gt;</span> <span class=k>this</span><span class=p>.</span><span class=nx>options</span><span class=p>.</span><span class=nx>sampleRate</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nb>Math</span><span class=p>.</span><span class=nx>random</span><span class=p>()</span> <span class=o>&gt;</span> <span class=k>this</span><span class=p>.</span><span class=nx>options</span><span class=p>.</span><span class=nx>sampleRate</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=k>return</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// Core Web Vitals の測定
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nx>getLCP</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>handleMetric</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;LCP&#39;</span><span class=p>));</span>
+</span></span></span><span class=line><span class=cl>        <span class=nx>getLCP</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>handleMetric</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;LCP&#39;</span><span class=p>));</span>
 </span></span><span class=line><span class=cl>        <span class=nx>getFID</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>handleMetric</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;FID&#39;</span><span class=p>));</span>
 </span></span><span class=line><span class=cl>        <span class=nx>getCLS</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>handleMetric</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;CLS&#39;</span><span class=p>));</span>
 </span></span><span class=line><span class=cl>        <span class=nx>getFCP</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>handleMetric</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;FCP&#39;</span><span class=p>));</span>
 </span></span><span class=line><span class=cl>        <span class=nx>getTTFB</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>handleMetric</span><span class=p>.</span><span class=nx>bind</span><span class=p>(</span><span class=k>this</span><span class=p>,</span> <span class=s1>&#39;TTFB&#39;</span><span class=p>));</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// ページアンロード時にレポート送信
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nb>window</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;beforeunload&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=nb>window</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;beforeunload&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=k>this</span><span class=p>.</span><span class=nx>sendReport</span><span class=p>();</span>
 </span></span><span class=line><span class=cl>        <span class=p>});</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
@@ -1438,7 +1438,7 @@
 </span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>metrics</span><span class=p>[</span><span class=nx>name</span><span class=p>]</span> <span class=o>=</span> <span class=nx>metric</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// リアルタイム分析
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>this</span><span class=p>.</span><span class=nx>analyzeMetric</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>metric</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>this</span><span class=p>.</span><span class=nx>analyzeMetric</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>metric</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=nx>analyzeMetric</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>metric</span><span class=p>)</span> <span class=p>{</span>
@@ -1462,17 +1462,17 @@
 </span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>log</span><span class=p>(</span><span class=sb>`</span><span class=si>${</span><span class=nx>name</span><span class=si>}</span><span class=sb>: </span><span class=si>${</span><span class=nx>metric</span><span class=p>.</span><span class=nx>value</span><span class=si>}</span><span class=sb> (</span><span class=si>${</span><span class=nx>rating</span><span class=si>}</span><span class=sb>)`</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// パフォーマンス問題の警告
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>if</span> <span class=p>(</span><span class=nx>rating</span> <span class=o>===</span> <span class=s1>&#39;poor&#39;</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>if</span> <span class=p>(</span><span class=nx>rating</span> <span class=o>===</span> <span class=s1>&#39;poor&#39;</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=k>this</span><span class=p>.</span><span class=nx>reportPerformanceIssue</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>metric</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>    <span class=p>}</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=nx>reportPerformanceIssue</span><span class=p>(</span><span class=nx>name</span><span class=p>,</span> <span class=nx>metric</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=c1>// 開発者向け警告
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=sb>`Performance issue detected: </span><span class=si>${</span><span class=nx>name</span><span class=si>}</span><span class=sb> = </span><span class=si>${</span><span class=nx>metric</span><span class=p>.</span><span class=nx>value</span><span class=si>}</span><span class=sb>`</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl>        <span class=nx>console</span><span class=p>.</span><span class=nx>warn</span><span class=p>(</span><span class=sb>`Performance issue detected: </span><span class=si>${</span><span class=nx>name</span><span class=si>}</span><span class=sb> = </span><span class=si>${</span><span class=nx>metric</span><span class=p>.</span><span class=nx>value</span><span class=si>}</span><span class=sb>`</span><span class=p>);</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// 改善提案
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kr>const</span> <span class=nx>suggestions</span> <span class=o>=</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=kr>const</span> <span class=nx>suggestions</span> <span class=o>=</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=nx>LCP</span><span class=o>:</span> <span class=s1>&#39;Consider optimizing images, reducing server response time, or implementing Critical CSS&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>FID</span><span class=o>:</span> <span class=s1>&#39;Consider reducing JavaScript execution time or implementing code splitting&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>CLS</span><span class=o>:</span> <span class=s1>&#39;Ensure images and ads have dimensions set, and avoid inserting content above existing content&#39;</span><span class=p>,</span>
@@ -1498,14 +1498,14 @@
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=k>try</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=c1>// Beacon API で確実に送信
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=k>if</span> <span class=p>(</span><span class=nx>navigator</span><span class=p>.</span><span class=nx>sendBeacon</span><span class=p>)</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>            <span class=k>if</span> <span class=p>(</span><span class=nx>navigator</span><span class=p>.</span><span class=nx>sendBeacon</span><span class=p>)</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=nx>navigator</span><span class=p>.</span><span class=nx>sendBeacon</span><span class=p>(</span>
 </span></span><span class=line><span class=cl>                    <span class=k>this</span><span class=p>.</span><span class=nx>options</span><span class=p>.</span><span class=nx>reportEndpoint</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>reportData</span><span class=p>)</span>
 </span></span><span class=line><span class=cl>                <span class=p>);</span>
 </span></span><span class=line><span class=cl>            <span class=p>}</span> <span class=k>else</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                <span class=c1>// フォールバック
-</span></span></span><span class=line><span class=cl><span class=c1></span>                <span class=kr>await</span> <span class=nx>fetch</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>options</span><span class=p>.</span><span class=nx>reportEndpoint</span><span class=p>,</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>                <span class=kr>await</span> <span class=nx>fetch</span><span class=p>(</span><span class=k>this</span><span class=p>.</span><span class=nx>options</span><span class=p>.</span><span class=nx>reportEndpoint</span><span class=p>,</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>method</span><span class=o>:</span> <span class=s1>&#39;POST&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>body</span><span class=o>:</span> <span class=nx>JSON</span><span class=p>.</span><span class=nx>stringify</span><span class=p>(</span><span class=nx>reportData</span><span class=p>),</span>
 </span></span><span class=line><span class=cl>                    <span class=nx>headers</span><span class=o>:</span> <span class=p>{</span>
@@ -1521,7 +1521,7 @@
 </span></span><span class=line><span class=cl><span class=p>}</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1>// 初期化
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;DOMContentLoaded&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl><span class=nb>document</span><span class=p>.</span><span class=nx>addEventListener</span><span class=p>(</span><span class=s1>&#39;DOMContentLoaded&#39;</span><span class=p>,</span> <span class=p>()</span> <span class=p>=&gt;</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=k>new</span> <span class=nx>PerformanceMonitor</span><span class=p>({</span>
 </span></span><span class=line><span class=cl>        <span class=nx>sampleRate</span><span class=o>:</span> <span class=mf>0.1</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>        <span class=nx>reportEndpoint</span><span class=o>:</span> <span class=s1>&#39;/api/performance&#39;</span>
@@ -1576,7 +1576,7 @@
 </span><span class=lnt>47
 </span><span class=lnt>48
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-javascript data-lang=javascript><span class=line><span class=cl><span class=c1>// webpack.config.js での最適化例
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kr>const</span> <span class=nx>path</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;path&#39;</span><span class=p>);</span>
+</span></span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>path</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;path&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>MiniCssExtractPlugin</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;mini-css-extract-plugin&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=kr>const</span> <span class=p>{</span> <span class=nx>BundleAnalyzerPlugin</span> <span class=p>}</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;webpack-bundle-analyzer&#39;</span><span class=p>);</span>
 </span></span><span class=line><span class=cl><span class=kr>const</span> <span class=nx>CompressionPlugin</span> <span class=o>=</span> <span class=nx>require</span><span class=p>(</span><span class=s1>&#39;compression-webpack-plugin&#39;</span><span class=p>);</span>
@@ -1604,18 +1604,18 @@
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=nx>plugins</span><span class=o>:</span> <span class=p>[</span>
 </span></span><span class=line><span class=cl>        <span class=c1>// CSS 抽出
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>new</span> <span class=nx>MiniCssExtractPlugin</span><span class=p>({</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>new</span> <span class=nx>MiniCssExtractPlugin</span><span class=p>({</span>
 </span></span><span class=line><span class=cl>            <span class=nx>filename</span><span class=o>:</span> <span class=s1>&#39;css/[name].[contenthash].css&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>chunkFilename</span><span class=o>:</span> <span class=s1>&#39;css/[id].[contenthash].css&#39;</span>
 </span></span><span class=line><span class=cl>        <span class=p>}),</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// バンドル分析
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>new</span> <span class=nx>BundleAnalyzerPlugin</span><span class=p>({</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>new</span> <span class=nx>BundleAnalyzerPlugin</span><span class=p>({</span>
 </span></span><span class=line><span class=cl>            <span class=nx>analyzerMode</span><span class=o>:</span> <span class=nx>process</span><span class=p>.</span><span class=nx>env</span><span class=p>.</span><span class=nx>ANALYZE</span> <span class=o>?</span> <span class=s1>&#39;server&#39;</span> <span class=o>:</span> <span class=s1>&#39;disabled&#39;</span>
 </span></span><span class=line><span class=cl>        <span class=p>}),</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1>// Gzip 圧縮
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=k>new</span> <span class=nx>CompressionPlugin</span><span class=p>({</span>
+</span></span></span><span class=line><span class=cl>        <span class=k>new</span> <span class=nx>CompressionPlugin</span><span class=p>({</span>
 </span></span><span class=line><span class=cl>            <span class=nx>algorithm</span><span class=o>:</span> <span class=s1>&#39;gzip&#39;</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>test</span><span class=o>:</span> <span class=sr>/\.(js|css|html|svg)$/</span><span class=p>,</span>
 </span></span><span class=line><span class=cl>            <span class=nx>threshold</span><span class=o>:</span> <span class=mi>8192</span><span class=p>,</span>
@@ -1649,9 +1649,9 @@
 <span class=tag-count>8</span>
 </a><a href=/tags/css/ class=tag-link>CSS
 <span class=tag-count>7</span>
-</a><a href=/tags/devops/ class=tag-link>DevOps
+</a><a href=/tags/devops/ class=tag-link>Devops
 <span class=tag-count>7</span>
 </a><a href=/tags/grpc/ class=tag-link>GRPC
 <span class=tag-count>7</span>
 </a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
-<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (9)</a></li><li><a href=/archives/#2025>2025年 (98)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (10)</a></li><li><a href=/archives/#2025>2025年 (97)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

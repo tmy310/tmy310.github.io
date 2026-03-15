@@ -1,4 +1,4 @@
-<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><title>【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録</title><link rel=canonical href=https://firebird-techtalktech.com/post/%E8%A8%AD%E8%A8%88%E5%9C%B0%E7%8D%84vpc-peering%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9%E3%81%A7%E5%85%A8%E7%A4%BE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A03%E6%97%A5%E9%96%93%E5%81%9C%E6%AD%A2%E7%B7%8A%E6%80%A5psc%E7%A7%BB%E8%A1%8C%E3%81%AE%E4%BF%AE%E7%BE%85%E5%A0%B4%E8%A8%98%E9%8C%B2/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録"><meta property='og:description' content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><meta property='og:url' content='https://firebird-techtalktech.com/post/%E8%A8%AD%E8%A8%88%E5%9C%B0%E7%8D%84vpc-peering%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9%E3%81%A7%E5%85%A8%E7%A4%BE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A03%E6%97%A5%E9%96%93%E5%81%9C%E6%AD%A2%E7%B7%8A%E6%80%A5psc%E7%A7%BB%E8%A1%8C%E3%81%AE%E4%BF%AE%E7%BE%85%E5%A0%B4%E8%A8%98%E9%8C%B2/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GCP'><meta property='article:tag' content='VPC'><meta property='article:tag' content='ネットワーク設計'><meta property='article:tag' content='VPC Peering'><meta property='article:tag' content='PSC'><meta property='article:tag' content='障害対応'><meta property='article:tag' content='設計ミス'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2025-09-14T17:00:00+09:00'><meta property='article:modified_time' content='2025-09-14T17:00:00+09:00'><meta name=twitter:title content="【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録"><meta name=twitter:description content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録","description":"「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-14T17:00:00\u002b09:00","dateModified":"2025-09-14T17:00:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/%E8%A8%AD%E8%A8%88%E5%9C%B0%E7%8D%84vpc-peering%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9%E3%81%A7%E5%85%A8%E7%A4%BE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A03%E6%97%A5%E9%96%93%E5%81%9C%E6%AD%A2%E7%B7%8A%E6%80%A5psc%E7%A7%BB%E8%A1%8C%E3%81%AE%E4%BF%AE%E7%BE%85%E5%A0%B4%E8%A8%98%E9%8C%B2\/","wordCount":"7090","keywords":["GCP","VPC","ネットワーク設計","VPC Peering","PSC","障害対応","設計ミス","author-created"]}</script><meta name=description content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_d7c67b01a0ed7653.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><title>【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録</title><link rel=canonical href=https://firebird-techtalktech.com/post/%E8%A8%AD%E8%A8%88%E5%9C%B0%E7%8D%84vpc-peering%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9%E3%81%A7%E5%85%A8%E7%A4%BE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A03%E6%97%A5%E9%96%93%E5%81%9C%E6%AD%A2%E7%B7%8A%E6%80%A5psc%E7%A7%BB%E8%A1%8C%E3%81%AE%E4%BF%AE%E7%BE%85%E5%A0%B4%E8%A8%98%E9%8C%B2/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録"><meta property='og:description' content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><meta property='og:url' content='https://firebird-techtalktech.com/post/%E8%A8%AD%E8%A8%88%E5%9C%B0%E7%8D%84vpc-peering%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9%E3%81%A7%E5%85%A8%E7%A4%BE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A03%E6%97%A5%E9%96%93%E5%81%9C%E6%AD%A2%E7%B7%8A%E6%80%A5psc%E7%A7%BB%E8%A1%8C%E3%81%AE%E4%BF%AE%E7%BE%85%E5%A0%B4%E8%A8%98%E9%8C%B2/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='GCP'><meta property='article:tag' content='VPC'><meta property='article:tag' content='ネットワーク設計'><meta property='article:tag' content='VPC Peering'><meta property='article:tag' content='PSC'><meta property='article:tag' content='障害対応'><meta property='article:tag' content='設計ミス'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2025-09-14T17:00:00+09:00'><meta property='article:modified_time' content='2025-09-14T17:00:00+09:00'><meta name=twitter:title content="【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録"><meta name=twitter:description content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"【設計地獄】VPC Peering設計ミスで全社システム3日間停止→緊急PSC移行の修羅場記録","description":"「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-14T17:00:00\u002b09:00","dateModified":"2025-09-14T17:00:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/%E8%A8%AD%E8%A8%88%E5%9C%B0%E7%8D%84vpc-peering%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9%E3%81%A7%E5%85%A8%E7%A4%BE%E3%82%B7%E3%82%B9%E3%83%86%E3%83%A03%E6%97%A5%E9%96%93%E5%81%9C%E6%AD%A2%E7%B7%8A%E6%80%A5psc%E7%A7%BB%E8%A1%8C%E3%81%AE%E4%BF%AE%E7%BE%85%E5%A0%B4%E8%A8%98%E9%8C%B2\/","wordCount":"7090","keywords":["GCP","VPC","ネットワーク設計","VPC Peering","PSC","障害対応","設計ミス","author-created"]}</script><meta name=description content="「VPC Peeringで簡単に接続できる」と考えて設計した複雑な社内ネットワークが、IPアドレス重複とルーティングループで全システム停止。3日3晩の緊急PSC移行作業で学んだネットワーク設計の真実。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
 <button type=submit class=search-button>
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/ class=nav-link>最新記事</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
 <span class=hamburger></span>
@@ -74,22 +74,22 @@
 </span><span class=lnt>20
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 共有サービスVPC</span>
 </span></span><span class=line><span class=cl>gcloud compute networks create shared-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --subnet-mode<span class=o>=</span>custom <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --project<span class=o>=</span>shared-services
+</span></span></span><span class=line><span class=cl>    --subnet-mode<span class=o>=</span>custom <span class=se>\
+</span></span></span><span class=line><span class=cl>    --project<span class=o>=</span>shared-services
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 各部署VPC作成</span>
 </span></span><span class=line><span class=cl><span class=k>for</span> dept in sales dev finance<span class=p>;</span> <span class=k>do</span>
 </span></span><span class=line><span class=cl>    gcloud compute networks create <span class=si>${</span><span class=nv>dept</span><span class=si>}</span>-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>        --subnet-mode<span class=o>=</span>custom <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>        --project<span class=o>=</span><span class=si>${</span><span class=nv>dept</span><span class=si>}</span>-project
+</span></span></span><span class=line><span class=cl>        --subnet-mode<span class=o>=</span>custom <span class=se>\
+</span></span></span><span class=line><span class=cl>        --project<span class=o>=</span><span class=si>${</span><span class=nv>dept</span><span class=si>}</span>-project
 </span></span><span class=line><span class=cl><span class=k>done</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 各環境VPC作成</span>
 </span></span><span class=line><span class=cl><span class=k>for</span> dept in sales dev finance<span class=p>;</span> <span class=k>do</span>
 </span></span><span class=line><span class=cl>    <span class=k>for</span> env in prod staging dev<span class=p>;</span> <span class=k>do</span>
 </span></span><span class=line><span class=cl>        gcloud compute networks create <span class=si>${</span><span class=nv>dept</span><span class=si>}</span>-<span class=si>${</span><span class=nv>env</span><span class=si>}</span>-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>            --subnet-mode<span class=o>=</span>custom <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>            --project<span class=o>=</span><span class=si>${</span><span class=nv>dept</span><span class=si>}</span>-<span class=si>${</span><span class=nv>env</span><span class=si>}</span>-project
+</span></span></span><span class=line><span class=cl>            --subnet-mode<span class=o>=</span>custom <span class=se>\
+</span></span></span><span class=line><span class=cl>            --project<span class=o>=</span><span class=si>${</span><span class=nv>dept</span><span class=si>}</span>-<span class=si>${</span><span class=nv>env</span><span class=si>}</span>-project
 </span></span><span class=line><span class=cl>    <span class=k>done</span>
 </span></span><span class=line><span class=cl><span class=k>done</span>
 </span></span></code></pre></td></tr></table></div></div><p>「順調だ。次はサブネット作成して、VPC Peeringで接続すれば完了」</p><h2 id=第二章地獄の始まり---ipアドレス重複の悪夢>第二章：地獄の始まり - IPアドレス重複の悪夢</h2><h3 id=6月20日構築作業の開始>6月20日：構築作業の開始</h3><p><strong>VPC Peeringの設定開始：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -106,14 +106,14 @@
 </span><span class=lnt>12
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 共有サービス → 各部署への接続</span>
 </span></span><span class=line><span class=cl>gcloud compute networks peerings create shared-to-sales <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>shared-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-project<span class=o>=</span>sales-project <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-network<span class=o>=</span>sales-vpc
+</span></span></span><span class=line><span class=cl>    --network<span class=o>=</span>shared-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl>    --peer-project<span class=o>=</span>sales-project <span class=se>\
+</span></span></span><span class=line><span class=cl>    --peer-network<span class=o>=</span>sales-vpc
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>gcloud compute networks peerings create shared-to-dev <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>shared-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-project<span class=o>=</span>dev-project <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --peer-network<span class=o>=</span>dev-vpc
+</span></span></span><span class=line><span class=cl>    --network<span class=o>=</span>shared-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl>    --peer-project<span class=o>=</span>dev-project <span class=se>\
+</span></span></span><span class=line><span class=cl>    --peer-network<span class=o>=</span>dev-vpc
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># ... 以下同様に12個のPeering作成</span>
 </span></span></code></pre></td></tr></table></div></div><p><strong>最初の警告サイン：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
@@ -251,13 +251,13 @@
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 重複IPアドレスの緊急修正</span>
 </span></span><span class=line><span class=cl><span class=c1># sales-prod: 10.1.0.0/24 → 10.1.10.0/24</span>
 </span></span><span class=line><span class=cl>gcloud compute networks subnets create sales-prod-new <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>sales-prod-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --range<span class=o>=</span>10.1.10.0/24
+</span></span></span><span class=line><span class=cl>    --network<span class=o>=</span>sales-prod-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl>    --range<span class=o>=</span>10.1.10.0/24
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># dev-prod: 10.2.0.0/24 → 10.2.10.0/24  </span>
 </span></span><span class=line><span class=cl>gcloud compute networks subnets create dev-prod-new <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>dev-prod-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --range<span class=o>=</span>10.2.10.0/24
+</span></span></span><span class=line><span class=cl>    --network<span class=o>=</span>dev-prod-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl>    --range<span class=o>=</span>10.2.10.0/24
 </span></span></code></pre></td></tr></table></div></div><p><strong>結果：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -289,24 +289,24 @@
 </span><span class=lnt>20
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Active DirectoryサービスのPSC設定</span>
 </span></span><span class=line><span class=cl>gcloud compute service-attachments create ad-service <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --producer-forwarding-rule<span class=o>=</span>ad-forwarding-rule <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --connection-preference<span class=o>=</span>ACCEPT_AUTOMATIC <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --nat-subnets<span class=o>=</span>ad-psc-subnet
+</span></span></span><span class=line><span class=cl>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --producer-forwarding-rule<span class=o>=</span>ad-forwarding-rule <span class=se>\
+</span></span></span><span class=line><span class=cl>    --connection-preference<span class=o>=</span>ACCEPT_AUTOMATIC <span class=se>\
+</span></span></span><span class=line><span class=cl>    --nat-subnets<span class=o>=</span>ad-psc-subnet
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># DNSサービスのPSC設定  </span>
 </span></span><span class=line><span class=cl>gcloud compute service-attachments create dns-service <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --producer-forwarding-rule<span class=o>=</span>dns-forwarding-rule <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --connection-preference<span class=o>=</span>ACCEPT_AUTOMATIC <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --nat-subnets<span class=o>=</span>dns-psc-subnet
+</span></span></span><span class=line><span class=cl>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --producer-forwarding-rule<span class=o>=</span>dns-forwarding-rule <span class=se>\
+</span></span></span><span class=line><span class=cl>    --connection-preference<span class=o>=</span>ACCEPT_AUTOMATIC <span class=se>\
+</span></span></span><span class=line><span class=cl>    --nat-subnets<span class=o>=</span>dns-psc-subnet
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c1># 監視サービスのPSC設定</span>
 </span></span><span class=line><span class=cl>gcloud compute service-attachments create monitoring-service <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --producer-forwarding-rule<span class=o>=</span>monitoring-forwarding-rule <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --connection-preference<span class=o>=</span>ACCEPT_AUTOMATIC <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --nat-subnets<span class=o>=</span>monitoring-psc-subnet
+</span></span></span><span class=line><span class=cl>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --producer-forwarding-rule<span class=o>=</span>monitoring-forwarding-rule <span class=se>\
+</span></span></span><span class=line><span class=cl>    --connection-preference<span class=o>=</span>ACCEPT_AUTOMATIC <span class=se>\
+</span></span></span><span class=line><span class=cl>    --nat-subnets<span class=o>=</span>monitoring-psc-subnet
 </span></span></code></pre></td></tr></table></div></div><h4 id=step-2各部署vpcからのpscエンドポイント作成>Step 2：各部署VPCからのPSCエンドポイント作成</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -321,16 +321,16 @@
 </span><span class=lnt>12
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 営業部からADサービスへの接続</span>
 </span></span><span class=line><span class=cl>gcloud compute addresses create sales-ad-psc-ip <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --subnet<span class=o>=</span>sales-psc-subnet <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --project<span class=o>=</span>sales-project
+</span></span></span><span class=line><span class=cl>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --subnet<span class=o>=</span>sales-psc-subnet <span class=se>\
+</span></span></span><span class=line><span class=cl>    --project<span class=o>=</span>sales-project
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>gcloud compute forwarding-rules create sales-ad-endpoint <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --network<span class=o>=</span>sales-vpc <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --address<span class=o>=</span>sales-ad-psc-ip <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --target-service-attachment<span class=o>=</span>projects/shared-services/regions/asia-northeast1/serviceAttachments/ad-service <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    --project<span class=o>=</span>sales-project
+</span></span></span><span class=line><span class=cl>    --region<span class=o>=</span>asia-northeast1 <span class=se>\
+</span></span></span><span class=line><span class=cl>    --network<span class=o>=</span>sales-vpc <span class=se>\
+</span></span></span><span class=line><span class=cl>    --address<span class=o>=</span>sales-ad-psc-ip <span class=se>\
+</span></span></span><span class=line><span class=cl>    --target-service-attachment<span class=o>=</span>projects/shared-services/regions/asia-northeast1/serviceAttachments/ad-service <span class=se>\
+</span></span></span><span class=line><span class=cl>    --project<span class=o>=</span>sales-project
 </span></span></code></pre></td></tr></table></div></div><h3 id=6月24日午後11時最初のpsc接続テスト>6月24日午後11時：最初のPSC接続テスト</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -466,7 +466,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>低遅延・高スループット要求</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>管理コスト最小化</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>適していない場合</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>適していない場合</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>複雑なハブ・スポーク型</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>サービス提供・消費関係</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>細かいアクセス制御要求</span><span class=w>
@@ -488,7 +488,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>IPアドレス重複がある</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>細かいアクセス制御が必要</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>適していない場合</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>適していない場合</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>シンプルな直接接続</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>低遅延が最重要</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span>- <span class=l>設定・運用コストを最小化</span><span class=w>
@@ -513,21 +513,21 @@
 </span><span class=lnt>18
 </span><span class=lnt>19
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## ネットワーク設計検証チェックリスト
-</span></span></span><span class=line><span class=cl><span class=gu></span>
+</span></span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 設計段階
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> IPアドレス重複チェック
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> IPアドレス重複チェック
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> ルーティングテーブル設計
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 接続可能性マトリクス作成
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> セキュリティポリシー定義
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 実装段階  
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 段階的構築（1VPCずつ）
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 段階的構築（1VPCずつ）
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 各段階での接続テスト
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 負荷テスト・障害テスト
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> ロールバック手順確認
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 稼働前テスト
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 全システム接続確認
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 全システム接続確認
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> パフォーマンス測定
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> セキュリティテスト
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 運用手順確認
@@ -601,7 +601,7 @@
 </span></span><span class=line><span class=cl><span class=k>for</span> vpc in <span class=k>$(</span>gcloud compute networks list --format<span class=o>=</span><span class=s2>&#34;value(name)&#34;</span><span class=k>)</span><span class=p>;</span> <span class=k>do</span>
 </span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;VPC: </span><span class=nv>$vpc</span><span class=s2>&#34;</span>
 </span></span><span class=line><span class=cl>    gcloud compute networks subnets list --network<span class=o>=</span><span class=nv>$vpc</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>        --format<span class=o>=</span><span class=s2>&#34;table(name,ipCidrRange)&#34;</span> --sort-by<span class=o>=</span>ipCidrRange
+</span></span></span><span class=line><span class=cl>        --format<span class=o>=</span><span class=s2>&#34;table(name,ipCidrRange)&#34;</span> --sort-by<span class=o>=</span>ipCidrRange
 </span></span><span class=line><span class=cl>    <span class=nb>echo</span> <span class=s2>&#34;&#34;</span>
 </span></span><span class=line><span class=cl><span class=k>done</span>
 </span></span><span class=line><span class=cl>
@@ -645,8 +645,8 @@
 </span><span class=lnt>12
 </span><span class=lnt>13
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># 接続テスト自動化（Cloud Build）</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>steps</span><span class=p>:</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;gcr.io/cloud-builders/gcloud&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>steps</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl>- <span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;gcr.io/cloud-builders/gcloud&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>script</span><span class=p>:</span><span class=w> </span><span class=p>|</span><span class=sd>
 </span></span></span><span class=line><span class=cl><span class=sd>    # 各VPCからの到達性テスト
 </span></span></span><span class=line><span class=cl><span class=sd>    for source_vpc in sales-vpc dev-vpc finance-vpc; do
@@ -704,19 +704,19 @@
 </span><span class=lnt>15
 </span><span class=lnt>16
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## PSC障害時対応フローチャート
-</span></span></span><span class=line><span class=cl><span class=gu></span>
+</span></span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### Level 1: エンドポイント障害
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>1.</span> 他のエンドポイントへの切り替え
+</span></span></span><span class=line><span class=cl><span class=k>1.</span> 他のエンドポイントへの切り替え
 </span></span><span class=line><span class=cl><span class=k>2.</span> サービス提供者への連絡
 </span></span><span class=line><span class=cl><span class=k>3.</span> 利用者への影響範囲通知
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### Level 2: サービス提供者障害  
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>1.</span> バックアップサービスへの切り替え
+</span></span></span><span class=line><span class=cl><span class=k>1.</span> バックアップサービスへの切り替え
 </span></span><span class=line><span class=cl><span class=k>2.</span> 緊急時VPC Peeringの有効化
 </span></span><span class=line><span class=cl><span class=k>3.</span> 復旧作業の開始
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### Level 3: 全面障害
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>1.</span> オンプレミス環境への切り戻し
+</span></span></span><span class=line><span class=cl><span class=k>1.</span> オンプレミス環境への切り戻し
 </span></span><span class=line><span class=cl><span class=k>2.</span> 事業継続計画の実行
 </span></span><span class=line><span class=cl><span class=k>3.</span> 外部サポートの要請
 </span></span></code></pre></td></tr></table></div></div><h2 id=まとめ簡単な接続という幻想からの脱却>まとめ：「簡単な接続」という幻想からの脱却</h2><h3 id=プロジェクトの総括>プロジェクトの総括</h3><p><strong>被害総額：</strong></p><ul><li>システム停止による機会損失: ¥15M</li><li>緊急対応作業費: ¥5M</li><li>外部コンサル費: ¥3M</li><li>PSC移行費用: ¥2M
@@ -728,7 +728,7 @@
 <a href=/tags/vpc/>VPC</a>
 <a href=/tags/%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E8%A8%AD%E8%A8%88/>ネットワーク設計</a>
 <a href=/tags/vpc-peering/>VPC Peering</a>
-<a href=/tags/psc/>PSC</a>
+<a href=/tags/psc/>Psc</a>
 <a href=/tags/%E9%9A%9C%E5%AE%B3%E5%AF%BE%E5%BF%9C/>障害対応</a>
 <a href=/tags/%E8%A8%AD%E8%A8%88%E3%83%9F%E3%82%B9/>設計ミス</a>
 <a href=/tags/author-created/>Author-Created</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/design-hell-vpc-peering-design-mistake-causes-3-day-company-wide-system-outage-emergency-psc-migration-battle-record/><div class=article-details><h2 class=article-title>[Design Hell] VPC Peering Design Mistake Causes 3-Day Company-wide System Outage → Emergency PSC Migration Battle Record</h2></div></a></article><article><a href=/post/migration-hell-complete-record-of-6-month-gcp-migration-disaster-from-20-year-physical-network-to-cloud/><div class=article-details><h2 class=article-title>[Migration Hell] Complete Record of 6-Month GCP Migration Disaster: From 20-Year Physical Network to Cloud</h2></div></a></article><article><a href=/post/%E7%A7%BB%E8%A1%8C%E5%9C%B0%E7%8D%8420%E5%B9%B4%E9%81%8B%E7%94%A8%E3%81%97%E3%81%9F%E7%89%A9%E7%90%86%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E3%82%92gcp%E3%81%AB%E7%A7%BB%E8%A1%8C%E3%81%97%E3%81%A66%E3%83%B6%E6%9C%88%E7%82%8E%E4%B8%8A%E3%81%97%E3%81%9F%E5%85%A8%E8%A8%98%E9%8C%B2/><div class=article-details><h2 class=article-title>【移行地獄】20年運用した物理ネットワークをGCPに移行して6ヶ月炎上した全記録</h2></div></a></article><article><a href=/post/%E6%9C%AC%E7%95%AA%E9%9A%9C%E5%AE%B3protocol-buffer%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%A7%E5%85%A8%E3%82%B5%E3%83%BC%E3%83%93%E3%82%B9%E5%81%9C%E6%AD%A2%E5%BE%A9%E6%97%A7%E3%81%BE%E3%81%A7%E3%81%AE72%E6%99%82%E9%96%93%E5%9C%B0%E7%8D%84%E4%BD%93%E9%A8%93%E8%A8%98/><div class=article-details><h2 class=article-title>【本番障害】Protocol Buffer破壊的変更で全サービス停止→復旧までの72時間地獄体験記</h2></div></a></article><article><a href=/post/%E7%B7%8A%E6%80%A5%E4%BA%8B%E6%85%8Bcloud-workstations%E3%81%AE%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3%E4%BA%8B%E6%95%85%E3%81%8B%E3%82%89%E5%AD%A6%E3%82%93%E3%81%A0secure-web-proxy%E5%AE%9F%E8%A3%85%E3%81%AE%E5%85%A8%E8%A8%98%E9%8C%B2/><div class=article-details><h2 class=article-title>【緊急事態】Cloud Workstationsのセキュリティ事故から学んだSecure Web Proxy実装の全記録</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
@@ -752,9 +752,9 @@
 <span class=tag-count>8</span>
 </a><a href=/tags/css/ class=tag-link>CSS
 <span class=tag-count>7</span>
-</a><a href=/tags/devops/ class=tag-link>DevOps
+</a><a href=/tags/devops/ class=tag-link>Devops
 <span class=tag-count>7</span>
 </a><a href=/tags/grpc/ class=tag-link>GRPC
 <span class=tag-count>7</span>
 </a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
-<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (9)</a></li><li><a href=/archives/#2025>2025年 (98)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (10)</a></li><li><a href=/archives/#2025>2025年 (97)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

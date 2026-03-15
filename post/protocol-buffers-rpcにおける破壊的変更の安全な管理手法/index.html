@@ -1,4 +1,4 @@
-<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><title>Protocol Buffers RPCにおける破壊的変更の安全な管理手法</title><link rel=canonical href=https://firebird-techtalktech.com/post/protocol-buffers-rpc%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E7%AE%A1%E7%90%86%E6%89%8B%E6%B3%95/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="Protocol Buffers RPCにおける破壊的変更の安全な管理手法"><meta property='og:description' content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/protocol-buffers-rpc%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E7%AE%A1%E7%90%86%E6%89%8B%E6%B3%95/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Protocol Buffer'><meta property='article:tag' content='gRPC'><meta property='article:tag' content='API設計'><meta property='article:tag' content='破壊的変更'><meta property='article:tag' content='マイクロサービス'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2025-09-14T13:30:00+09:00'><meta property='article:modified_time' content='2025-09-14T13:30:00+09:00'><meta name=twitter:title content="Protocol Buffers RPCにおける破壊的変更の安全な管理手法"><meta name=twitter:description content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Protocol Buffers RPCにおける破壊的変更の安全な管理手法","description":"Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-14T13:30:00\u002b09:00","dateModified":"2025-09-14T13:30:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/protocol-buffers-rpc%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E7%AE%A1%E7%90%86%E6%89%8B%E6%B3%95\/","wordCount":"4182","keywords":["Protocol Buffer","gRPC","API設計","破壊的変更","マイクロサービス","author-created"]}</script><meta name=description content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_d7c67b01a0ed7653.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><title>Protocol Buffers RPCにおける破壊的変更の安全な管理手法</title><link rel=canonical href=https://firebird-techtalktech.com/post/protocol-buffers-rpc%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E7%AE%A1%E7%90%86%E6%89%8B%E6%B3%95/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="Protocol Buffers RPCにおける破壊的変更の安全な管理手法"><meta property='og:description' content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><meta property='og:url' content='https://firebird-techtalktech.com/post/protocol-buffers-rpc%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E7%AE%A1%E7%90%86%E6%89%8B%E6%B3%95/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Protocol Buffer'><meta property='article:tag' content='gRPC'><meta property='article:tag' content='API設計'><meta property='article:tag' content='破壊的変更'><meta property='article:tag' content='マイクロサービス'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2025-09-14T13:30:00+09:00'><meta property='article:modified_time' content='2025-09-14T13:30:00+09:00'><meta name=twitter:title content="Protocol Buffers RPCにおける破壊的変更の安全な管理手法"><meta name=twitter:description content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"Protocol Buffers RPCにおける破壊的変更の安全な管理手法","description":"Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-14T13:30:00\u002b09:00","dateModified":"2025-09-14T13:30:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/protocol-buffers-rpc%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8B%E7%A0%B4%E5%A3%8A%E7%9A%84%E5%A4%89%E6%9B%B4%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E7%AE%A1%E7%90%86%E6%89%8B%E6%B3%95\/","wordCount":"4182","keywords":["Protocol Buffer","gRPC","API設計","破壊的変更","マイクロサービス","author-created"]}</script><meta name=description content="Protocol BuffersのRPCサービスにおける破壊的変更を段階的に管理する手法を、具体的なコード例とともに詳しく解説します。"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
 <button type=submit class=search-button>
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/ class=nav-link>最新記事</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
 <span class=hamburger></span>
@@ -50,47 +50,47 @@
 </span><span class=lnt>41
 </span><span class=lnt>42
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto v1.0.0
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v1</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// ユーザー作成
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// ユーザー情報取得（後で非推奨になる予定）
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>GetUserInfo</span><span class=p>(</span><span class=n>GetUserInfoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserInfoResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// ユーザー更新
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// ユーザー作成
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// ユーザー情報取得（後で非推奨になる予定）
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>GetUserInfo</span><span class=p>(</span><span class=n>GetUserInfoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserInfoResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// ユーザー更新
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span>  <span class=c1>// 後で削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span>  <span class=c1>// 後で削除予定
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>CreateUserResponse</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>CreateUserResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>GetUserInfoRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>user_id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserInfoRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>user_id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>GetUserInfoResponse</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=c1>// 後で削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserInfoResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=c1>// 後で削除予定
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>         <span class=c1>// 後で削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// 後で削除予定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>         <span class=c1>// 後で削除予定
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// 後で削除予定
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><p>この初期バージョンには、将来的に問題となる以下の要素が含まれています：</p><ul><li><code>GetUserInfo</code> RPC: 機能が限定的で効率が悪い</li><li><code>age</code> フィールド: プライバシーの観点から削除が必要</li><li><code>legacy_format</code> フィールド: 旧システム向けの形式で不要</li><li><code>department</code> フィールド: より詳細なプロフィール情報に統合予定</li></ul><h2 id=phase-1-非推奨マークと新api追加-v110>Phase 1: 非推奨マークと新API追加 (v1.1.0)</h2><p>破壊的変更の第一段階では、旧APIを維持しつつ新しいAPIを追加します。重要なのは、<strong>旧APIに <code>deprecated = true</code> を設定</strong>し、代替手段を明示することです。</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -167,80 +167,80 @@
 </span><span class=lnt>74
 </span><span class=lnt>75
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto v1.1.0
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v1</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 非推奨マーク: GetUserDetails に移行してください
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>GetUserInfo</span><span class=p>(</span><span class=n>GetUserInfoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserInfoResponse</span><span class=p>)</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=p>}</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 新しいAPI: 改善された機能
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>GetUserDetails</span><span class=p>(</span><span class=n>GetUserDetailsRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserDetailsResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 新API: より柔軟なユーザー更新
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>UpdateUserProfile</span><span class=p>(</span><span class=n>UpdateUserProfileRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserProfileResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 非推奨マーク: GetUserDetails に移行してください
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>GetUserInfo</span><span class=p>(</span><span class=n>GetUserInfoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserInfoResponse</span><span class=p>)</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>    <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 新しいAPI: 改善された機能
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>GetUserDetails</span><span class=p>(</span><span class=n>GetUserDetailsRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserDetailsResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 新API: より柔軟なユーザー更新
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUserProfile</span><span class=p>(</span><span class=n>UpdateUserProfileRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserProfileResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span>  <span class=c1>// 非推奨: birth_date を使用してください
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 新フィールド追加
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>  <span class=c1>// YYYY-MM-DD形式
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span>  <span class=c1>// 非推奨: birth_date を使用してください
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 新フィールド追加
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>  <span class=c1>// YYYY-MM-DD形式
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c1>// 非推奨メッセージ
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>GetUserInfoRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>user_id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c1>// 非推奨メッセージ
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserInfoRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>user_id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>GetUserInfoResponse</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=c1>// 非推奨
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserInfoResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>legacy_format</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span>  <span class=c1>// 非推奨
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c1>// 新しいメッセージ
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>GetUserDetailsRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>user_id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 追加オプション
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>bool</span> <span class=n>include_profile</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>bool</span> <span class=n>include_preferences</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c1>// 新しいメッセージ
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserDetailsRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>user_id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 追加オプション
+</span></span></span><span class=line><span class=cl>  <span class=kt>bool</span> <span class=n>include_profile</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>bool</span> <span class=n>include_preferences</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>GetUserDetailsResponse</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserDetails</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserDetailsResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserDetails</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserDetails</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserPreferences</span> <span class=n>preferences</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>UserDetails</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserPreferences</span> <span class=n>preferences</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserProfile</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>title</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>location</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>UserProfile</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>title</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>location</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserPreferences</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>language</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>timezone</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>bool</span> <span class=n>email_notifications</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>UserPreferences</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>language</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>timezone</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>bool</span> <span class=n>email_notifications</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h3 id=phase-1での運用チェックリスト>Phase 1での運用チェックリスト</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -249,7 +249,7 @@
 </span><span class=lnt>6
 </span><span class=lnt>7
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## チェックリスト - Phase 1: 非推奨マーク
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 新APIを追加し、十分にテスト済み
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 新APIを追加し、十分にテスト済み
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 旧APIに <span class=sb>`option deprecated = true`</span> を追加
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 非推奨フィールドにコメントで代替手段を明記
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> クライアント向け移行ガイド文書を作成
@@ -307,56 +307,56 @@
 </span><span class=lnt>50
 </span><span class=lnt>51
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto v1.3.0 (移行期間中バージョン)
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v1</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 非推奨API - 削除予定日: 2024-12-31
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>GetUserInfo</span><span class=p>(</span><span class=n>GetUserInfoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserInfoResponse</span><span class=p>)</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>    <span class=c1>// 警告: この API は v2.0.0 で削除されます
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=p>}</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>GetUserDetails</span><span class=p>(</span><span class=n>GetUserDetailsRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserDetailsResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>UpdateUserProfile</span><span class=p>(</span><span class=n>UpdateUserProfileRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserProfileResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// さらなる改善API追加
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>BatchGetUsers</span><span class=p>(</span><span class=n>BatchGetUsersRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>BatchGetUsersResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 非推奨API - 削除予定日: 2024-12-31
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>GetUserInfo</span><span class=p>(</span><span class=n>GetUserInfoRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserInfoResponse</span><span class=p>)</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>    <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>    <span class=c1>// 警告: この API は v2.0.0 で削除されます
+</span></span></span><span class=line><span class=cl>  <span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>GetUserDetails</span><span class=p>(</span><span class=n>GetUserDetailsRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserDetailsResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUserProfile</span><span class=p>(</span><span class=n>UpdateUserProfileRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserProfileResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// さらなる改善API追加
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>BatchGetUsers</span><span class=p>(</span><span class=n>BatchGetUsersRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>BatchGetUsersResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 条件付きサポート: birth_date が提供された場合は age を無視
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>3</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span>  <span class=c1>// 削除予定: 2024-12-31
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 条件付きサポート: birth_date が提供された場合は age を無視
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>age</span> <span class=o>=</span> <span class=mi>3</span> <span class=p>[</span><span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>];</span>  <span class=c1>// 削除予定: 2024-12-31
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c1>// reserved を使用して安全な削除準備
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 段階的フィールド削除準備
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// age, department の番号を予約
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>,</span> <span class=s>&#34;department&#34;</span><span class=p>;</span>  <span class=c1>// 名前も予約
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c1>// reserved を使用して安全な削除準備
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 段階的フィールド削除準備
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// age, department の番号を予約
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>,</span> <span class=s>&#34;department&#34;</span><span class=p>;</span>  <span class=c1>// 名前も予約
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>GetUserInfoResponse</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// legacy_format フィールドは削除準備
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>reserved</span> <span class=s>&#34;legacy_format&#34;</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>GetUserInfoResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>option</span> <span class=n>deprecated</span> <span class=o>=</span> <span class=kc>true</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// legacy_format フィールドは削除準備
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=s>&#34;legacy_format&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>User</span> <span class=n>user</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h3 id=phase-2での運用チェックリスト>Phase 2での運用チェックリスト</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -365,7 +365,7 @@
 </span><span class=lnt>6
 </span><span class=lnt>7
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## チェックリスト - Phase 2: 移行期間
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 非推奨API使用量が50%以下に減少
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 非推奨API使用量が50%以下に減少
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 主要クライアントの移行完了確認
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 削除予定日をAPIドキュメントに明記
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 警告レベルの監視アラート設定
@@ -453,86 +453,86 @@
 </span><span class=lnt>80
 </span><span class=lnt>81
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-protobuf data-lang=protobuf><span class=line><span class=cl><span class=c1>// user_service.proto v2.0.0 (メジャーバージョンアップ)
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=n>syntax</span> <span class=o>=</span> <span class=s>&#34;proto3&#34;</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v2</span><span class=p>;</span>  <span class=c1>// パッケージバージョンも更新
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// GetUserInfo は完全削除
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=c1>// rpc GetUserInfo は削除済み
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>GetUserDetails</span><span class=p>(</span><span class=n>GetUserDetailsRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserDetailsResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>UpdateUserProfile</span><span class=p>(</span><span class=n>UpdateUserProfileRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserProfileResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>rpc</span> <span class=n>BatchGetUsers</span><span class=p>(</span><span class=n>BatchGetUsersRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>BatchGetUsersResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 新機能追加
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>rpc</span> <span class=n>SearchUsers</span><span class=p>(</span><span class=n>SearchUsersRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>SearchUsersResponse</span><span class=p>);</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kn>package</span> <span class=nn>userservice</span><span class=o>.</span><span class=n>v2</span><span class=p>;</span>  <span class=c1>// パッケージバージョンも更新
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// age フィールドは完全削除、番号は予約済み
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>  <span class=c1>// 必須フィールドに変更
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>service</span> <span class=n>UserService</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>CreateUser</span><span class=p>(</span><span class=n>CreateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>CreateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// GetUserInfo は完全削除
+</span></span></span><span class=line><span class=cl>  <span class=c1>// rpc GetUserInfo は削除済み
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>GetUserDetails</span><span class=p>(</span><span class=n>GetUserDetailsRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>GetUserDetailsResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUser</span><span class=p>(</span><span class=n>UpdateUserRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>UpdateUserProfile</span><span class=p>(</span><span class=n>UpdateUserProfileRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>UpdateUserProfileResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>BatchGetUsers</span><span class=p>(</span><span class=n>BatchGetUsersRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>BatchGetUsersResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 新機能追加
+</span></span></span><span class=line><span class=cl>  <span class=k>rpc</span> <span class=n>SearchUsers</span><span class=p>(</span><span class=n>SearchUsersRequest</span><span class=p>)</span> <span class=k>returns</span> <span class=p>(</span><span class=n>SearchUsersResponse</span><span class=p>);</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c1>// 削除されたメッセージの番号を予約して再利用を防ぐ
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>reserved</span> <span class=mi>100</span> <span class=k>to</span> <span class=mi>110</span><span class=p>;</span>  <span class=c1>// 削除されたメッセージ番号範囲
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=n>reserved</span> <span class=s>&#34;GetUserInfoRequest&#34;</span><span class=p>,</span> <span class=s>&#34;GetUserInfoResponse&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>CreateUserRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// age フィールドは完全削除、番号は予約済み
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span>  <span class=c1>// 必須フィールドに変更
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 削除済みフィールドの番号と名前を予約
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// 旧 age, department
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>,</span> <span class=s>&#34;department&#34;</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// 新フィールド追加可能
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=kt>string</span> <span class=n>phone_number</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c1>// 削除されたメッセージの番号を予約して再利用を防ぐ
+</span></span></span><span class=line><span class=cl><span class=n>reserved</span> <span class=mi>100</span> <span class=k>to</span> <span class=mi>110</span><span class=p>;</span>  <span class=c1>// 削除されたメッセージ番号範囲
+</span></span></span><span class=line><span class=cl><span class=n>reserved</span> <span class=s>&#34;GetUserInfoRequest&#34;</span><span class=p>,</span> <span class=s>&#34;GetUserInfoResponse&#34;</span><span class=p>;</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserDetails</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserPreferences</span> <span class=n>preferences</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=c1>// v2.0.0 で新機能追加
-</span></span></span><span class=line><span class=cl><span class=c1></span>  <span class=k>repeated</span> <span class=kt>string</span> <span class=n>tags</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int64</span> <span class=n>created_at</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int64</span> <span class=n>updated_at</span> <span class=o>=</span> <span class=mi>9</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>User</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 削除済みフィールドの番号と名前を予約
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=mi>4</span><span class=p>,</span> <span class=mi>5</span><span class=p>;</span>  <span class=c1>// 旧 age, department
+</span></span></span><span class=line><span class=cl>  <span class=n>reserved</span> <span class=s>&#34;age&#34;</span><span class=p>,</span> <span class=s>&#34;department&#34;</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// 新フィールド追加可能
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>phone_number</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>SearchUsersRequest</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>query</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int32</span> <span class=n>limit</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>page_token</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=n>UserSearchFilter</span> <span class=n>filter</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>UserDetails</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>id</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>name</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>email</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>birth_date</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserProfile</span> <span class=n>profile</span> <span class=o>=</span> <span class=mi>5</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserPreferences</span> <span class=n>preferences</span> <span class=o>=</span> <span class=mi>6</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=c1>// v2.0.0 で新機能追加
+</span></span></span><span class=line><span class=cl>  <span class=k>repeated</span> <span class=kt>string</span> <span class=n>tags</span> <span class=o>=</span> <span class=mi>7</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int64</span> <span class=n>created_at</span> <span class=o>=</span> <span class=mi>8</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int64</span> <span class=n>updated_at</span> <span class=o>=</span> <span class=mi>9</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>SearchUsersResponse</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=k>repeated</span> <span class=n>UserDetails</span> <span class=n>users</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>next_page_token</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>int32</span> <span class=n>total_count</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>SearchUsersRequest</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>query</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>limit</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>page_token</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=n>UserSearchFilter</span> <span class=n>filter</span> <span class=o>=</span> <span class=mi>4</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=kd>message</span> <span class=nc>UserSearchFilter</span> <span class=p>{</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>string</span> <span class=n>location</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span>  <span class=kt>bool</span> <span class=n>active_only</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>SearchUsersResponse</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=k>repeated</span> <span class=n>UserDetails</span> <span class=n>users</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>next_page_token</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>int32</span> <span class=n>total_count</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=err>
+</span></span></span><span class=line><span class=cl><span class=kd>message</span> <span class=nc>UserSearchFilter</span> <span class=p>{</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>department</span> <span class=o>=</span> <span class=mi>1</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>string</span> <span class=n>location</span> <span class=o>=</span> <span class=mi>2</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl>  <span class=kt>bool</span> <span class=n>active_only</span> <span class=o>=</span> <span class=mi>3</span><span class=p>;</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h3 id=phase-3での運用チェックリスト>Phase 3での運用チェックリスト</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
 </span><span class=lnt>2
 </span><span class=lnt>3
@@ -541,7 +541,7 @@
 </span><span class=lnt>6
 </span><span class=lnt>7
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## チェックリスト - Phase 3: 削除実行
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> メジャーバージョン (v2.0.0) としてリリース
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> メジャーバージョン (v2.0.0) としてリリース
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 削除対象API/フィールドを完全除去
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> reserved で番号と名前を予約済み
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 移行ドキュメントを更新
@@ -564,7 +564,7 @@
 </span><span class=lnt>15
 </span><span class=lnt>16
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-go data-lang=go><span class=line><span class=cl><span class=c1>// サーバー側実装例（Go）</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>s</span><span class=w> </span><span class=o>*</span><span class=nx>UserService</span><span class=p>)</span><span class=w> </span><span class=nf>GetUserInfo</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>req</span><span class=w> </span><span class=o>*</span><span class=nx>pb</span><span class=p>.</span><span class=nx>GetUserInfoRequest</span><span class=p>)</span><span class=w> </span><span class=p>(</span><span class=o>*</span><span class=nx>pb</span><span class=p>.</span><span class=nx>GetUserInfoResponse</span><span class=p>,</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=kd>func</span><span class=w> </span><span class=p>(</span><span class=nx>s</span><span class=w> </span><span class=o>*</span><span class=nx>UserService</span><span class=p>)</span><span class=w> </span><span class=nf>GetUserInfo</span><span class=p>(</span><span class=nx>ctx</span><span class=w> </span><span class=nx>context</span><span class=p>.</span><span class=nx>Context</span><span class=p>,</span><span class=w> </span><span class=nx>req</span><span class=w> </span><span class=o>*</span><span class=nx>pb</span><span class=p>.</span><span class=nx>GetUserInfoRequest</span><span class=p>)</span><span class=w> </span><span class=p>(</span><span class=o>*</span><span class=nx>pb</span><span class=p>.</span><span class=nx>GetUserInfoResponse</span><span class=p>,</span><span class=w> </span><span class=kt>error</span><span class=p>)</span><span class=w> </span><span class=p>{</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=c1>// 非推奨API使用時の警告ログ</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nx>log</span><span class=p>.</span><span class=nf>Warn</span><span class=p>(</span><span class=s>&#34;GetUserInfo API is deprecated, use GetUserDetails instead&#34;</span><span class=p>,</span><span class=w> 
 </span></span></span><span class=line><span class=cl><span class=w>             </span><span class=s>&#34;client&#34;</span><span class=p>,</span><span class=w> </span><span class=nf>getClientFromContext</span><span class=p>(</span><span class=nx>ctx</span><span class=p>))</span><span class=w>
@@ -578,7 +578,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>        </span><span class=nx>IncludeProfile</span><span class=p>:</span><span class=w> </span><span class=kc>true</span><span class=p>,</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=p>}</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=k>return</span><span class=w> </span><span class=nx>s</span><span class=p>.</span><span class=nf>getUserDetailsInternal</span><span class=p>(</span><span class=nx>ctx</span><span class=p>,</span><span class=w> </span><span class=nx>detailsReq</span><span class=p>)</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=p>}</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=w>
 </span></span></span></code></pre></td></tr></table></div></div><h3 id=2-クライアント側の対応戦略>2. クライアント側の対応戦略</h3><p>クライアント側では、バージョン対応と段階的移行を実装します：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -676,10 +676,10 @@
 </span><span class=lnt>41
 </span><span class=lnt>42
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gh># Protocol Buffers 破壊的変更管理ガイド
-</span></span></span><span class=line><span class=cl><span class=gh></span>
+</span></span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 0: 計画・準備段階
 </span></span></span><span class=line><span class=cl><span class=gu>### チェックリスト
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>- [ ]</span> 変更影響範囲の調査完了
+</span></span></span><span class=line><span class=cl><span class=k>- [ ]</span> 変更影響範囲の調査完了
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 既存クライアントリストの作成
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 移行計画の策定（3-6ヶ月スケジュール）
 </span></span><span class=line><span class=cl><span class=k>- [ ]</span> 監視システムの準備
@@ -687,34 +687,34 @@
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 1: 非推奨マーク・新API追加 (v1.1.0)
 </span></span></span><span class=line><span class=cl><span class=gu>### 実施内容
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> 新APIの追加と十分なテスト
+</span></span></span><span class=line><span class=cl><span class=k>-</span> 新APIの追加と十分なテスト
 </span></span><span class=line><span class=cl><span class=k>-</span> 旧APIに <span class=sb>`deprecated = true`</span> マーク
 </span></span><span class=line><span class=cl><span class=k>-</span> 移行ガイドドキュメント作成
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 監視項目
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> 旧API使用率の定期測定
+</span></span></span><span class=line><span class=cl><span class=k>-</span> 旧API使用率の定期測定
 </span></span><span class=line><span class=cl><span class=k>-</span> エラーログの監視
 </span></span><span class=line><span class=cl><span class=k>-</span> クライアント別使用状況の追跡
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 2: 移行促進期間 (v1.2.0 - v1.5.0)
 </span></span></span><span class=line><span class=cl><span class=gu>### 実施内容
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> 削除予定日の明確化
+</span></span></span><span class=line><span class=cl><span class=k>-</span> 削除予定日の明確化
 </span></span><span class=line><span class=cl><span class=k>-</span> 積極的な移行支援
 </span></span><span class=line><span class=cl><span class=k>-</span> 警告レベルの監視設定
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 成功指標
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> 旧API使用率 &lt; 10%
+</span></span></span><span class=line><span class=cl><span class=k>-</span> 旧API使用率 &lt; 10%
 </span></span><span class=line><span class=cl><span class=k>-</span> 主要クライアント移行完了率 &gt; 90%
 </span></span><span class=line><span class=cl><span class=k>-</span> 新API安定性確認
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## Phase 3: 削除実行 (v2.0.0)
 </span></span></span><span class=line><span class=cl><span class=gu>### 実施内容
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> メジャーバージョンアップ
+</span></span></span><span class=line><span class=cl><span class=k>-</span> メジャーバージョンアップ
 </span></span><span class=line><span class=cl><span class=k>-</span> 完全削除と reserved 設定
 </span></span><span class=line><span class=cl><span class=k>-</span> リリースノート詳細記載
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>### 事後確認
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> 削除後の動作確認
+</span></span></span><span class=line><span class=cl><span class=k>-</span> 削除後の動作確認
 </span></span><span class=line><span class=cl><span class=k>-</span> 残存クライアントへの対応
 </span></span><span class=line><span class=cl><span class=k>-</span> パフォーマンス改善確認
 </span></span></code></pre></td></tr></table></div></div><h2 id=緊急時の対応戦略>緊急時の対応戦略</h2><p>予期しない問題が発生した場合の対応手順も準備しておくことが重要です：</p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -733,18 +733,18 @@
 </span><span class=lnt>14
 </span><span class=lnt>15
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-markdown data-lang=markdown><span class=line><span class=cl><span class=gu>## 緊急ロールバック手順
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>1.</span> <span class=gs>**即座の対応**</span>: 旧バージョンへのトラフィック切り戻し
+</span></span></span><span class=line><span class=cl><span class=k>1.</span> <span class=gs>**即座の対応**</span>: 旧バージョンへのトラフィック切り戻し
 </span></span><span class=line><span class=cl><span class=k>2.</span> <span class=gs>**影響調査**</span>: 破綻したクライアントの特定
 </span></span><span class=line><span class=cl><span class=k>3.</span> <span class=gs>**修正版リリース**</span>: hotfix バージョンの準備
 </span></span><span class=line><span class=cl><span class=k>4.</span> <span class=gs>**再移行計画**</span>: より慎重なスケジュール再設定
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## フィールド番号の管理
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> 削除済み番号の reserved 設定
+</span></span></span><span class=line><span class=cl><span class=k>-</span> 削除済み番号の reserved 設定
 </span></span><span class=line><span class=cl><span class=k>-</span> 番号衝突の防止
 </span></span><span class=line><span class=cl><span class=k>-</span> 将来の拡張性確保
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=gu>## 文書化要件
-</span></span></span><span class=line><span class=cl><span class=gu></span><span class=k>-</span> API変更履歴の維持
+</span></span></span><span class=line><span class=cl><span class=k>-</span> API変更履歴の維持
 </span></span><span class=line><span class=cl><span class=k>-</span> 移行ガイドの更新
 </span></span><span class=line><span class=cl><span class=k>-</span> FAQ の継続メンテナンス
 </span></span></code></pre></td></tr></table></div></div><h2 id=まとめ>まとめ</h2><p>Protocol BuffersのRPCにおける破壊的変更は、適切な段階的アプローチにより安全に管理できます。重要なポイントは：</p><ol><li><strong>計画性</strong>: 事前の影響調査と移行計画の策定</li><li><strong>段階性</strong>: 即座の削除ではなく、非推奨→移行→削除の段階的実施</li><li><strong>監視</strong>: 各段階での使用状況とエラーの継続監視</li><li><strong>コミュニケーション</strong>: クライアント開発者への適切な情報提供</li><li><strong>安全性</strong>: reserved による番号保護と緊急時対応の準備</li></ol><p>この手法により、サービスの進化を続けながらも安定性を保つことができ、マイクロサービスアーキテクチャの長期的な成功につながります。破壊的変更は避けられませんが、適切に管理することで、システム全体の品質向上を実現できるのです。</p><hr><p><strong>著者について</strong>: この記事は、大規模なマイクロサービス環境でのProtocol Buffers運用経験を基に執筆されています。実際のプロダクション環境での破壊的変更管理の知見を共有することで、同様の課題を抱える開発者の助けになれば幸いです。</p><div class="ad-container ad-briefs_bottom"><a href="//af.moshimo.com/af/c/click?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" rel=nofollow referrerpolicy=no-referrer-when-downgrade attributionsrc><img src=//image.moshimo.com/af-img/0032/000000001220.gif width=468 height=60 style=border:none></a><img src="//i.moshimo.com/af/i/impression?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" width=1 height=1 style=border:none loading=lazy></div><style>.ad-container{margin:16px 0}.ad-placeholder{background:var(--card-background);border:1px dashed var(--card-border-color);color:var(--card-text-color-secondary);border-radius:8px;padding:12px;text-align:center;font-size:.9rem}</style></section><footer class=article-footer><section class=article-tags><a href=/tags/protocol-buffer/>Protocol Buffer</a>
@@ -773,9 +773,9 @@
 <span class=tag-count>8</span>
 </a><a href=/tags/css/ class=tag-link>CSS
 <span class=tag-count>7</span>
-</a><a href=/tags/devops/ class=tag-link>DevOps
+</a><a href=/tags/devops/ class=tag-link>Devops
 <span class=tag-count>7</span>
 </a><a href=/tags/grpc/ class=tag-link>GRPC
 <span class=tag-count>7</span>
 </a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
-<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (9)</a></li><li><a href=/archives/#2025>2025年 (98)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (10)</a></li><li><a href=/archives/#2025>2025年 (97)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>

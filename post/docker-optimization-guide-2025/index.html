@@ -1,4 +1,4 @@
-<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><meta name=keywords content="Docker最適化,コンテナ運用,パフォーマンス,監視,セキュリティ"><title>🐳 Docker最適化・運用ガイド - 2025年実践版</title><link rel=canonical href=https://firebird-techtalktech.com/post/docker-optimization-guide-2025/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="🐳 Docker最適化・運用ガイド - 2025年実践版"><meta property='og:description' content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><meta property='og:url' content='https://firebird-techtalktech.com/post/docker-optimization-guide-2025/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Docker'><meta property='article:tag' content='コンテナ'><meta property='article:tag' content='DevOps'><meta property='article:tag' content='最適化'><meta property='article:tag' content='監視'><meta property='article:tag' content='セキュリティ'><meta property='article:published_time' content='2025-09-21T18:25:00+09:00'><meta property='article:modified_time' content='2025-09-21T18:25:00+09:00'><meta name=twitter:title content="🐳 Docker最適化・運用ガイド - 2025年実践版"><meta name=twitter:description content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var dnt,doNotTrack=!1;if(!1&&(dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes"),!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="noindex, follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"🐳 Docker最適化・運用ガイド - 2025年実践版","description":"Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS\/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-21T18:25:00\u002b09:00","dateModified":"2025-09-21T18:25:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/docker-optimization-guide-2025\/","wordCount":"4773","keywords":["Docker","コンテナ","DevOps","最適化","監視","セキュリティ"]}</script><meta name=description content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_d7c67b01a0ed7653.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><meta name=keywords content="Docker最適化,コンテナ運用,パフォーマンス,監視,セキュリティ"><title>🐳 Docker最適化・運用ガイド - 2025年実践版</title><link rel=canonical href=https://firebird-techtalktech.com/post/docker-optimization-guide-2025/><link rel=stylesheet href=/scss/style.min.e6937209cf479aae8b2dc8dae2b126867e86dcb9029b922867e771b019f3d3d9.css><meta property='og:title' content="🐳 Docker最適化・運用ガイド - 2025年実践版"><meta property='og:description' content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><meta property='og:url' content='https://firebird-techtalktech.com/post/docker-optimization-guide-2025/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='Docker'><meta property='article:tag' content='コンテナ'><meta property='article:tag' content='DevOps'><meta property='article:tag' content='最適化'><meta property='article:tag' content='監視'><meta property='article:tag' content='セキュリティ'><meta property='article:published_time' content='2025-09-21T18:25:00+09:00'><meta property='article:modified_time' content='2025-09-21T18:25:00+09:00'><meta name=twitter:title content="🐳 Docker最適化・運用ガイド - 2025年実践版"><meta name=twitter:description content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="noindex, follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"🐳 Docker最適化・運用ガイド - 2025年実践版","description":"Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS\/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2025-09-21T18:25:00\u002b09:00","dateModified":"2025-09-21T18:25:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/docker-optimization-guide-2025\/","wordCount":"4773","keywords":["Docker","コンテナ","DevOps","最適化","監視","セキュリティ"]}</script><meta name=description content="Docker・コンテナ技術に関する5つの技術記事を統合。Windows最適化、バッチジョブ監視、Nginx統合、ECS/Fargate運用まで、2025年最新のDocker実践技術を包括的にまとめた運用ガイド"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
 <button type=submit class=search-button>
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/categories/%E6%9C%80%E6%96%B0%E8%A8%98%E4%BA%8B/ class=nav-link>最新記事</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
 <span class=hamburger></span>
@@ -106,35 +106,35 @@
 </span><span class=lnt>29
 </span><span class=lnt>30
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=c># マルチステージビルドによる最適化</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>deps</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 依存関係のみ先にコピー（キャッシュ効率化）</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> package*.json ./<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm ci --only<span class=o>=</span>production <span class=o>&amp;&amp;</span> npm cache clean --force<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>deps</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># 依存関係のみ先にコピー（キャッシュ効率化）</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> package*.json ./<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> npm ci --only<span class=o>=</span>production <span class=o>&amp;&amp;</span> npm cache clean --force<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>builder</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> package*.json ./<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm ci<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> . .<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm run build<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>builder</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> package*.json ./<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> npm ci<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> . .<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> npm run build<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>runner</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ENV</span> NODE_ENV production<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>runner</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>ENV</span> NODE_ENV production<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 必要最小限のファイルのみコピー</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>deps /app/node_modules ./node_modules<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>builder /app/dist ./dist<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>builder /app/public ./public<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># 必要最小限のファイルのみコピー</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --from<span class=o>=</span>deps /app/node_modules ./node_modules<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --from<span class=o>=</span>builder /app/dist ./dist<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --from<span class=o>=</span>builder /app/public ./public<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># セキュリティ強化</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> addgroup --system --gid <span class=m>1001</span> nodejs<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> adduser --system --uid <span class=m>1001</span> nextjs<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>USER</span><span class=w> </span><span class=s>nextjs</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># セキュリティ強化</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> addgroup --system --gid <span class=m>1001</span> nodejs<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> adduser --system --uid <span class=m>1001</span> nextjs<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>USER</span><span class=w> </span><span class=s>nextjs</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>EXPOSE</span><span class=w> </span><span class=s>3000</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;npm&#34;</span><span class=p>,</span> <span class=s2>&#34;start&#34;</span><span class=p>]</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>EXPOSE</span><span class=w> </span><span class=s>3000</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;npm&#34;</span><span class=p>,</span> <span class=s2>&#34;start&#34;</span><span class=p>]</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h4 id=4-開発時の高速化テクニック>4. 開発時の高速化テクニック</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -156,8 +156,8 @@
 </span><span class=lnt>19
 </span><span class=lnt>20
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># docker-compose.dev.yml</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;3.8&#39;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;3.8&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>services</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>app</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>build</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>context</span><span class=p>:</span><span class=w> </span><span class=l>.</span><span class=w>
@@ -172,7 +172,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>CHOKIDAR_USEPOLLING=false</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>WATCHPACK_POLLING=false</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>volumes</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>node_modules_cache</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>driver</span><span class=p>:</span><span class=w> </span><span class=l>local</span><span class=w>
 </span></span></span></code></pre></td></tr></table></div></div><p><strong>パフォーマンス測定・監視：</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -192,7 +192,7 @@
 </span><span class=lnt>15
 </span><span class=lnt>16
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=cp>#!/bin/bash
-</span></span></span><span class=line><span class=cl><span class=cp></span><span class=c1># Docker性能測定スクリプト</span>
+</span></span></span><span class=line><span class=cl><span class=c1># Docker性能測定スクリプト</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=nb>echo</span> <span class=s2>&#34;=== Docker Build Performance Test ===&#34;</span>
 </span></span><span class=line><span class=cl>
@@ -406,21 +406,21 @@
 </span><span class=lnt>17
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>python:3.11-slim</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># New Relic エージェントインストール</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> pip install newrelic<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># New Relic エージェントインストール</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> pip install newrelic<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 設定ファイルコピー</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> newrelic.ini /app/<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> batch_job_monitor.py /app/<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># 設定ファイルコピー</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> newrelic.ini /app/<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> batch_job_monitor.py /app/<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 環境変数設定</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ENV</span> <span class=nv>NEW_RELIC_CONFIG_FILE</span><span class=o>=</span>/app/newrelic.ini<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ENV</span> <span class=nv>NEW_RELIC_ENVIRONMENT</span><span class=o>=</span>production
+</span></span></span><span class=line><span class=cl><span class=c># 環境変数設定</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>ENV</span> <span class=nv>NEW_RELIC_CONFIG_FILE</span><span class=o>=</span>/app/newrelic.ini<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>ENV</span> <span class=nv>NEW_RELIC_ENVIRONMENT</span><span class=o>=</span>production
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=c># バッチジョブ実行</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;newrelic-admin&#34;</span><span class=p>,</span> <span class=s2>&#34;run-program&#34;</span><span class=p>,</span> <span class=s2>&#34;python&#34;</span><span class=p>,</span> <span class=s2>&#34;batch_job.py&#34;</span><span class=p>]</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;newrelic-admin&#34;</span><span class=p>,</span> <span class=s2>&#34;run-program&#34;</span><span class=p>,</span> <span class=s2>&#34;python&#34;</span><span class=p>,</span> <span class=s2>&#34;batch_job.py&#34;</span><span class=p>]</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h4 id=3-kubernetes環境での監視>3. Kubernetes環境での監視</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -456,14 +456,14 @@
 </span><span class=lnt>33
 </span><span class=lnt>34
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># k8s-batch-job.yaml</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>batch/v1</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Job</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>batch/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>Job</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>metadata</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>monitored-batch-job</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>labels</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>batch-processor</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>monitoring</span><span class=p>:</span><span class=w> </span><span class=l>newrelic</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>spec</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>template</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>metadata</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>annotations</span><span class=p>:</span><span class=w>
@@ -687,7 +687,7 @@
 </span><span class=lnt>116
 </span><span class=lnt>117
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-nginx data-lang=nginx><span class=line><span class=cl><span class=c1># nginx.conf - 本番環境最適化版
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>user</span> <span class=s>nginx</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl><span class=k>user</span> <span class=s>nginx</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=k>worker_processes</span> <span class=s>auto</span><span class=p>;</span>
 </span></span><span class=line><span class=cl><span class=k>worker_rlimit_nofile</span> <span class=mi>65535</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>
@@ -699,20 +699,20 @@
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl><span class=k>http</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>    <span class=c1># 基本設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kn>sendfile</span> <span class=no>on</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl>    <span class=kn>sendfile</span> <span class=no>on</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>tcp_nopush</span> <span class=no>on</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>tcp_nodelay</span> <span class=no>on</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>keepalive_timeout</span> <span class=mi>65</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>keepalive_requests</span> <span class=mi>1000</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=c1># パフォーマンス最適化
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kn>open_file_cache</span> <span class=s>max=10000</span> <span class=s>inactive=20s</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl>    <span class=kn>open_file_cache</span> <span class=s>max=10000</span> <span class=s>inactive=20s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>open_file_cache_valid</span> <span class=s>30s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>open_file_cache_min_uses</span> <span class=mi>2</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>open_file_cache_errors</span> <span class=no>on</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=c1># 圧縮設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kn>gzip</span> <span class=no>on</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl>    <span class=kn>gzip</span> <span class=no>on</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>gzip_vary</span> <span class=no>on</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>gzip_min_length</span> <span class=mi>1000</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>gzip_types</span>
@@ -724,13 +724,13 @@
 </span></span><span class=line><span class=cl>        <span class=s>text/xml</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=c1># セキュリティヘッダー
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kn>add_header</span> <span class=s>X-Frame-Options</span> <span class=s>DENY</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl>    <span class=kn>add_header</span> <span class=s>X-Frame-Options</span> <span class=s>DENY</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>add_header</span> <span class=s>X-Content-Type-Options</span> <span class=s>nosniff</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>add_header</span> <span class=s>X-XSS-Protection</span> <span class=s>&#34;1</span><span class=p>;</span> <span class=kn>mode=block&#34;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    <span class=kn>add_header</span> <span class=s>Strict-Transport-Security</span> <span class=s>&#34;max-age=31536000</span><span class=p>;</span> <span class=kn>includeSubDomains&#34;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=c1># ログ設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kn>log_format</span> <span class=s>json_combined</span> <span class=s>escape=json</span>
+</span></span></span><span class=line><span class=cl>    <span class=kn>log_format</span> <span class=s>json_combined</span> <span class=s>escape=json</span>
 </span></span><span class=line><span class=cl>        <span class=s>&#39;</span><span class=p>{</span><span class=kn>&#39;</span>
 </span></span><span class=line><span class=cl>        <span class=s>&#39;&#34;time_local&#34;:&#34;</span><span class=nv>$time_local&#34;,&#39;</span>
 </span></span><span class=line><span class=cl>        <span class=s>&#39;&#34;remote_addr&#34;:&#34;</span><span class=nv>$remote_addr&#34;,&#39;</span>
@@ -747,7 +747,7 @@
 </span></span><span class=line><span class=cl>    <span class=kn>error_log</span> <span class=s>/var/log/nginx/error.log</span> <span class=s>warn</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>    
 </span></span><span class=line><span class=cl>    <span class=c1># アップストリーム設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>    <span class=kn>upstream</span> <span class=s>app_backend</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>    <span class=kn>upstream</span> <span class=s>app_backend</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>        <span class=kn>server</span> <span class=n>app1</span><span class=p>:</span><span class=mi>3000</span> <span class=s>max_fails=3</span> <span class=s>fail_timeout=30s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=kn>server</span> <span class=n>app2</span><span class=p>:</span><span class=mi>3000</span> <span class=s>max_fails=3</span> <span class=s>fail_timeout=30s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=kn>keepalive</span> <span class=mi>32</span><span class=p>;</span>
@@ -764,21 +764,21 @@
 </span></span><span class=line><span class=cl>        <span class=kn>server_name</span> <span class=s>example.com</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1># SSL設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>ssl_certificate</span> <span class=s>/etc/ssl/certs/server.crt</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl>        <span class=kn>ssl_certificate</span> <span class=s>/etc/ssl/certs/server.crt</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=kn>ssl_certificate_key</span> <span class=s>/etc/ssl/private/server.key</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=kn>ssl_protocols</span> <span class=s>TLSv1.2</span> <span class=s>TLSv1.3</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=kn>ssl_ciphers</span> <span class=s>ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=kn>ssl_prefer_server_ciphers</span> <span class=no>off</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1># 静的ファイル配信
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>location</span> <span class=s>/static/</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=kn>location</span> <span class=s>/static/</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=kn>alias</span> <span class=s>/var/www/static/</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>expires</span> <span class=s>1y</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>add_header</span> <span class=s>Cache-Control</span> <span class=s>&#34;public,</span> <span class=s>immutable&#34;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1># アプリケーションプロキシ
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>location</span> <span class=s>/</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=kn>location</span> <span class=s>/</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=kn>proxy_pass</span> <span class=s>http://app_backend</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>proxy_http_version</span> <span class=mi>1</span><span class=s>.1</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>proxy_set_header</span> <span class=s>Upgrade</span> <span class=nv>$http_upgrade</span><span class=p>;</span>
@@ -790,13 +790,13 @@
 </span></span><span class=line><span class=cl>            <span class=kn>proxy_cache_bypass</span> <span class=nv>$http_upgrade</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            
 </span></span><span class=line><span class=cl>            <span class=c1># タイムアウト設定
-</span></span></span><span class=line><span class=cl><span class=c1></span>            <span class=kn>proxy_connect_timeout</span> <span class=s>5s</span><span class=p>;</span>
+</span></span></span><span class=line><span class=cl>            <span class=kn>proxy_connect_timeout</span> <span class=s>5s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>proxy_send_timeout</span> <span class=s>60s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>proxy_read_timeout</span> <span class=s>60s</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>        <span class=p>}</span>
 </span></span><span class=line><span class=cl>        
 </span></span><span class=line><span class=cl>        <span class=c1># ヘルスチェック用エンドポイント
-</span></span></span><span class=line><span class=cl><span class=c1></span>        <span class=kn>location</span> <span class=s>/health</span> <span class=p>{</span>
+</span></span></span><span class=line><span class=cl>        <span class=kn>location</span> <span class=s>/health</span> <span class=p>{</span>
 </span></span><span class=line><span class=cl>            <span class=kn>access_log</span> <span class=no>off</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>return</span> <span class=mi>200</span> <span class=s>&#34;healthy\n&#34;</span><span class=p>;</span>
 </span></span><span class=line><span class=cl>            <span class=kn>add_header</span> <span class=s>Content-Type</span> <span class=s>text/plain</span><span class=p>;</span>
@@ -832,33 +832,33 @@
 </span><span class=lnt>27
 </span><span class=lnt>28
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=c># Nginx + アプリケーション統合Dockerfile</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>builder</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> package*.json ./<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm ci<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> . .<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm run build<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>builder</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> package*.json ./<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> npm ci<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> . .<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> npm run build<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>nginx:alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>production</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>nginx:alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>production</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># カスタムNginx設定</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> nginx.conf /etc/nginx/nginx.conf<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> ssl/ /etc/ssl/<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># カスタムNginx設定</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> nginx.conf /etc/nginx/nginx.conf<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> ssl/ /etc/ssl/<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># ビルド成果物コピー</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>builder /app/dist /var/www/html<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>builder /app/static /var/www/static<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># ビルド成果物コピー</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --from<span class=o>=</span>builder /app/dist /var/www/html<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --from<span class=o>=</span>builder /app/static /var/www/static<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># ログディレクトリ作成</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> mkdir -p /var/log/nginx<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># ログディレクトリ作成</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> mkdir -p /var/log/nginx<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># ヘルスチェック</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>HEALTHCHECK</span> --interval<span class=o>=</span>30s --timeout<span class=o>=</span>3s --start-period<span class=o>=</span>5s --retries<span class=o>=</span><span class=m>3</span> <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    CMD curl -f http://localhost/health <span class=o>||</span> <span class=nb>exit</span> <span class=m>1</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># ヘルスチェック</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>HEALTHCHECK</span> --interval<span class=o>=</span>30s --timeout<span class=o>=</span>3s --start-period<span class=o>=</span>5s --retries<span class=o>=</span><span class=m>3</span> <span class=se>\
+</span></span></span><span class=line><span class=cl>    CMD curl -f http://localhost/health <span class=o>||</span> <span class=nb>exit</span> <span class=m>1</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>EXPOSE</span><span class=w> </span><span class=s>80</span> <span class=m>443</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>EXPOSE</span><span class=w> </span><span class=s>80</span> <span class=m>443</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;nginx&#34;</span><span class=p>,</span> <span class=s2>&#34;-g&#34;</span><span class=p>,</span> <span class=s2>&#34;daemon off;&#34;</span><span class=p>]</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;nginx&#34;</span><span class=p>,</span> <span class=s2>&#34;-g&#34;</span><span class=p>,</span> <span class=s2>&#34;daemon off;&#34;</span><span class=p>]</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h4 id=3-docker-compose-での統合運用>3. Docker Compose での統合運用</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -923,9 +923,9 @@
 </span><span class=lnt>62
 </span><span class=lnt>63
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># docker-compose.yml - Nginx + アプリケーション</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;3.8&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>version</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;3.8&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>services</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>services</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>nginx</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>build</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>context</span><span class=p>:</span><span class=w> </span><span class=l>.</span><span class=w>
@@ -979,10 +979,10 @@
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>networks</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>      </span>- <span class=l>app_network</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>volumes</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>volumes</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>nginx_logs</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>networks</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>networks</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>app_network</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>driver</span><span class=p>:</span><span class=w> </span><span class=l>bridge</span><span class=w>
 </span></span></span></code></pre></td></tr></table></div></div><hr><h2 id=-aws-ecsfargate運用>☁️ AWS ECS・Fargate運用</h2><h3 id=閉域vpc環境でのコンテナ運用>閉域VPC環境でのコンテナ運用</h3><p><strong>セキュアなECS/Fargate構成：</strong></p><h4 id=1-閉域vpc設計>1. 閉域VPC設計</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
@@ -1048,10 +1048,10 @@
 </span><span class=lnt>61
 </span><span class=lnt>62
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># CloudFormation テンプレート</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>AWSTemplateFormatVersion</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2010-09-09&#39;</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Description</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;Secure ECS cluster in private VPC&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>AWSTemplateFormatVersion</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;2010-09-09&#39;</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>Description</span><span class=p>:</span><span class=w> </span><span class=s1>&#39;Secure ECS cluster in private VPC&#39;</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>Resources</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>Resources</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=c># VPC設定</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>VPC</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>Type</span><span class=p>:</span><span class=w> </span><span class=l>AWS::EC2::VPC</span><span class=w>
@@ -1343,12 +1343,12 @@
 </span><span class=lnt>96
 </span><span class=lnt>97
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-hcl data-lang=hcl><span class=line><span class=cl><span class=c1># main.tf
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>provider</span> <span class=s2>&#34;aws&#34;</span> {
+</span></span></span><span class=line><span class=cl><span class=k>provider</span> <span class=s2>&#34;aws&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  region</span> <span class=o>=</span> <span class=k>var</span><span class=p>.</span><span class=k>aws_region</span>
 </span></span><span class=line><span class=cl>}<span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1># ECSクラスター
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>resource</span> <span class=s2>&#34;aws_ecs_cluster&#34; &#34;main&#34;</span> {
+</span></span></span><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;aws_ecs_cluster&#34; &#34;main&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  name</span> <span class=o>=</span> <span class=s2>&#34;secure-cluster&#34;</span>
 </span></span><span class=line><span class=cl>
 </span></span><span class=line><span class=cl>  <span class=k>setting</span> {
@@ -1363,7 +1363,7 @@
 </span></span><span class=line><span class=cl>}<span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1># ECSサービス
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>resource</span> <span class=s2>&#34;aws_ecs_service&#34; &#34;app&#34;</span> {
+</span></span></span><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;aws_ecs_service&#34; &#34;app&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  name</span>            <span class=o>=</span> <span class=s2>&#34;secure-app-service&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  cluster</span>         <span class=o>=</span> <span class=k>aws_ecs_cluster</span><span class=p>.</span><span class=k>main</span><span class=p>.</span><span class=k>id</span>
 </span></span><span class=line><span class=cl><span class=n>  task_definition</span> <span class=o>=</span> <span class=k>aws_ecs_task_definition</span><span class=p>.</span><span class=k>app</span><span class=p>.</span><span class=k>arn</span>
@@ -1391,7 +1391,7 @@
 </span></span><span class=line><span class=cl>}<span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1># セキュリティグループ
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>resource</span> <span class=s2>&#34;aws_security_group&#34; &#34;ecs_tasks&#34;</span> {
+</span></span></span><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;aws_security_group&#34; &#34;ecs_tasks&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  name</span>        <span class=o>=</span> <span class=s2>&#34;ecs-tasks-sg&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  description</span> <span class=o>=</span> <span class=s2>&#34;Allow inbound access for ECS tasks&#34;</span>
 </span></span><span class=line><span class=cl><span class=n>  vpc_id</span>      <span class=o>=</span> <span class=k>var</span><span class=p>.</span><span class=k>vpc_id</span>
@@ -1416,7 +1416,7 @@
 </span></span><span class=line><span class=cl>}<span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1>
 </span></span></span><span class=line><span class=cl><span class=c1># Auto Scaling設定
-</span></span></span><span class=line><span class=cl><span class=c1></span><span class=k>resource</span> <span class=s2>&#34;aws_appautoscaling_target&#34; &#34;ecs_target&#34;</span> {
+</span></span></span><span class=line><span class=cl><span class=k>resource</span> <span class=s2>&#34;aws_appautoscaling_target&#34; &#34;ecs_target&#34;</span> {
 </span></span><span class=line><span class=cl><span class=n>  max_capacity</span>       <span class=o>=</span> <span class=m>10</span>
 </span></span><span class=line><span class=cl><span class=n>  min_capacity</span>       <span class=o>=</span> <span class=m>2</span>
 </span></span><span class=line><span class=cl><span class=n>  resource_id</span>        <span class=o>=</span> <span class=s2>&#34;service/${aws_ecs_cluster.main.name}/${aws_ecs_service.app.name}&#34;</span>
@@ -1475,40 +1475,40 @@
 </span><span class=lnt>34
 </span><span class=lnt>35
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-dockerfile data-lang=dockerfile><span class=line><span class=cl><span class=c># セキュアなDockerfile例</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>base</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>node:18-alpine</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>base</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># セキュリティ強化</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> apk --no-cache add dumb-init <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    <span class=o>&amp;&amp;</span> addgroup -g <span class=m>1001</span> -S nodejs <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    <span class=o>&amp;&amp;</span> adduser -S nextjs -u <span class=m>1001</span> -G nodejs<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># セキュリティ強化</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> apk --no-cache add dumb-init <span class=se>\
+</span></span></span><span class=line><span class=cl>    <span class=o>&amp;&amp;</span> addgroup -g <span class=m>1001</span> -S nodejs <span class=se>\
+</span></span></span><span class=line><span class=cl>    <span class=o>&amp;&amp;</span> adduser -S nextjs -u <span class=m>1001</span> -G nodejs<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 脆弱性スキャン対応</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> apk update <span class=o>&amp;&amp;</span> apk upgrade<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># 脆弱性スキャン対応</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> apk update <span class=o>&amp;&amp;</span> apk upgrade<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>base</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>deps</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>USER</span><span class=w> </span><span class=s>nextjs</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>base</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>deps</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>USER</span><span class=w> </span><span class=s>nextjs</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 依存関係のセキュリティ監査</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --chown<span class=o>=</span>nextjs:nodejs package*.json ./<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>RUN</span> npm audit --audit-level moderate <span class=se>\
-</span></span></span><span class=line><span class=cl><span class=se></span>    <span class=o>&amp;&amp;</span> npm ci --only<span class=o>=</span>production<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># 依存関係のセキュリティ監査</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --chown<span class=o>=</span>nextjs:nodejs package*.json ./<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>RUN</span> npm audit --audit-level moderate <span class=se>\
+</span></span></span><span class=line><span class=cl>    <span class=o>&amp;&amp;</span> npm ci --only<span class=o>=</span>production<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>FROM</span><span class=w> </span><span class=s>base</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>runner</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>USER</span><span class=w> </span><span class=s>nextjs</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>FROM</span><span class=w> </span><span class=s>base</span><span class=w> </span><span class=k>AS</span><span class=w> </span><span class=s>runner</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>WORKDIR</span><span class=w> </span><span class=s>/app</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>USER</span><span class=w> </span><span class=s>nextjs</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># 最小権限でファイルコピー</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --from<span class=o>=</span>deps --chown<span class=o>=</span>nextjs:nodejs /app/node_modules ./node_modules<span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>COPY</span> --chown<span class=o>=</span>nextjs:nodejs . .<span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># 最小権限でファイルコピー</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --from<span class=o>=</span>deps --chown<span class=o>=</span>nextjs:nodejs /app/node_modules ./node_modules<span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>COPY</span> --chown<span class=o>=</span>nextjs:nodejs . .<span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># セキュリティヘッダー設定</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>EXPOSE</span><span class=w> </span><span class=s>3000</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ENV</span> PORT <span class=m>3000</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># セキュリティヘッダー設定</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>EXPOSE</span><span class=w> </span><span class=s>3000</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>ENV</span> PORT <span class=m>3000</span><span class=err>
 </span></span></span><span class=line><span class=cl><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=c># dumb-init使用でPID 1問題回避</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>ENTRYPOINT</span> <span class=p>[</span><span class=s2>&#34;dumb-init&#34;</span><span class=p>,</span> <span class=s2>&#34;--&#34;</span><span class=p>]</span><span class=err>
-</span></span></span><span class=line><span class=cl><span class=err></span><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;npm&#34;</span><span class=p>,</span> <span class=s2>&#34;start&#34;</span><span class=p>]</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=c># dumb-init使用でPID 1問題回避</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>ENTRYPOINT</span> <span class=p>[</span><span class=s2>&#34;dumb-init&#34;</span><span class=p>,</span> <span class=s2>&#34;--&#34;</span><span class=p>]</span><span class=err>
+</span></span></span><span class=line><span class=cl><span class=k>CMD</span> <span class=p>[</span><span class=s2>&#34;npm&#34;</span><span class=p>,</span> <span class=s2>&#34;start&#34;</span><span class=p>]</span><span class=err>
 </span></span></span></code></pre></td></tr></table></div></div><h4 id=2-ランタイムセキュリティ監視>2. ランタイムセキュリティ監視</h4><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
 </span><span class=lnt> 2
 </span><span class=lnt> 3
@@ -1679,12 +1679,12 @@
 </span><span class=lnt>34
 </span><span class=lnt>35
 </span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-yaml data-lang=yaml><span class=line><span class=cl><span class=c># network-policy.yaml</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.k8s.io/v1</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>NetworkPolicy</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>metadata</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>apiVersion</span><span class=p>:</span><span class=w> </span><span class=l>networking.k8s.io/v1</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>kind</span><span class=p>:</span><span class=w> </span><span class=l>NetworkPolicy</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>metadata</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>name</span><span class=p>:</span><span class=w> </span><span class=l>secure-app-policy</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>namespace</span><span class=p>:</span><span class=w> </span><span class=l>production</span><span class=w>
-</span></span></span><span class=line><span class=cl><span class=w></span><span class=nt>spec</span><span class=p>:</span><span class=w>
+</span></span></span><span class=line><span class=cl><span class=nt>spec</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>  </span><span class=nt>podSelector</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>    </span><span class=nt>matchLabels</span><span class=p>:</span><span class=w>
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>app</span><span class=p>:</span><span class=w> </span><span class=l>secure-app</span><span class=w>
@@ -1715,7 +1715,7 @@
 </span></span></span><span class=line><span class=cl><span class=w>      </span><span class=nt>port</span><span class=p>:</span><span class=w> </span><span class=m>443</span><span class=w>  </span><span class=c># HTTPS only</span><span class=w>
 </span></span></span></code></pre></td></tr></table></div></div><hr><h2 id=-まとめ運用指針>🎯 まとめ・運用指針</h2><h3 id=2025年docker運用の成功要因>2025年Docker運用の成功要因</h3><p><strong>技術的要因：</strong></p><ol><li><strong>パフォーマンス最適化</strong>: WSL2、ビルド効率化、リソース管理</li><li><strong>包括的監視</strong>: APM統合、ログ集約、メトリクス可視化</li><li><strong>セキュリティ強化</strong>: 多層防御、脆弱性管理、アクセス制御</li><li><strong>運用自動化</strong>: IaC、CI/CD、Auto Scaling</li></ol><p><strong>運用的要因：</strong></p><ol><li><strong>標準化</strong>: Dockerfile、設定ファイルのテンプレート化</li><li><strong>ドキュメント化</strong>: 運用手順、トラブルシューティング</li><li><strong>チーム教育</strong>: Docker基礎、セキュリティ意識</li><li><strong>継続改善</strong>: パフォーマンス測定、フィードバック活用</li></ol><h3 id=今後の技術トレンド>今後の技術トレンド</h3><p><strong>2025年後半の注目技術：</strong></p><ul><li><strong>WebAssembly</strong>: コンテナ代替技術の普及</li><li><strong>Distroless Images</strong>: セキュリティ強化イメージ</li><li><strong>Service Mesh</strong>: マイクロサービス間通信の標準化</li><li><strong>GitOps</strong>: 宣言的インフラ管理の成熟</li></ul><p><strong>長期的展望（2026-2030）：</strong></p><ul><li><strong>サーバーレスコンテナ</strong>: Fargate類似技術の普及</li><li><strong>エッジコンピューティング</strong>: 分散コンテナ実行環境</li><li><strong>AI統合運用</strong>: 異常検知、自動修復の高度化</li><li><strong>量子セキュリティ</strong>: 耐量子暗号によるコンテナ保護</li></ul><hr><p><em>このガイドは2025年9月のDocker・コンテナ技術情報を基に作成されています。最新情報は各公式サイトでご確認ください。</em></p><div class="ad-container ad-briefs_bottom"><a href="//af.moshimo.com/af/c/click?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" rel=nofollow referrerpolicy=no-referrer-when-downgrade attributionsrc><img src=//image.moshimo.com/af-img/0032/000000001220.gif width=468 height=60 style=border:none></a><img src="//i.moshimo.com/af/i/impression?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" width=1 height=1 style=border:none loading=lazy></div><style>.ad-container{margin:16px 0}.ad-placeholder{background:var(--card-background);border:1px dashed var(--card-border-color);color:var(--card-text-color-secondary);border-radius:8px;padding:12px;text-align:center;font-size:.9rem}</style></section><footer class=article-footer><section class=article-tags><a href=/tags/docker/>Docker</a>
 <a href=/tags/%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A/>コンテナ</a>
-<a href=/tags/devops/>DevOps</a>
+<a href=/tags/devops/>Devops</a>
 <a href=/tags/%E6%9C%80%E9%81%A9%E5%8C%96/>最適化</a>
 <a href=/tags/%E7%9B%A3%E8%A6%96/>監視</a>
 <a href=/tags/%E3%82%BB%E3%82%AD%E3%83%A5%E3%83%AA%E3%83%86%E3%82%A3/>セキュリティ</a></section></footer></article><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/docker%E5%85%A5%E9%96%80%E3%82%B3%E3%83%B3%E3%83%86%E3%83%8A%E6%8A%80%E8%A1%93%E3%81%AE%E5%9F%BA%E7%A4%8E%E3%81%8B%E3%82%89%E5%AE%9F%E8%B7%B5%E3%81%BE%E3%81%A7/><div class=article-details><h2 class=article-title>Docker入門：コンテナ技術の基礎から実践まで</h2></div></a></article><article><a href=/post/%EF%B8%8F-kubernetes%E7%B7%8F%E5%90%88%E3%83%8B%E3%83%A5%E3%83%BC%E3%82%B9%E3%83%80%E3%82%A4%E3%82%B8%E3%82%A7%E3%82%B9%E3%83%88-2025%E5%B9%B49%E6%9C%88/><div class=article-details><h2 class=article-title>⚙️ Kubernetes総合ニュースダイジェスト - 2025年9月</h2></div></a></article><article><a href=/post/terraform-curated-guide-2025/><div class=article-details><h2 class=article-title>🏗️ Terraform技術記事まとめ - 2025年厳選コレクション</h2></div></a></article><article><a href=/post/bigquery%E3%81%AE%E3%82%AF%E3%82%A8%E3%83%AA%E6%80%A7%E8%83%BD%E3%82%92%E5%8A%87%E7%9A%84%E3%81%AB%E6%94%B9%E5%96%84%E3%81%99%E3%82%8B4%E3%81%A4%E3%81%AE%E6%9C%80%E6%96%B0%E6%A9%9F%E8%83%BD/><div class=article-details><h2 class=article-title>BigQueryのクエリ性能を劇的に改善する4つの最新機能</h2></div></a></article><article><a href=/post/cloud-workstations%E3%81%8B%E3%82%89github%E3%81%B8%E3%81%AE%E5%AE%89%E5%85%A8%E3%81%AA%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9%E3%82%92%E5%AE%9F%E7%8F%BE%E3%81%99%E3%82%8B-secure-web-proxy%E3%81%AB%E3%82%88%E3%82%8B%E3%83%AA%E3%83%9D%E3%82%B8%E3%83%88%E3%83%AA%E3%83%AC%E3%83%99%E3%83%AB%E5%88%B6%E5%BE%A1/><div class=article-details><h2 class=article-title>Cloud WorkstationsからGitHubへの安全なアクセスを実現する - Secure Web Proxyによるリポジトリレベル制御</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
@@ -1739,9 +1739,9 @@
 <span class=tag-count>8</span>
 </a><a href=/tags/css/ class=tag-link>CSS
 <span class=tag-count>7</span>
-</a><a href=/tags/devops/ class=tag-link>DevOps
+</a><a href=/tags/devops/ class=tag-link>Devops
 <span class=tag-count>7</span>
 </a><a href=/tags/grpc/ class=tag-link>GRPC
 <span class=tag-count>7</span>
 </a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
-<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (9)</a></li><li><a href=/archives/#2025>2025年 (98)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
+<span class=tag-count>7</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (10)</a></li><li><a href=/archives/#2025>2025年 (97)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (4)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS</a></li></ul></div></div><div class=footer-bottom><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
