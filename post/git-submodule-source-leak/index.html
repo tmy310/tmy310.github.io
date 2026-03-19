@@ -81,7 +81,7 @@ git push</p><p>※ .gitmodules に branch = main を設定していれば、git 
 オーバーレイ: 親の layouts/ / assets/ 等で上書き（Hugo などで有効）。</p><p>パッチ適用: 親レポに patches/ を置き、git apply/git am を CI/ローカルで当てる。サブモジュール自体は upstream のまま。</p><p>いずれの方法でも、サブモジュール配下からの push は不要です。</p><p>まとめ
 サブモジュールは独立リポ。origin が Public かつ書き込み可であれば即漏えい。</p><p>親の push.recurseSubmodules=no、サブモジュール pushURL 無効化、pre-push の URL Allowlist で 多層防御 を。</p><p>CI と運用ルールで最後の見張りを置いて、ヒューマンエラーを吸収する。</p><p>付録: チェックリスト（配布用）
 親: git remote -v で push 先を確認</p><p>親: git config push.recurseSubmodules が no</p><p>サブモジュール: remote -v で pushURL が DISABLED（または Private）</p><p>親 .git/hooks/pre-push に URL Allowlist 実装</p><p>GitHub: Private + Protected Branch + Secret Scanning</p><p>CI: 可視性チェック + リモート Allowlist</p><p>運用: git push &ndash;dry-run を習慣化</p><p>本記事のサンプルスクリプトは 自己責任でお試しください。組織のポリシーに合わせて、許可ドメインやブランチ名、CI 条件を調整してください。</p><div class="ad-container ad-briefs_bottom"><a href="//af.moshimo.com/af/c/click?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" rel=nofollow referrerpolicy=no-referrer-when-downgrade attributionsrc><img src=//image.moshimo.com/af-img/0032/000000001220.gif width=468 height=60 style=border:none></a><img src="//i.moshimo.com/af/i/impression?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" width=1 height=1 style=border:none loading=lazy></div><style>.ad-container{margin:16px 0}.ad-placeholder{background:var(--card-background);border:1px dashed var(--card-border-color);color:var(--card-text-color-secondary);border-radius:8px;padding:12px;text-align:center;font-size:.9rem}</style></section><footer class=article-footer><section class=article-tags><a href=/tags/git/>Git</a>
-<a href=/tags/github/>GitHub</a>
+<a href=/tags/github/>Github</a>
 <a href=/tags/security/>Security</a>
 <a href=/tags/submodule/>Submodule</a>
 <a href=/tags/devsecops/>DevSecOps</a></section></footer></article><div class=sns-share-section><div class=sns-share-buttons><span class=sns-share-label>この記事をシェア</span><a href="https://x.com/intent/tweet?text=%e3%82%b5%e3%83%96%e3%83%a2%e3%82%b8%e3%83%a5%e3%83%bc%e3%83%ab%e7%b5%8c%e7%94%b1%e3%81%a7%e7%99%ba%e7%94%9f%e3%81%99%e3%82%8b%e3%82%bd%e3%83%bc%e3%82%b9%e3%82%b3%e3%83%bc%e3%83%89%e6%bc%8f%e3%81%88%e3%81%84%e3%81%ae%e8%90%bd%e3%81%a8%e3%81%97%e7%a9%b4%e3%81%a8%e5%af%be%e7%ad%96%0Ahttps%3a%2f%2ffirebird-techtalktech.com%2fpost%2fgit-submodule-source-leak%2f%0A&hashtags=Git%2cGitHub%2cSecurity%2cSubmodule%2cDevSecOps" target=_blank rel=noopener class="sns-btn sns-x">X</a>
@@ -100,7 +100,7 @@ git push</p><p>※ .gitmodules に branch = main を設定していれば、git 
 <span class=tag-count>27</span>
 </a><a href=/tags/%E3%83%84%E3%83%BC%E3%83%AB/ class=tag-link>ツール
 <span class=tag-count>13</span>
-</a><a href=/tags/ai/ class=tag-link>AI
+</a><a href=/tags/ai/ class=tag-link>Ai
 <span class=tag-count>10</span>
 </a><a href=/tags/network/ class=tag-link>Network
 <span class=tag-count>9</span>
