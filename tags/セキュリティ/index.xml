@@ -5510,4 +5510,81 @@ padding: 12px;
 text-align: center;
 font-size: 0.9rem;
 }
-&lt;/style&gt;</description></item></channel></rss>
+&lt;/style&gt;</description></item><item><title>パスワード生成器</title><link>https://firebird-techtalktech.com/tools/password/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/tools/password/</guid><description>&lt;div class="tool-container"&gt;
+&lt;h2 id="パスワード生成器"&gt;パスワード生成器
+&lt;/h2&gt;&lt;div class="tool-box"&gt;
+&lt;div class="tool-row"&gt;
+&lt;label&gt;長さ: &lt;span id="len-display"&gt;16&lt;/span&gt;文字&lt;/label&gt;
+&lt;input type="range" id="length" min="8" max="64" value="16" oninput="document.getElementById('len-display').textContent=this.value"&gt;
+&lt;/div&gt;
+&lt;div class="tool-row checkbox-row"&gt;
+&lt;label&gt;&lt;input type="checkbox" id="upper" checked&gt; 大文字 (A-Z)&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" id="lower" checked&gt; 小文字 (a-z)&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" id="numbers" checked&gt; 数字 (0-9)&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" id="symbols" checked&gt; 記号 (!@#$...)&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class="tool-row"&gt;
+&lt;input type="text" id="output" readonly placeholder="ここにパスワードが生成されます"&gt;
+&lt;button onclick="copyPassword()"&gt;コピー&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="tool-row"&gt;
+&lt;button class="btn-primary" onclick="generate()"&gt;生成する&lt;/button&gt;
+&lt;/div&gt;
+&lt;p id="copy-msg" style="color:green;display:none"&gt;コピーしました！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function generate() {
+const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const lower = 'abcdefghijklmnopqrstuvwxyz';
+const nums = '0123456789';
+const syms = '!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?';
+let chars = '';
+if (document.getElementById('upper').checked) chars += upper;
+if (document.getElementById('lower').checked) chars += lower;
+if (document.getElementById('numbers').checked) chars += nums;
+if (document.getElementById('symbols').checked) chars += syms;
+if (!chars) { alert('文字種を1つ以上選択してください'); return; }
+const len = parseInt(document.getElementById('length').value);
+let pwd = '';
+const arr = new Uint32Array(len);
+crypto.getRandomValues(arr);
+for (let i = 0; i &lt; len; i++) pwd += chars[arr[i] % chars.length];
+document.getElementById('output').value = pwd;
+}
+function copyPassword() {
+const v = document.getElementById('output').value;
+if (!v) return;
+navigator.clipboard.writeText(v).then(() =&gt; {
+const msg = document.getElementById('copy-msg');
+msg.style.display = 'block';
+setTimeout(() =&gt; msg.style.display = 'none', 2000);
+});
+}
+generate();
+&lt;/script&gt;
+&lt;style&gt;
+.tool-container { max-width: 560px; margin: 2rem auto; }
+.tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.tool-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.checkbox-row { gap: 1rem; }
+.tool-row input[type=text] { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; }
+.tool-row input[type=range] { flex: 1; }
+.btn-primary { background: #e25555; color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 4px; cursor: pointer; font-size: 1rem; }
+.btn-primary:hover { background: #c73e3e; }
+button { padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h2 id="使い方"&gt;使い方
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;スライダーで長さを選ぶ（8〜64文字）&lt;/li&gt;
+&lt;li&gt;使いたい文字種にチェックを入れる&lt;/li&gt;
+&lt;li&gt;「生成する」をクリック&lt;/li&gt;
+&lt;li&gt;「コピー」でクリップボードにコピー&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="セキュリティについて"&gt;セキュリティについて
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;乱数には &lt;code&gt;crypto.getRandomValues()&lt;/code&gt; を使用（暗号学的に安全）&lt;/li&gt;
+&lt;li&gt;生成されたパスワードはサーバーに送信されません&lt;/li&gt;
+&lt;li&gt;すべてブラウザ内で完結します&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
