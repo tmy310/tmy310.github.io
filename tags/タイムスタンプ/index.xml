@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>タイムスタンプ on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%B3%E3%83%97/</link><description>Recent content in タイムスタンプ on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><atom:link href="https://firebird-techtalktech.com/tags/%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%B9%E3%82%BF%E3%83%B3%E3%83%97/index.xml" rel="self" type="application/rss+xml"/><item><title>Unixタイムスタンプ変換</title><link>https://firebird-techtalktech.com/tools/timestamp/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/tools/timestamp/</guid><description>&lt;div class="tool-container"&gt;
+&lt;h2 id="unixタイムスタンプ変換"&gt;Unixタイムスタンプ変換
+&lt;/h2&gt;&lt;div class="tool-box"&gt;
+&lt;div class="now-box"&gt;
+&lt;span&gt;現在のUnixタイムスタンプ：&lt;/span&gt;
+&lt;strong id="now-ts"&gt;-&lt;/strong&gt;
+&lt;button onclick="copyNow()"&gt;コピー&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="convert-section"&gt;
+&lt;h3&gt;タイムスタンプ → 日時&lt;/h3&gt;
+&lt;div class="tool-row"&gt;
+&lt;input type="number" id="ts-input" placeholder="例: 1700000000" style="flex:1;padding:0.5rem;border:1px solid #ccc;border-radius:4px;font-family:monospace;"&gt;
+&lt;button class="btn-primary" onclick="tsToDate()"&gt;変換&lt;/button&gt;
+&lt;/div&gt;
+&lt;div id="ts-result" class="result-box" style="display:none"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="convert-section"&gt;
+&lt;h3&gt;日時 → タイムスタンプ&lt;/h3&gt;
+&lt;div class="tool-row"&gt;
+&lt;input type="datetime-local" id="date-input" style="flex:1;padding:0.5rem;border:1px solid #ccc;border-radius:4px;"&gt;
+&lt;button class="btn-primary" onclick="dateToTs()"&gt;変換&lt;/button&gt;
+&lt;/div&gt;
+&lt;div id="date-result" class="result-box" style="display:none"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;p id="copy-msg" style="color:green;display:none"&gt;コピーしました！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function updateNow() {
+document.getElementById('now-ts').textContent = Math.floor(Date.now() / 1000);
+}
+updateNow();
+setInterval(updateNow, 1000);
+function copyNow() {
+const v = document.getElementById('now-ts').textContent;
+navigator.clipboard.writeText(v).then(() =&gt; {
+const msg = document.getElementById('copy-msg');
+msg.style.display = 'block';
+setTimeout(() =&gt; msg.style.display = 'none', 2000);
+});
+}
+function tsToDate() {
+const ts = parseInt(document.getElementById('ts-input').value);
+const box = document.getElementById('ts-result');
+if (isNaN(ts)) { box.style.display='none'; return; }
+const d = new Date(ts * 1000);
+box.innerHTML = `
+&lt;div&gt;&lt;strong&gt;JST (UTC+9)：&lt;/strong&gt;${d.toLocaleString('ja-JP', {timeZone:'Asia/Tokyo'})}&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;UTC：&lt;/strong&gt;${d.toUTCString()}&lt;/div&gt;
+&lt;div&gt;&lt;strong&gt;ISO 8601：&lt;/strong&gt;${d.toISOString()}&lt;/div&gt;
+`;
+box.style.display = 'block';
+}
+function dateToTs() {
+const val = document.getElementById('date-input').value;
+const box = document.getElementById('date-result');
+if (!val) { box.style.display='none'; return; }
+const ts = Math.floor(new Date(val).getTime() / 1000);
+box.innerHTML = `&lt;div&gt;&lt;strong&gt;Unixタイムスタンプ：&lt;/strong&gt;&lt;span style="font-family:monospace"&gt;${ts}&lt;/span&gt;&lt;/div&gt;`;
+box.style.display = 'block';
+}
+// datetime-localの初期値を現在時刻に
+const now = new Date();
+now.setSeconds(0, 0);
+document.getElementById('date-input').value = now.toISOString().slice(0, 16);
+&lt;/script&gt;
+&lt;style&gt;
+.tool-container { max-width: 600px; margin: 2rem auto; }
+.tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.now-box { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; background: var(--body-background, #fff); border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.75rem 1rem; }
+.now-box strong { font-family: monospace; font-size: 1.2rem; color: #e25555; }
+.convert-section h3 { font-size: 0.95rem; font-weight: bold; margin: 0 0 0.5rem; }
+.tool-row { display: flex; gap: 0.75rem; align-items: center; }
+.result-box { background: var(--body-background, #fff); border: 1px solid #e0e0e0; border-radius: 6px; padding: 0.75rem 1rem; font-size: 0.9rem; line-height: 1.8; }
+.btn-primary { background: #e25555; color: #fff; border: none; padding: 0.55rem 1.1rem; border-radius: 4px; cursor: pointer; white-space: nowrap; }
+.btn-primary:hover { background: #c73e3e; }
+button { padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h2 id="使い方"&gt;使い方
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;タイムスタンプ → 日時&lt;/strong&gt;: 数値を入力して変換&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;日時 → タイムスタンプ&lt;/strong&gt;: 日時を選択して変換&lt;/li&gt;
+&lt;li&gt;現在時刻のタイムスタンプはリアルタイム更新&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="用途例"&gt;用途例
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;ログのタイムスタンプ確認&lt;/li&gt;
+&lt;li&gt;API レスポンスの日時解析&lt;/li&gt;
+&lt;li&gt;クッキー・トークンの有効期限確認&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

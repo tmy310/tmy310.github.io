@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>ハッシュ on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E3%83%8F%E3%83%83%E3%82%B7%E3%83%A5/</link><description>Recent content in ハッシュ on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><atom:link href="https://firebird-techtalktech.com/tags/%E3%83%8F%E3%83%83%E3%82%B7%E3%83%A5/index.xml" rel="self" type="application/rss+xml"/><item><title>ハッシュ生成（SHA-256 / SHA-1）</title><link>https://firebird-techtalktech.com/tools/hash/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/tools/hash/</guid><description>&lt;div class="tool-container"&gt;
+&lt;h2 id="ハッシュ生成"&gt;ハッシュ生成
+&lt;/h2&gt;&lt;div class="tool-box"&gt;
+&lt;div class="tool-row"&gt;
+&lt;label&gt;アルゴリズム：&lt;/label&gt;
+&lt;select id="algo"&gt;
+&lt;option value="SHA-256"&gt;SHA-256&lt;/option&gt;
+&lt;option value="SHA-1"&gt;SHA-1&lt;/option&gt;
+&lt;option value="SHA-512"&gt;SHA-512&lt;/option&gt;
+&lt;/select&gt;
+&lt;button class="btn-primary" onclick="generateHash()"&gt;生成する&lt;/button&gt;
+&lt;button onclick="copyOutput()"&gt;コピー&lt;/button&gt;
+&lt;button onclick="clearAll()"&gt;クリア&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="editor-col"&gt;
+&lt;label&gt;入力テキスト&lt;/label&gt;
+&lt;textarea id="input" placeholder="ハッシュ化するテキストを入力" spellcheck="false" rows="6"&gt;&lt;/textarea&gt;
+&lt;/div&gt;
+&lt;div class="editor-col" style="margin-top:0.5rem"&gt;
+&lt;label&gt;ハッシュ値&lt;/label&gt;
+&lt;input type="text" id="output" readonly placeholder="ここにハッシュ値が表示されます" style="font-family:monospace;width:100%;padding:0.6rem;border:1px solid #ccc;border-radius:4px;box-sizing:border-box;"&gt;
+&lt;/div&gt;
+&lt;p id="status"&gt;&lt;/p&gt;
+&lt;p id="copy-msg" style="color:green;display:none"&gt;コピーしました！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+async function generateHash() {
+const input = document.getElementById('input').value;
+const algo = document.getElementById('algo').value;
+const status = document.getElementById('status');
+if (!input) return;
+try {
+const encoder = new TextEncoder();
+const data = encoder.encode(input);
+const hashBuffer = await crypto.subtle.digest(algo, data);
+const hashArray = Array.from(new Uint8Array(hashBuffer));
+const hashHex = hashArray.map(b =&gt; b.toString(16).padStart(2, '0')).join('');
+document.getElementById('output').value = hashHex;
+status.style.color = 'green';
+status.textContent = '✅ ' + algo + ' ハッシュ生成完了（' + hashHex.length + '文字）';
+} catch(e) {
+status.style.color = 'red';
+status.textContent = '❌ エラー: ' + e.message;
+}
+}
+function clearAll() {
+document.getElementById('input').value = '';
+document.getElementById('output').value = '';
+document.getElementById('status').textContent = '';
+}
+function copyOutput() {
+const v = document.getElementById('output').value;
+if (!v) return;
+navigator.clipboard.writeText(v).then(() =&gt; {
+const msg = document.getElementById('copy-msg');
+msg.style.display = 'block';
+setTimeout(() =&gt; msg.style.display = 'none', 2000);
+});
+}
+&lt;/script&gt;
+&lt;style&gt;
+.tool-container { max-width: 700px; margin: 2rem auto; }
+.tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.tool-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.editor-col { display: flex; flex-direction: column; gap: 0.4rem; }
+.editor-col label { font-weight: bold; font-size: 0.9rem; }
+textarea { width: 100%; padding: 0.75rem; font-family: monospace; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 4px; resize: vertical; box-sizing: border-box; }
+select { padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc; }
+.btn-primary { background: #e25555; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.95rem; }
+.btn-primary:hover { background: #c73e3e; }
+button { padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
+#status { font-size: 0.9rem; min-height: 1.2em; }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h2 id="使い方"&gt;使い方
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;テキストを入力欄に貼り付ける&lt;/li&gt;
+&lt;li&gt;アルゴリズムを選択（SHA-256推奨）&lt;/li&gt;
+&lt;li&gt;「生成する」をクリック&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="注意事項"&gt;注意事項
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;ハッシュは一方向関数です（元のテキストには戻せません）&lt;/li&gt;
+&lt;li&gt;すべてブラウザ内で処理されます（サーバー送信なし）&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

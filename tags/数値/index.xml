@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>数値 on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E6%95%B0%E5%80%A4/</link><description>Recent content in 数値 on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><atom:link href="https://firebird-techtalktech.com/tags/%E6%95%B0%E5%80%A4/index.xml" rel="self" type="application/rss+xml"/><item><title>数値進数変換</title><link>https://firebird-techtalktech.com/tools/number-base/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/tools/number-base/</guid><description>&lt;div class="tool-container"&gt;
+&lt;h2 id="数値進数変換"&gt;数値進数変換
+&lt;/h2&gt;&lt;div class="tool-box"&gt;
+&lt;div class="input-grid"&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;10進数&lt;/label&gt;
+&lt;input type="text" id="dec" placeholder="例: 255" oninput="fromDec()" spellcheck="false"&gt;
+&lt;/div&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;2進数&lt;/label&gt;
+&lt;input type="text" id="bin" placeholder="例: 11111111" oninput="fromBin()" spellcheck="false"&gt;
+&lt;/div&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;8進数&lt;/label&gt;
+&lt;input type="text" id="oct" placeholder="例: 377" oninput="fromOct()" spellcheck="false"&gt;
+&lt;/div&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;16進数&lt;/label&gt;
+&lt;input type="text" id="hex" placeholder="例: ff" oninput="fromHex()" spellcheck="false"&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p id="status"&gt;&lt;/p&gt;
+&lt;button onclick="clearAll()"&gt;クリア&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function update(n) {
+if (isNaN(n) || n === null) return;
+document.getElementById('dec').value = n.toString(10);
+document.getElementById('bin').value = n.toString(2);
+document.getElementById('oct').value = n.toString(8);
+document.getElementById('hex').value = n.toString(16).toUpperCase();
+document.getElementById('status').textContent = '';
+}
+function fromDec() {
+const v = parseInt(document.getElementById('dec').value, 10);
+if (!isNaN(v)) update(v); else document.getElementById('status').textContent = '❌ 無効な10進数';
+}
+function fromBin() {
+const v = parseInt(document.getElementById('bin').value, 2);
+if (!isNaN(v)) update(v); else document.getElementById('status').textContent = '❌ 無効な2進数';
+}
+function fromOct() {
+const v = parseInt(document.getElementById('oct').value, 8);
+if (!isNaN(v)) update(v); else document.getElementById('status').textContent = '❌ 無効な8進数';
+}
+function fromHex() {
+const v = parseInt(document.getElementById('hex').value, 16);
+if (!isNaN(v)) update(v); else document.getElementById('status').textContent = '❌ 無効な16進数';
+}
+function clearAll() {
+['dec','bin','oct','hex'].forEach(id =&gt; document.getElementById(id).value = '');
+document.getElementById('status').textContent = '';
+}
+&lt;/script&gt;
+&lt;style&gt;
+.tool-container { max-width: 480px; margin: 2rem auto; }
+.tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.input-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+.input-row { display: flex; align-items: center; gap: 0.75rem; }
+.input-row label { width: 60px; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; }
+.input-row input { flex: 1; padding: 0.6rem; font-family: monospace; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+#status { font-size: 0.9rem; color: red; min-height: 1.2em; }
+button { align-self: flex-start; padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h2 id="使い方"&gt;使い方
+&lt;/h2&gt;&lt;p&gt;どの欄に入力しても他の進数に自動変換されます。&lt;/p&gt;
+&lt;h2 id="用途例"&gt;用途例
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;ビットマスクの確認&lt;/li&gt;
+&lt;li&gt;カラーコードの16進数変換&lt;/li&gt;
+&lt;li&gt;ファイルパーミッション（8進数）の確認&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>

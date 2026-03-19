@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>URL on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/url/</link><description>Recent content in URL on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><atom:link href="https://firebird-techtalktech.com/tags/url/index.xml" rel="self" type="application/rss+xml"/><item><title>URLエンコード・デコード</title><link>https://firebird-techtalktech.com/tools/url-encode/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/tools/url-encode/</guid><description>&lt;div class="tool-container"&gt;
+&lt;h2 id="urlエンコードデコード"&gt;URLエンコード・デコード
+&lt;/h2&gt;&lt;div class="tool-box"&gt;
+&lt;div class="tool-row"&gt;
+&lt;button class="btn-primary" onclick="encode()"&gt;エンコード →&lt;/button&gt;
+&lt;button onclick="decode()"&gt;← デコード&lt;/button&gt;
+&lt;button onclick="clearAll()"&gt;クリア&lt;/button&gt;
+&lt;button onclick="copyOutput()"&gt;コピー&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="editor-row"&gt;
+&lt;div class="editor-col"&gt;
+&lt;label&gt;入力&lt;/label&gt;
+&lt;textarea id="input" placeholder="変換するテキストを入力" spellcheck="false"&gt;&lt;/textarea&gt;
+&lt;/div&gt;
+&lt;div class="editor-col"&gt;
+&lt;label&gt;出力&lt;/label&gt;
+&lt;textarea id="output" readonly spellcheck="false"&gt;&lt;/textarea&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p id="status"&gt;&lt;/p&gt;
+&lt;p id="copy-msg" style="color:green;display:none"&gt;コピーしました！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function encode() {
+const input = document.getElementById('input').value;
+const status = document.getElementById('status');
+try {
+document.getElementById('output').value = encodeURIComponent(input);
+status.style.color = 'green';
+status.textContent = '✅ エンコード完了';
+} catch(e) {
+status.style.color = 'red';
+status.textContent = '❌ エラー: ' + e.message;
+}
+}
+function decode() {
+const input = document.getElementById('input').value.trim();
+const status = document.getElementById('status');
+try {
+document.getElementById('output').value = decodeURIComponent(input);
+status.style.color = 'green';
+status.textContent = '✅ デコード完了';
+} catch(e) {
+status.style.color = 'red';
+status.textContent = '❌ 無効なURL文字列です';
+}
+}
+function clearAll() {
+document.getElementById('input').value = '';
+document.getElementById('output').value = '';
+document.getElementById('status').textContent = '';
+}
+function copyOutput() {
+const v = document.getElementById('output').value;
+if (!v) return;
+navigator.clipboard.writeText(v).then(() =&gt; {
+const msg = document.getElementById('copy-msg');
+msg.style.display = 'block';
+setTimeout(() =&gt; msg.style.display = 'none', 2000);
+});
+}
+&lt;/script&gt;
+&lt;style&gt;
+.tool-container { max-width: 900px; margin: 2rem auto; }
+.tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.tool-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.editor-row { display: flex; gap: 1rem; }
+.editor-col { flex: 1; display: flex; flex-direction: column; gap: 0.4rem; }
+.editor-col label { font-weight: bold; font-size: 0.9rem; }
+textarea { width: 100%; height: 260px; padding: 0.75rem; font-family: monospace; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 4px; resize: vertical; box-sizing: border-box; }
+.btn-primary { background: #e25555; color: #fff; border: none; padding: 0.6rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.95rem; }
+.btn-primary:hover { background: #c73e3e; }
+button { padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; }
+#status { font-size: 0.9rem; min-height: 1.2em; }
+@media (max-width: 600px) { .editor-row { flex-direction: column; } }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h2 id="使い方"&gt;使い方
+&lt;/h2&gt;&lt;ol&gt;
+&lt;li&gt;入力欄にテキストまたはURLを貼り付ける&lt;/li&gt;
+&lt;li&gt;「エンコード →」でパーセントエンコード形式に変換&lt;/li&gt;
+&lt;li&gt;「← デコード」で元のテキストに復元&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id="用途例"&gt;用途例
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;日本語URLのエンコード確認&lt;/li&gt;
+&lt;li&gt;クエリパラメータの特殊文字処理&lt;/li&gt;
+&lt;li&gt;APIリクエストのURLパラメータ生成&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
