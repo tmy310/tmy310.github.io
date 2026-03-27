@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>デザイン on firebirdテックトーク</title><link>https://firebird-techtalktech.com/tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3/</link><description>Recent content in デザイン on firebirdテックトーク</description><generator>Hugo -- gohugo.io</generator><language>ja</language><copyright>トミー</copyright><atom:link href="https://firebird-techtalktech.com/tags/%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3/index.xml" rel="self" type="application/rss+xml"/><item><title>カラーコード変換</title><link>https://firebird-techtalktech.com/tools/color/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://firebird-techtalktech.com/tools/color/</guid><description>&lt;div class="tool-container"&gt;
+&lt;h2 id="カラーコード変換"&gt;カラーコード変換
+&lt;/h2&gt;&lt;div class="tool-box"&gt;
+&lt;div class="picker-row"&gt;
+&lt;input type="color" id="picker" value="#e25555" oninput="fromPicker()" style="width:60px;height:60px;border:none;cursor:pointer;border-radius:8px;"&gt;
+&lt;div class="color-preview" id="preview" style="background:#e25555;"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class="input-grid"&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;HEX&lt;/label&gt;
+&lt;input type="text" id="hex" value="#e25555" oninput="fromHex()" placeholder="#rrggbb" spellcheck="false"&gt;
+&lt;button onclick="copy('hex')"&gt;コピー&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;RGB&lt;/label&gt;
+&lt;input type="text" id="rgb" value="rgb(226, 85, 85)" oninput="fromRgb()" placeholder="rgb(r, g, b)" spellcheck="false"&gt;
+&lt;button onclick="copy('rgb')"&gt;コピー&lt;/button&gt;
+&lt;/div&gt;
+&lt;div class="input-row"&gt;
+&lt;label&gt;HSL&lt;/label&gt;
+&lt;input type="text" id="hsl" value="hsl(0, 68%, 61%)" oninput="fromHsl()" placeholder="hsl(h, s%, l%)" spellcheck="false"&gt;
+&lt;button onclick="copy('hsl')"&gt;コピー&lt;/button&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;p id="copy-msg" style="color:green;display:none"&gt;コピーしました！&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script&gt;
+function hexToRgb(hex) {
+hex = hex.replace(/^#/, '');
+if (hex.length === 3) hex = hex.split('').map(c =&gt; c+c).join('');
+const n = parseInt(hex, 16);
+return { r: (n&gt;&gt;16)&amp;255, g: (n&gt;&gt;8)&amp;255, b: n&amp;255 };
+}
+function rgbToHsl(r, g, b) {
+r/=255; g/=255; b/=255;
+const max=Math.max(r,g,b), min=Math.min(r,g,b);
+let h,s,l=(max+min)/2;
+if(max===min){h=s=0;}else{
+const d=max-min; s=l&gt;0.5?d/(2-max-min):d/(max+min);
+switch(max){case r:h=((g-b)/d+(g&lt;b?6:0))/6;break;case g:h=((b-r)/d+2)/6;break;default:h=((r-g)/d+4)/6;}
+}
+return { h: Math.round(h*360), s: Math.round(s*100), l: Math.round(l*100) };
+}
+function hslToRgb(h, s, l) {
+s/=100; l/=100;
+const a=s*Math.min(l,1-l);
+const f=n=&gt;{const k=(n+h/30)%12; return l-a*Math.max(-1,Math.min(k-3,9-k,1));};
+return { r: Math.round(f(0)*255), g: Math.round(f(8)*255), b: Math.round(f(4)*255) };
+}
+function updateAll(r, g, b) {
+const hex = '#' + [r,g,b].map(v=&gt;v.toString(16).padStart(2,'0')).join('');
+const {h,s,l} = rgbToHsl(r,g,b);
+document.getElementById('hex').value = hex;
+document.getElementById('rgb').value = `rgb(${r}, ${g}, ${b})`;
+document.getElementById('hsl').value = `hsl(${h}, ${s}%, ${l}%)`;
+document.getElementById('picker').value = hex;
+document.getElementById('preview').style.background = hex;
+}
+function fromPicker() {
+const {r,g,b} = hexToRgb(document.getElementById('picker').value);
+updateAll(r,g,b);
+}
+function fromHex() {
+const val = document.getElementById('hex').value.trim();
+if(!/^#?[0-9a-fA-F]{3}$|^#?[0-9a-fA-F]{6}$/.test(val)) return;
+const {r,g,b} = hexToRgb(val.startsWith('#')?val:'#'+val);
+updateAll(r,g,b);
+}
+function fromRgb() {
+const m = document.getElementById('rgb').value.match(/(\d+),\s*(\d+),\s*(\d+)/);
+if(!m) return;
+updateAll(+m[1],+m[2],+m[3]);
+}
+function fromHsl() {
+const m = document.getElementById('hsl').value.match(/(\d+),\s*(\d+)%?,\s*(\d+)%?/);
+if(!m) return;
+const {r,g,b} = hslToRgb(+m[1],+m[2],+m[3]);
+updateAll(r,g,b);
+}
+function copy(id) {
+navigator.clipboard.writeText(document.getElementById(id).value).then(() =&gt; {
+const msg = document.getElementById('copy-msg');
+msg.style.display = 'block';
+setTimeout(() =&gt; msg.style.display = 'none', 2000);
+});
+}
+&lt;/script&gt;
+&lt;style&gt;
+.tool-container { max-width: 500px; margin: 2rem auto; }
+.tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.picker-row { display: flex; align-items: center; gap: 1rem; }
+.color-preview { flex: 1; height: 60px; border-radius: 8px; border: 1px solid #ddd; }
+.input-grid { display: flex; flex-direction: column; gap: 0.6rem; }
+.input-row { display: flex; align-items: center; gap: 0.5rem; }
+.input-row label { width: 40px; font-weight: bold; font-size: 0.9rem; flex-shrink: 0; }
+.input-row input { flex: 1; padding: 0.5rem; font-family: monospace; font-size: 0.9rem; border: 1px solid #ccc; border-radius: 4px; }
+button { padding: 0.4rem 0.75rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; font-size: 0.85rem; }
+&lt;/style&gt;
+&lt;hr&gt;
+&lt;h2 id="使い方"&gt;使い方
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;カラーピッカーで色を選ぶとHEX・RGB・HSLが自動更新&lt;/li&gt;
+&lt;li&gt;各入力欄に直接値を入力しても相互変換&lt;/li&gt;
+&lt;li&gt;「コピー」で各形式をクリップボードにコピー&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id="用途例"&gt;用途例
+&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;CSSカラーコードの変換&lt;/li&gt;
+&lt;li&gt;デザインツールとの値の共有&lt;/li&gt;
+&lt;/ul&gt;</description></item></channel></rss>
