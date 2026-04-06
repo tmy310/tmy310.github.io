@@ -715,7 +715,13 @@ button { padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; curso
 &lt;label&gt;&lt;input type="checkbox" id="upper" checked&gt; 大文字 (A-Z)&lt;/label&gt;
 &lt;label&gt;&lt;input type="checkbox" id="lower" checked&gt; 小文字 (a-z)&lt;/label&gt;
 &lt;label&gt;&lt;input type="checkbox" id="numbers" checked&gt; 数字 (0-9)&lt;/label&gt;
-&lt;label&gt;&lt;input type="checkbox" id="symbols" checked&gt; 記号 (!@#$...)&lt;/label&gt;
+&lt;/div&gt;
+&lt;div class="tool-row checkbox-row sym-row"&gt;
+&lt;span class="sym-label"&gt;記号:&lt;/span&gt;
+&lt;label&gt;&lt;input type="checkbox" id="sym-at" checked&gt; @&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" id="sym-us" checked&gt; _&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" id="sym-hy" checked&gt; -&lt;/label&gt;
+&lt;label&gt;&lt;input type="checkbox" id="sym-dt" checked&gt; .&lt;/label&gt;
 &lt;/div&gt;
 &lt;div class="tool-row"&gt;
 &lt;input type="text" id="output" readonly placeholder="ここにパスワードが生成されます"&gt;
@@ -732,12 +738,14 @@ function generate() {
 const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const lower = 'abcdefghijklmnopqrstuvwxyz';
 const nums = '0123456789';
-const syms = '!@#$%^&amp;*()-_=+[]{}|;:,.&lt;&gt;?';
 let chars = '';
 if (document.getElementById('upper').checked) chars += upper;
 if (document.getElementById('lower').checked) chars += lower;
 if (document.getElementById('numbers').checked) chars += nums;
-if (document.getElementById('symbols').checked) chars += syms;
+if (document.getElementById('sym-at').checked) chars += '@';
+if (document.getElementById('sym-us').checked) chars += '_';
+if (document.getElementById('sym-hy').checked) chars += '-';
+if (document.getElementById('sym-dt').checked) chars += '.';
 if (!chars) { alert('文字種を1つ以上選択してください'); return; }
 const len = parseInt(document.getElementById('length').value);
 let pwd = '';
@@ -762,6 +770,8 @@ generate();
 .tool-box { background: var(--card-background, #f9f9f9); border-radius: 8px; padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
 .tool-row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 .checkbox-row { gap: 1rem; }
+.sym-row { border-top: 1px dashed #ddd; padding-top: 0.5rem; }
+.sym-label { font-size: 0.9rem; color: #666; white-space: nowrap; }
 .tool-row input[type=text] { flex: 1; padding: 0.5rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; font-family: monospace; }
 .tool-row input[type=range] { flex: 1; }
 .btn-primary { background: #e25555; color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 4px; cursor: pointer; font-size: 1rem; }
@@ -772,7 +782,11 @@ button { padding: 0.5rem 1rem; border-radius: 4px; border: 1px solid #ccc; curso
 &lt;h2 id="使い方"&gt;使い方
 &lt;/h2&gt;&lt;ol&gt;
 &lt;li&gt;スライダーで長さを選ぶ（8〜64文字）&lt;/li&gt;
-&lt;li&gt;使いたい文字種にチェックを入れる&lt;/li&gt;
+&lt;li&gt;使いたい文字種にチェックを入れる
+&lt;ul&gt;
+&lt;li&gt;記号は &lt;code&gt;@&lt;/code&gt; &lt;code&gt;_&lt;/code&gt; &lt;code&gt;-&lt;/code&gt; &lt;code&gt;.&lt;/code&gt; を個別に選択可能&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
 &lt;li&gt;「生成する」をクリック&lt;/li&gt;
 &lt;li&gt;「コピー」でクリップボードにコピー&lt;/li&gt;
 &lt;/ol&gt;
