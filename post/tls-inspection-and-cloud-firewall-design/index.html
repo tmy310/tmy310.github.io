@@ -1,0 +1,403 @@
+<!doctype html><html lang=ja dir=ltr><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><meta name=description content="はじめに 企業ネットワークにおけるセキュリティ強化において、TLS通信の監視・制御と適切なファイアウォール設計は重要な要素です。本記事では、TLSインスペクションの技術的仕組みと、Google Cloud Platform（GCP）とAmazon Web Services（AWS）におけるファイアウォール設計思想の違いについて詳しく解説します。\n"><title>TLSインスペクション技術とクラウドファイアウォール設計思想の深掘り解説</title><link rel=canonical href=https://firebird-techtalktech.com/post/tls-inspection-and-cloud-firewall-design/><link rel=stylesheet href=/scss/style.min.5354f9c8497676c3861d6af57b78418035499bcffb101bea35d9c1672713881b.css><meta property='og:title' content="TLSインスペクション技術とクラウドファイアウォール設計思想の深掘り解説"><meta property='og:description' content="はじめに 企業ネットワークにおけるセキュリティ強化において、TLS通信の監視・制御と適切なファイアウォール設計は重要な要素です。本記事では、TLSインスペクションの技術的仕組みと、Google Cloud Platform（GCP）とAmazon Web Services（AWS）におけるファイアウォール設計思想の違いについて詳しく解説します。\n"><meta property='og:url' content='https://firebird-techtalktech.com/post/tls-inspection-and-cloud-firewall-design/'><meta property='og:site_name' content='firebirdテックトーク'><meta property='og:type' content='article'><meta property='article:section' content='Post'><meta property='article:tag' content='network'><meta property='article:tag' content='security'><meta property='article:tag' content='gcp'><meta property='article:tag' content='aws'><meta property='article:tag' content='tls'><meta property='article:tag' content='firewall'><meta property='article:tag' content='author-created'><meta property='article:published_time' content='2026-07-08T15:10:00+09:00'><meta property='article:modified_time' content='2026-07-08T15:10:00+09:00'><meta name=twitter:title content="TLSインスペクション技術とクラウドファイアウォール設計思想の深掘り解説"><meta name=twitter:description content="はじめに 企業ネットワークにおけるセキュリティ強化において、TLS通信の監視・制御と適切なファイアウォール設計は重要な要素です。本記事では、TLSインスペクションの技術的仕組みと、Google Cloud Platform（GCP）とAmazon Web Services（AWS）におけるファイアウォール設計思想の違いについて詳しく解説します。\n"><link rel="shortcut icon" href=/images/favicon.png><script async src="https://www.googletagmanager.com/gtag/js?id=G-J8ND35KCZW"></script><script>var doNotTrack=!1,dnt=navigator.doNotTrack||window.doNotTrack||navigator.msDoNotTrack,doNotTrack=dnt=="1"||dnt=="yes";if(!doNotTrack){window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date),gtag("config","G-J8ND35KCZW")}</script><meta name=robots content="index,follow"><script type=application/ld+json>{"@context":"https://schema.org","@type":"WebSite","name":"firebirdテックトーク","url":"https:\/\/firebird-techtalktech.com\/","description":"技術ネタ、趣味や備忘録などを書いているブログです","publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"potentialAction":{"@type":"SearchAction","target":"https:\/\/firebird-techtalktech.com\/search/?q={search_term_string}","query-input":"required name=search_term_string"}}</script><script type=application/ld+json>{"@context":"https://schema.org","@type":"Article","headline":"TLSインスペクション技術とクラウドファイアウォール設計思想の深掘り解説","description":"\u003ch2 id=\u0022はじめに\u0022\u003eはじめに\n\u003c\/h2\u003e\u003cp\u003e企業ネットワークにおけるセキュリティ強化において、TLS通信の監視・制御と適切なファイアウォール設計は重要な要素です。本記事では、TLSインスペクションの技術的仕組みと、Google Cloud Platform（GCP）とAmazon Web Services（AWS）におけるファイアウォール設計思想の違いについて詳しく解説します。\u003c\/p\u003e","author":{"@type":"Person","name":"トミー"},"publisher":{"@type":"Person","name":"トミー","url":"https:\/\/firebird-techtalktech.com\/about/"},"datePublished":"2026-07-08T15:10:00\u002b09:00","dateModified":"2026-07-08T15:10:00\u002b09:00","url":"https:\/\/firebird-techtalktech.com\/post\/tls-inspection-and-cloud-firewall-design\/","wordCount":"3305","keywords":["network","security","gcp","aws","tls","firewall","author-created"]}</script><meta name=description content="はじめに
+企業ネットワークにおけるセキュリティ強化において、TLS通信の監視・制御と適切なファイアウォール設計は重要な要素です。本記事では、TLSインスペクションの技術的仕組みと、Google Cloud Platform（GCP）とAmazon Web Services（AWS）におけるファイアウォール設計思想の違い …"><meta property="og:site_name" content="firebirdテックトーク"><meta property="og:type" content="article"><meta name=google-adsense-account content="ca-pub-8563231513969804"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8563231513969804" crossorigin=anonymous></script></head><body class=article-page><script>(function(){const e="StackColorScheme";localStorage.getItem(e)||localStorage.setItem(e,"auto")})()</script><script>(function(){const t="StackColorScheme",e=localStorage.getItem(t),n=window.matchMedia("(prefers-color-scheme: dark)").matches===!0;e=="dark"||e==="auto"&&n?document.documentElement.dataset.scheme="dark":document.documentElement.dataset.scheme="light"})()</script><header class=site-header><div class=header-container><div class=header-brand><div class=header-logo><a href=/><img src=/img/avatar_hu_7c8527e874134ee5.png width=40 height=40 class=header-logo-img loading=lazy alt=Avatar></a></div><div class=header-title><h1 class=site-title><a href=/>firebirdテックトーク</a></h1><div class=site-tagline>技術ネタ、趣味や備忘録などを書いているブログです</div></div></div><div class=header-search><form class=search-form action=/search/ method=get><div class=search-wrapper><input type=text name=keyword placeholder=記事を検索... class=search-input autocomplete=off>
+<button type=submit class=search-button>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></button></div></form></div><nav class=header-nav><ul class=nav-menu><li class=nav-item><a href=/ class=nav-link>ホーム</a></li><li class=nav-item><a href=/tags/author-created/ class=nav-link>マイブログ</a></li><li class=nav-item><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=nav-link>旅行記</a></li><li class=nav-item><a href=/tools/ class=nav-link>ツール</a></li><li class=nav-item><a href=/tags/ class=nav-link>タグ一覧</a></li></ul></nav><button class=mobile-menu-toggle type=button aria-label=メニューを開く>
+<span class=hamburger></span>
+<span class=hamburger></span>
+<span class=hamburger></span></button></div></header><style>.site-header{background:var(--card-background);border-bottom:1px solid var(--card-separator-color);position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.1)}.header-container{max-width:1200px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:60px;gap:20px}.header-brand{display:flex;align-items:center;gap:12px;flex-shrink:0}.header-logo-img{width:40px;height:40px;border-radius:50%;object-fit:cover}.header-title{display:flex;flex-direction:column;min-width:0}.site-title{margin:0;font-size:1.3em;font-weight:700;line-height:1}.site-title a{color:var(--card-text-color-main);text-decoration:none;transition:color .2s}.site-title a:hover{color:var(--accent-color)}.site-tagline{font-size:.8em;color:var(--card-text-color-secondary);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.header-search{flex:1;max-width:400px;margin:0 20px}.search-form{width:100%}.search-wrapper{position:relative;display:flex;align-items:center}.search-input{width:100%;padding:8px 40px 8px 12px;border:1px solid var(--card-separator-color);border-radius:20px;background:var(--body-background);color:var(--card-text-color-main);font-size:.9em;transition:all .2s}.search-input:focus{outline:none;border-color:var(--accent-color);box-shadow:0 0 0 2px var(--accent-color-light)}.search-button{position:absolute;right:8px;background:0 0;border:none;padding:4px;color:var(--card-text-color-tertiary);cursor:pointer;transition:color .2s}.search-button:hover{color:var(--accent-color)}.header-nav{flex-shrink:0}.nav-menu{display:flex;list-style:none;margin:0;padding:0;gap:20px}.nav-item{margin:0}.nav-link{color:var(--card-text-color-main);text-decoration:none;font-weight:500;font-size:.9em;transition:color .2s;white-space:nowrap}.nav-link:hover{color:var(--accent-color)}.mobile-menu-toggle{display:none;flex-direction:column;gap:3px;background:0 0;border:none;padding:8px;cursor:pointer}.hamburger{width:20px;height:2px;background:var(--card-text-color-main);transition:all .3s}@media(max-width:768px){.header-container{padding:0 15px;height:56px}.header-search{order:3;flex:1;margin:0;max-width:none}.header-nav{display:none}.mobile-menu-toggle{display:flex;order:2}.site-tagline{display:none}.site-title{font-size:1.1em}}@media(max-width:480px){.header-container{gap:10px}.header-brand{gap:8px}.header-logo-img{width:32px;height:32px}.site-title{font-size:1em}}</style><div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky"><button class="hamburger hamburger--spin" type=button id=toggle-menu aria-label=メニューを開く・閉じる>
+<span class=hamburger-box><span class=hamburger-inner></span></span></button><div class=media-sidebar-content></div></aside><style>.left-sidebar-widgets{margin-top:10px;padding:15px}.left-sidebar-widgets .popular-tags-widget{margin-bottom:0}.left-sidebar-widgets .popular-tags-widget .widget-title{font-size:1rem;margin-bottom:15px;color:var(--accent-color);border-bottom:2px solid var(--accent-color);padding-bottom:8px}.media-sidebar-content{margin-top:10px;padding-top:10px}.media-sidebar-content .widget{margin-bottom:20px;padding:12px;background:var(--body-background);border-radius:6px;border:1px solid var(--card-separator-color)}.media-sidebar-content .widget .widget-title{font-size:.95em;margin-bottom:12px;color:var(--accent-color);border-bottom:1px solid var(--accent-color);padding-bottom:6px}.media-sidebar-content .topic-section{margin-bottom:15px}.media-sidebar-content .media-section{margin-bottom:15px;padding-bottom:12px}.media-sidebar-content .topic-title,.media-sidebar-content .media-title{font-size:.9em;margin-bottom:8px}.media-sidebar-content .topic-item,.media-sidebar-content .featured-item{margin-bottom:8px;padding:6px}.media-sidebar-content .trend-tag,.media-sidebar-content .guide-item,.media-sidebar-content .topic-category{padding:6px 8px}.media-sidebar-content .breaking-item{padding:8px}.media-sidebar-content .pickup-item{padding:8px}@media(max-width:1024px){.media-sidebar-content{display:none}}@media(min-width:1024px){.left-sidebar{width:300px;min-width:300px}}</style><aside class="sidebar right-sidebar sticky"><section class="widget ad-widget"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M10 14a3.5 3.5.0 005 0l4-4a3.5 3.5.0 00-5-5l-.5.5"/><path d="M14 10a3.5 3.5.0 00-5 0l-4 4a3.5 3.5.0 005 5l.5-.5"/></svg></div><h2 class="widget-title section-title">スポンサーリンク</h2><div class=widget-content><div class="ad-container ad-sidebar"><a href="//af.moshimo.com/af/c/click?a_id=5220188&p_id=6430&pc_id=18166&pl_id=82494" rel=nofollow referrerpolicy=no-referrer-when-downgrade attributionsrc><img src=//image.moshimo.com/af-img/5467/000000082494.png width=499 height=1080 style=border:none></a><img src="//i.moshimo.com/af/i/impression?a_id=5220188&p_id=6430&pc_id=18166&pl_id=82494" width=1 height=1 style=border:none loading=lazy></div></div></section><style>.ad-widget{margin-bottom:8px;padding:0}.ad-widget .widget-icon{margin-bottom:4px;display:none}.ad-widget .widget-title{margin-bottom:6px;font-size:.8em;text-align:center}.ad-container{display:flex;justify-content:center;align-items:center;min-height:auto;padding:0;margin:0}.ad-sidebar{width:100%;max-width:320px;margin:0 auto;line-height:0}.ad-sidebar img{max-width:100%;height:auto;border-radius:6px;display:block;margin:0;padding:0}@media(max-width:768px){.ad-container{max-width:100%}.ad-sidebar{max-width:100%}}[data-scheme=dark] .ad-placeholder{background:var(--card-background)!important;border-color:var(--card-separator-color)!important;color:var(--card-text-color-secondary)!important}</style><section class="widget archives"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">目次</h2><div class=widget--toc><nav id=TableOfContents><ol><li><a href=#はじめに>はじめに</a></li><li><a href=#part-1-tlsインスペクション技術の深掘り>Part 1: TLSインスペクション技術の深掘り</a><ol><li><a href=#https通信の基本的な仕組み>HTTPS通信の基本的な仕組み</a><ol><li><a href=#1-証明書とは何か>1. 証明書とは何か</a></li><li><a href=#2-https通信の流れ>2. HTTPS通信の流れ</a></li><li><a href=#3-ハイブリッド暗号方式>3. ハイブリッド暗号方式</a></li></ol></li><li><a href=#tlsインスペクションの技術的仕組み>TLSインスペクションの技術的仕組み</a><ol><li><a href=#通常の暗号化通信vs-tlsインスペクション>通常の暗号化通信vs TLSインスペクション</a></li><li><a href=#詳細な処理フロー>詳細な処理フロー</a></li></ol></li><li><a href=#private-caの実装例>Private CAの実装例</a></li><li><a href=#パフォーマンスへの影響と対策>パフォーマンスへの影響と対策</a><ol><li><a href=#処理時間への影響要因>処理時間への影響要因</a></li><li><a href=#小規模環境での最適化>小規模環境での最適化</a></li></ol></li><li><a href=#証明書配布の考慮事項>証明書配布の考慮事項</a></li></ol></li><li><a href=#part-2-gcp-vs-aws-ファイアウォール設計思想比較>Part 2: GCP vs AWS ファイアウォール設計思想比較</a><ol><li><a href=#根本的な設計思想の違い>根本的な設計思想の違い</a><ol><li><a href=#gcp-ネットワーク中心設計>GCP: ネットワーク中心設計</a></li><li><a href=#aws-リソース中心設計>AWS: リソース中心設計</a></li></ol></li><li><a href=#設計思想の詳細比較>設計思想の詳細比較</a><ol><li><a href=#1-ファイアウォールルールの適用方法>1. ファイアウォールルールの適用方法</a></li><li><a href=#2-横断的適用の違い>2. 横断的適用の違い</a></li><li><a href=#3-管理の複雑性>3. 管理の複雑性</a></li></ol></li><li><a href=#実装レベルでの違い>実装レベルでの違い</a><ol><li><a href=#タグベース制御の実装>タグベース制御の実装</a></li><li><a href=#階層化制御の実装>階層化制御の実装</a></li></ol></li><li><a href=#選択指針とベストプラクティス>選択指針とベストプラクティス</a><ol><li><a href=#gcpが適している場面>GCPが適している場面</a></li><li><a href=#awsが適している場面>AWSが適している場面</a></li></ol></li></ol></li><li><a href=#まとめ>まとめ</a><ol><li><a href=#tlsインスペクション技術>TLSインスペクション技術</a></li><li><a href=#クラウドファイアウォール設計>クラウドファイアウォール設計</a></li></ol></li></ol></nav></div></section><section class="widget tagCloud"><div class=widget-icon><svg class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><line x1="5" y1="9" x2="19" y2="9"/><line x1="5" y1="15" x2="19" y2="15"/><line x1="11" y1="4" x2="7" y2="20"/><line x1="17" y1="4" x2="13" y2="20"/></svg></div><h2 class="widget-title section-title">カテゴリ</h2><div class=tagCloud-tags><a href=/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/ class=font_size_94>マイブログ
+</a><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/ class=font_size_30>旅行記
+</a><a href=/categories/%E3%83%84%E3%83%BC%E3%83%AB/ class=font_size_13>ツール
+</a><a href=/categories/technology-strategy/ class=font_size_1>Technology Strategy</a></div></section></aside><main class="main full-width"><article class=main-article><header class=article-header><div class=article-details><header class=article-category><a href=/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/>マイブログ</a></header><div class=article-title-wrapper><h2 class=article-title><a href=/post/tls-inspection-and-cloud-firewall-design/>TLSインスペクション技術とクラウドファイアウォール設計思想の深掘り解説</a></h2></div><footer class=article-time><div><svg class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><path d="M11.795 21H5a2 2 0 01-2-2V7a2 2 0 012-2h12a2 2 0 012 2v4"/><circle cx="18" cy="18" r="4"/><path d="M15 3v4"/><path d="M7 3v4"/><path d="M3 11h16"/><path d="M18 16.496V18l1 1"/></svg>
+<time class=article-time--published>2026年7月8日</time></div><div><svg class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z"/><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+<time class=article-time--reading>読了時間: 7分</time></div></footer></div></header><section class=article-content><div class="pasoko-bubble pasoko-left pasoko-auto"><div class=pasoko-character><img src=/images/pasoko_2.png alt=パソコ（ブログアシスタント） loading=lazy>
+<span class=pasoko-name>パソコ</span></div><div class=pasoko-speech><p>パソコだよ！今日も一緒に学んでいこう！</p></div></div><h2 id=はじめに>はじめに</h2><p>企業ネットワークにおけるセキュリティ強化において、TLS通信の監視・制御と適切なファイアウォール設計は重要な要素です。本記事では、TLSインスペクションの技術的仕組みと、Google Cloud Platform（GCP）とAmazon Web Services（AWS）におけるファイアウォール設計思想の違いについて詳しく解説します。</p><h2 id=part-1-tlsインスペクション技術の深掘り>Part 1: TLSインスペクション技術の深掘り</h2><h3 id=https通信の基本的な仕組み>HTTPS通信の基本的な仕組み</h3><p>まず、通常のHTTPS通信がどのように行われるかを理解しましょう。</p><h4 id=1-証明書とは何か>1. 証明書とは何か</h4><p><strong>証明書の構成要素</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>証明書 = 公開鍵 + メタデータ + CA署名
+</span></span><span class=line><span class=cl>- 公開鍵: 暗号化に使用される鍵
+</span></span><span class=line><span class=cl>- メタデータ: ドメイン名、有効期限、発行者情報
+</span></span><span class=line><span class=cl>- CA署名: 認証局によるデジタル署名
+</span></span></code></pre></td></tr></table></div></div><h4 id=2-https通信の流れ>2. HTTPS通信の流れ</h4><p><strong>Step 1: 接続開始</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>クライアント → &#34;example.comに接続したい&#34; → サーバー
+</span></span></code></pre></td></tr></table></div></div><p><strong>Step 2: 証明書交換</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>サーバー → &#34;私の証明書です（公開鍵含む）&#34; → クライアント
+</span></span></code></pre></td></tr></table></div></div><p><strong>Step 3: 証明書検証</strong></p><ul><li>ドメイン名の一致確認</li><li>信頼できるCAによる署名確認</li><li>有効期限チェック</li></ul><p><strong>Step 4: 暗号化鍵交換</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>クライアント → &#34;共通鍵候補をサーバーの公開鍵で暗号化&#34; → サーバー
+</span></span><span class=line><span class=cl>サーバー → &#34;秘密鍵で復号して共通鍵を取得&#34; → 暗号化通信開始
+</span></span></code></pre></td></tr></table></div></div><h4 id=3-ハイブリッド暗号方式>3. ハイブリッド暗号方式</h4><p>HTTPS では効率性のために2種類の暗号化を併用：</p><p><strong>公開鍵暗号（RSA/ECDSA）</strong></p><ul><li>用途: 共通鍵の安全な受け渡し</li><li>特徴: 安全だが処理が重い</li></ul><p><strong>共通鍵暗号（AES）</strong></p><ul><li>用途: 実際のデータ通信</li><li>特徴: 高速だが鍵の共有が課題</li></ul><h3 id=tlsインスペクションの技術的仕組み>TLSインスペクションの技術的仕組み</h3><h4 id=通常の暗号化通信vs-tlsインスペクション>通常の暗号化通信vs TLSインスペクション</h4><p><strong>通常のHTTPS（インスペクションなし）</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>クライアント ←→ [暗号化通信] ←→ サーバー
+</span></span></code></pre></td></tr></table></div></div><ul><li>中間者は通信内容を読み取れない</li><li>tcpdumpでも暗号化されたバイナリデータのみ</li></ul><p><strong>TLSインスペクション有効時</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>クライアント ←→ [暗号化A] ←→ プロキシ ←→ [暗号化B] ←→ サーバー
+</span></span></code></pre></td></tr></table></div></div><h4 id=詳細な処理フロー>詳細な処理フロー</h4><p><strong>1. サーバーとの接続確立</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>プロキシ → 外部サイトに接続 → 本物の証明書取得
+</span></span></code></pre></td></tr></table></div></div><p><strong>2. 偽証明書の動的生成</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Private CA → 外部サイト名義の証明書生成 → クライアントに送信
+</span></span></code></pre></td></tr></table></div></div><p><strong>3. 2つの暗号化接続の管理</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>接続A: クライアント ←→ プロキシ（偽証明書使用）
+</span></span><span class=line><span class=cl>接続B: プロキシ ←→ 外部サイト（本物証明書使用）
+</span></span></code></pre></td></tr></table></div></div><p><strong>4. 通信内容の検査</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>暗号化されたデータ → プロキシで復号 → 平文で検査 → 再暗号化して転送
+</span></span></code></pre></td></tr></table></div></div><h3 id=private-caの実装例>Private CAの実装例</h3><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span><span class=lnt>19
+</span><span class=lnt>20
+</span><span class=lnt>21
+</span><span class=lnt>22
+</span><span class=lnt>23
+</span><span class=lnt>24
+</span><span class=lnt>25
+</span><span class=lnt>26
+</span><span class=lnt>27
+</span><span class=lnt>28
+</span><span class=lnt>29
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=c1># Private CA Pool作成
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_privateca_ca_pool&#34;</span> <span class=s2>&#34;tls_inspection&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>tier</span> <span class=o>=</span> <span class=s2>&#34;DEVOPS&#34;</span><span class=c1>  # 個別証明書追跡不要
+</span></span></span><span class=line><span class=cl>  <span class=nx>publishing_options</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>publish_ca_cert</span> <span class=o>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>    <span class=nx>publish_crl</span>     <span class=o>=</span> <span class=kc>false</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1># 自己署名CA作成
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_privateca_certificate_authority&#34;</span> <span class=s2>&#34;main&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>type</span> <span class=o>=</span> <span class=s2>&#34;SELF_SIGNED&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=nx>config</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>subject</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>organization</span> <span class=o>=</span> <span class=s2>&#34;Enterprise Security CA&#34;</span>
+</span></span><span class=line><span class=cl>      <span class=nx>common_name</span>  <span class=o>=</span> <span class=s2>&#34;tls-inspection-ca&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=nx>x509_config</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>      <span class=nx>ca_options</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>        <span class=nx>is_ca</span> <span class=o>=</span> <span class=kc>true</span><span class=c1>  # CA権限有効
+</span></span></span><span class=line><span class=cl>      <span class=p>}</span>
+</span></span><span class=line><span class=cl>    <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1># TLSインスペクション用ポリシー
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_network_security_tls_inspection_policy&#34;</span> <span class=s2>&#34;main&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>ca_pool</span> <span class=o>=</span> <span class=nx>google_privateca_ca_pool</span><span class=p>.</span><span class=nx>tls_inspection</span><span class=p>.</span><span class=nx>id</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=パフォーマンスへの影響と対策>パフォーマンスへの影響と対策</h3><h4 id=処理時間への影響要因>処理時間への影響要因</h4><p><strong>1. 2重のTLSハンドシェイク</strong></p><ul><li>通常: 1回のハンドシェイク</li><li>TLSインスペクション: 2回のハンドシェイク</li></ul><p><strong>2. 証明書動的生成</strong></p><ul><li>初回アクセス時に数百ms〜数秒の遅延</li></ul><p><strong>3. 暗号化処理の倍増</strong></p><ul><li>データを2回暗号化/復号</li><li>CPU負荷が約2倍</li></ul><p><strong>4. データ検査処理</strong></p><ul><li>全パケットのスキャン</li><li>バッファリング遅延</li></ul><h4 id=小規模環境での最適化>小規模環境での最適化</h4><p><strong>Keep-Alive設定の最適化</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=c1># 推奨設定（小規模環境）
+</span></span></span><span class=line><span class=cl><span class=nx>keep_alive_timeout</span> <span class=o>=</span> <span class=s2>&#34;600s&#34;</span><span class=c1>    # 10分
+</span></span></span><span class=line><span class=cl><span class=nx>max_connections</span>    <span class=o>=</span> <span class=s2>&#34;unlimited&#34;</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1># 理由
+</span></span></span><span class=line><span class=cl><span class=c1># - 同時接続数: 5-20人程度
+</span></span></span><span class=line><span class=cl><span class=c1># - リソース影響: 最小限
+</span></span></span><span class=line><span class=cl><span class=c1># - セッション再利用効果: 大幅なパフォーマンス向上
+</span></span></span></code></pre></td></tr></table></div></div><p><strong>結果的な改善効果</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># 初回接続: 遅い（証明書生成 + ハンドシェイク）</span>
+</span></span><span class=line><span class=cl>git fetch  <span class=c1># 3-5秒</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 以降: 高速（Keep-Alive活用）</span>
+</span></span><span class=line><span class=cl>git status  <span class=c1># 0.1秒</span>
+</span></span><span class=line><span class=cl>git pull    <span class=c1># 0.2秒</span>
+</span></span><span class=line><span class=cl>git push    <span class=c1># 0.3秒</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=証明書配布の考慮事項>証明書配布の考慮事項</h3><p><strong>クライアント側での証明書インストール</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-bash data-lang=bash><span class=line><span class=cl><span class=c1># Private CA証明書をクライアントに配布</span>
+</span></span><span class=line><span class=cl><span class=c1># 方法1: 手動インストール</span>
+</span></span><span class=line><span class=cl>sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ca.crt
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=c1># 方法2: Dockerイメージに埋め込み</span>
+</span></span><span class=line><span class=cl>COPY ca.crt /usr/local/share/ca-certificates/
+</span></span><span class=line><span class=cl>RUN update-ca-certificates
+</span></span></code></pre></td></tr></table></div></div><h2 id=part-2-gcp-vs-aws-ファイアウォール設計思想比較>Part 2: GCP vs AWS ファイアウォール設計思想比較</h2><h3 id=根本的な設計思想の違い>根本的な設計思想の違い</h3><h4 id=gcp-ネットワーク中心設計>GCP: ネットワーク中心設計</h4><p><strong>基本概念</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>VPCネットワーク = ファイアウォールルールの管理単位
+</span></span></code></pre></td></tr></table></div></div><p><strong>実装パターン</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;web_servers&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>network</span> <span class=o>=</span> <span class=nx>google_compute_network</span><span class=p>.</span><span class=nx>main</span><span class=p>.</span><span class=nx>name</span><span class=c1>  # VPCに設定
+</span></span></span><span class=line><span class=cl>  <span class=nx>target_tags</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;web-server&#34;</span><span class=p>]</span><span class=c1>                # タグで適用対象指定
+</span></span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=nx>allow</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>protocol</span> <span class=o>=</span> <span class=s2>&#34;tcp&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ports</span>    <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;80&#34;</span><span class=p>,</span> <span class=s2>&#34;443&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_instance&#34;</span> <span class=s2>&#34;web1&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>network_interface</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>network</span> <span class=o>=</span> <span class=nx>google_compute_network</span><span class=p>.</span><span class=nx>main</span><span class=p>.</span><span class=nx>name</span><span class=c1>  # 同じVPC
+</span></span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  <span class=nx>tags</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;web-server&#34;</span><span class=p>]</span><span class=c1>  # ファイアウォールルール適用
+</span></span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=aws-リソース中心設計>AWS: リソース中心設計</h4><p><strong>基本概念</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Security Group = 独立したファイアウォール設定リソース
+</span></span></code></pre></td></tr></table></div></div><p><strong>実装パターン</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_security_group&#34;</span> <span class=s2>&#34;web_servers&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>name_prefix</span> <span class=o>=</span> <span class=s2>&#34;web-servers&#34;</span><span class=c1>  # 独立したリソース
+</span></span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=nx>ingress</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>from_port</span>   <span class=o>=</span> <span class=m>80</span>
+</span></span><span class=line><span class=cl>    <span class=nx>to_port</span>     <span class=o>=</span> <span class=m>443</span>
+</span></span><span class=line><span class=cl>    <span class=nx>protocol</span>    <span class=o>=</span> <span class=s2>&#34;tcp&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>cidr_blocks</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;0.0.0.0/0&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_instance&#34;</span> <span class=s2>&#34;web1&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>security_groups</span> <span class=o>=</span> <span class=p>[</span><span class=nx>aws_security_group</span><span class=p>.</span><span class=nx>web_servers</span><span class=p>.</span><span class=nx>id</span><span class=p>]</span><span class=c1>  # 直接アタッチ
+</span></span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=設計思想の詳細比較>設計思想の詳細比較</h3><h4 id=1-ファイアウォールルールの適用方法>1. ファイアウォールルールの適用方法</h4><p><strong>GCP: ネットワーク境界での制御</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>VPC作成 → ファイアウォールルール定義 → タグでインスタンス選択
+</span></span></code></pre></td></tr></table></div></div><p><strong>利点</strong></p><ul><li>ネットワーク設計との一体化</li><li>VPC単位での一元管理</li><li>ネットワーク境界の明確化</li></ul><p><strong>制約</strong></p><ul><li>VPC境界内でのみ有効</li><li>他のVPCルールは適用不可</li></ul><p><strong>AWS: リソース直接制御</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>Security Group作成 → インスタンスに直接アタッチ
+</span></span></code></pre></td></tr></table></div></div><p><strong>利点</strong></p><ul><li>柔軟なリソース配置</li><li>VPC跨ぎ適用可能</li><li>アカウント跨ぎ参照可能</li></ul><p><strong>制約</strong></p><ul><li>複雑な構成時の管理難易度増加</li></ul><h4 id=2-横断的適用の違い>2. 横断的適用の違い</h4><p><strong>AWSの柔軟性例</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=c1># 複数VPCに同一Security Groupを適用
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_security_group&#34;</span> <span class=s2>&#34;common_rules&#34;</span> <span class=p>{</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>  # VPC-Aのインスタンス
+</span></span></span><span class=line><span class=cl><span class=c1>  # VPC-Bのインスタンス（VPC Peering経由）
+</span></span></span><span class=line><span class=cl><span class=c1>  # VPC-Cのインスタンス（Transit Gateway経由）
+</span></span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>GCPの制約例</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=c1># VPCごとに個別のファイアウォールルールが必要
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;vpc_a_rules&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>network</span> <span class=o>=</span> <span class=nx>google_compute_network</span><span class=p>.</span><span class=nx>vpc_a</span><span class=p>.</span><span class=nx>name</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;vpc_b_rules&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>network</span> <span class=o>=</span> <span class=nx>google_compute_network</span><span class=p>.</span><span class=nx>vpc_b</span><span class=p>.</span><span class=nx>name</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=3-管理の複雑性>3. 管理の複雑性</h4><p><strong>GCP: ネットワーク中心管理</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>利点: ネットワーク設計の整合性強制
+</span></span><span class=line><span class=cl>課題: VPC設計の変更が困難
+</span></span></code></pre></td></tr></table></div></div><p><strong>AWS: リソース中心管理</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-fallback data-lang=fallback><span class=line><span class=cl>利点: 柔軟なリソース配置・管理
+</span></span><span class=line><span class=cl>課題: 複雑な構成での一元管理難易
+</span></span></code></pre></td></tr></table></div></div><h3 id=実装レベルでの違い>実装レベルでの違い</h3><h4 id=タグベース制御の実装>タグベース制御の実装</h4><p><strong>GCP例: Cloud Workstations</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt>1
+</span><span class=lnt>2
+</span><span class=lnt>3
+</span><span class=lnt>4
+</span><span class=lnt>5
+</span><span class=lnt>6
+</span><span class=lnt>7
+</span><span class=lnt>8
+</span><span class=lnt>9
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;workstation_control_plane&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>network</span> <span class=o>=</span> <span class=nx>google_compute_network</span><span class=p>.</span><span class=nx>main</span><span class=p>.</span><span class=nx>name</span>
+</span></span><span class=line><span class=cl>  <span class=nx>target_tags</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;cloud-workstations-instance&#34;</span><span class=p>]</span><span class=c1>  # Google Cloudが自動付与
+</span></span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=nx>allow</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>protocol</span> <span class=o>=</span> <span class=s2>&#34;tcp&#34;</span>
+</span></span><span class=line><span class=cl>    <span class=nx>ports</span>    <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;443&#34;</span><span class=p>,</span> <span class=s2>&#34;980&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>AWS例: 同等機能</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_security_group&#34;</span> <span class=s2>&#34;workstation_sg&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>ingress</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>from_port</span> <span class=o>=</span> <span class=m>443</span>
+</span></span><span class=line><span class=cl>    <span class=nx>to_port</span>   <span class=o>=</span> <span class=m>980</span>
+</span></span><span class=line><span class=cl>    <span class=nx>protocol</span>  <span class=o>=</span> <span class=s2>&#34;tcp&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span><span class=line><span class=cl>
+</span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_instance&#34;</span> <span class=s2>&#34;workstation&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>security_groups</span> <span class=o>=</span> <span class=p>[</span><span class=nx>aws_security_group</span><span class=p>.</span><span class=nx>workstation_sg</span><span class=p>.</span><span class=nx>id</span><span class=p>]</span>
+</span></span><span class=line><span class=cl>  <span class=nx>tags</span> <span class=o>=</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>Service</span> <span class=o>=</span> <span class=s2>&#34;workstation&#34;</span><span class=c1>  # 管理用タグ（ファイアウォールとは独立）
+</span></span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h4 id=階層化制御の実装>階層化制御の実装</h4><p><strong>GCP: 優先度ベース階層制御</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=c1># 高優先度: 特定通信許可
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;allow_management&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>priority</span> <span class=o>=</span> <span class=m>1000</span>
+</span></span><span class=line><span class=cl>  <span class=nx>target_tags</span> <span class=o>=</span> <span class=p>[</span><span class=s2>&#34;management&#34;</span><span class=p>]</span>
+</span></span><span class=line><span class=cl><span class=p>}</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1># 中優先度: 基本通信許可  
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;allow_basic&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>priority</span> <span class=o>=</span> <span class=m>60000</span>
+</span></span><span class=line><span class=cl><span class=p>}</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1># 低優先度: デフォルト拒否
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;google_compute_firewall&#34;</span> <span class=s2>&#34;deny_all&#34;</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>  <span class=nx>priority</span> <span class=o>=</span> <span class=m>65535</span>
+</span></span><span class=line><span class=cl>  <span class=nx>deny</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>protocol</span> <span class=o>=</span> <span class=s2>&#34;all&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><p><strong>AWS: Security Group + NACL組み合わせ</strong></p><div class=highlight><div class=chroma><table class=lntable><tr><td class=lntd><pre tabindex=0 class=chroma><code><span class=lnt> 1
+</span><span class=lnt> 2
+</span><span class=lnt> 3
+</span><span class=lnt> 4
+</span><span class=lnt> 5
+</span><span class=lnt> 6
+</span><span class=lnt> 7
+</span><span class=lnt> 8
+</span><span class=lnt> 9
+</span><span class=lnt>10
+</span><span class=lnt>11
+</span><span class=lnt>12
+</span><span class=lnt>13
+</span><span class=lnt>14
+</span><span class=lnt>15
+</span><span class=lnt>16
+</span><span class=lnt>17
+</span><span class=lnt>18
+</span></code></pre></td><td class=lntd><pre tabindex=0 class=chroma><code class=language-terraform data-lang=terraform><span class=line><span class=cl><span class=c1># インスタンスレベル: Security Group
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_security_group&#34;</span> <span class=s2>&#34;instance_sg&#34;</span> <span class=p>{</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>  # 許可ルールのみ
+</span></span></span><span class=line><span class=cl><span class=p>}</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1># サブネットレベル: Network ACL
+</span></span></span><span class=line><span class=cl><span class=kr>resource</span> <span class=s2>&#34;aws_network_acl&#34;</span> <span class=s2>&#34;subnet_nacl&#34;</span> <span class=p>{</span><span class=c1>
+</span></span></span><span class=line><span class=cl><span class=c1>  # 許可・拒否ルール
+</span></span></span><span class=line><span class=cl>  <span class=nx>ingress</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>rule_no</span> <span class=o>=</span> <span class=m>100</span>
+</span></span><span class=line><span class=cl>    <span class=nx>action</span>  <span class=o>=</span> <span class=s2>&#34;allow&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl>  
+</span></span><span class=line><span class=cl>  <span class=nx>ingress</span> <span class=p>{</span>
+</span></span><span class=line><span class=cl>    <span class=nx>rule_no</span> <span class=o>=</span> <span class=m>200</span>
+</span></span><span class=line><span class=cl>    <span class=nx>action</span>  <span class=o>=</span> <span class=s2>&#34;deny&#34;</span>
+</span></span><span class=line><span class=cl>  <span class=p>}</span>
+</span></span><span class=line><span class=cl><span class=p>}</span>
+</span></span></code></pre></td></tr></table></div></div><h3 id=選択指針とベストプラクティス>選択指針とベストプラクティス</h3><h4 id=gcpが適している場面>GCPが適している場面</h4><p><strong>1. ネットワーク設計重視</strong></p><ul><li>明確なネットワーク境界が必要</li><li>ネットワークセキュリティポリシーの統一</li></ul><p><strong>2. 管理の簡素化</strong></p><ul><li>少数のVPCでの運用</li><li>設計変更頻度が低い</li></ul><p><strong>3. Google Cloudサービス連携</strong></p><ul><li>マネージドサービスとの統合</li><li>自動タグ付与機能の活用</li></ul><h4 id=awsが適している場面>AWSが適している場面</h4><p><strong>1. 柔軟性重視</strong></p><ul><li>複雑なマルチVPC構成</li><li>頻繁な構成変更</li></ul><p><strong>2. 横断的管理</strong></p><ul><li>アカウント跨ぎリソース管理</li><li>複数リージョンでの統一ポリシー</li></ul><p><strong>3. 細かい制御</strong></p><ul><li>リソース単位でのきめ細かい制御</li><li>動的な設定変更</li></ul><h2 id=まとめ>まとめ</h2><h3 id=tlsインスペクション技術>TLSインスペクション技術</h3><p><strong>重要ポイント</strong></p><ol><li><strong>2重暗号化</strong>: クライアント-プロキシ-サーバー間での独立した暗号化</li><li><strong>証明書管理</strong>: Private CAによる動的証明書生成</li><li><strong>パフォーマンス最適化</strong>: Keep-Alive設定による小規模環境での改善効果</li><li><strong>運用考慮</strong>: 証明書配布とクライアント設定の重要性</li></ol><h3 id=クラウドファイアウォール設計>クラウドファイアウォール設計</h3><p><strong>設計思想の違い</strong></p><ul><li><strong>GCP</strong>: ネットワーク中心設計による統合管理</li><li><strong>AWS</strong>: リソース中心設計による柔軟性</li></ul><p><strong>選択基準</strong></p><ul><li><strong>統一性重視</strong> → GCP VPCファイアウォール</li><li><strong>柔軟性重視</strong> → AWS Security Group</li></ul><p>企業のセキュリティ要件と運用体制に応じて、適切な技術選択を行うことが重要です。TLSインスペクションでは特に、セキュリティ強化と開発生産性のバランスを考慮した設計が求められます。</p><hr><p><em>本記事の技術情報は、実際のエンタープライズ環境での検証結果に基づいており、具体的な実装時は追加の要件検討が必要です。</em></p><div class="ad-container ad-briefs_bottom"><a href="//af.moshimo.com/af/c/click?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" rel=nofollow referrerpolicy=no-referrer-when-downgrade attributionsrc><img src=//image.moshimo.com/af-img/0032/000000001220.gif width=468 height=60 style=border:none></a><img src="//i.moshimo.com/af/i/impression?a_id=5207614&p_id=54&pc_id=54&pl_id=1220" width=1 height=1 style=border:none loading=lazy></div><style>.ad-container{margin:16px 0}.ad-placeholder{background:var(--card-background);border:1px dashed var(--card-border-color);color:var(--card-text-color-secondary);border-radius:8px;padding:12px;text-align:center;font-size:.9rem}</style></section><footer class=article-footer><section class=article-tags><a href=/tags/network/>Network</a>
+<a href=/tags/security/>Security</a>
+<a href=/tags/gcp/>Gcp</a>
+<a href=/tags/aws/>AWS</a>
+<a href=/tags/tls/>Tls</a>
+<a href=/tags/firewall/>Firewall</a>
+<a href=/tags/author-created/>Author-Created</a></section></footer></article><div class=sns-share-section><div class=sns-share-buttons><span class=sns-share-label>この記事をシェア</span><a href="https://x.com/intent/tweet?text=TLS%e3%82%a4%e3%83%b3%e3%82%b9%e3%83%9a%e3%82%af%e3%82%b7%e3%83%a7%e3%83%b3%e6%8a%80%e8%a1%93%e3%81%a8%e3%82%af%e3%83%a9%e3%82%a6%e3%83%89%e3%83%95%e3%82%a1%e3%82%a4%e3%82%a2%e3%82%a6%e3%82%a9%e3%83%bc%e3%83%ab%e8%a8%ad%e8%a8%88%e6%80%9d%e6%83%b3%e3%81%ae%e6%b7%b1%e6%8e%98%e3%82%8a%e8%a7%a3%e8%aa%ac%0Ahttps%3a%2f%2ffirebird-techtalktech.com%2fpost%2ftls-inspection-and-cloud-firewall-design%2f%0A&hashtags=network%2csecurity%2cgcp%2caws%2ctls%2cfirewall%2cauthor-created" target=_blank rel=noopener class="sns-btn sns-x">X</a>
+<a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2ffirebird-techtalktech.com%2fpost%2ftls-inspection-and-cloud-firewall-design%2f" target=_blank rel=noopener class="sns-btn sns-fb">Facebook</a>
+<a href=https://b.hatena.ne.jp/entry/https://firebird-techtalktech.com/post/tls-inspection-and-cloud-firewall-design/ target=_blank rel=noopener class="sns-btn sns-hatena">はてブ</a></div><div class=sns-follow-links><span class=sns-share-label>フォロー</span>
+<a href=https://x.com/firebird19245 target=_blank rel=noopener class="sns-btn sns-x">@firebird19245</a></div></div><style>.sns-share-section{margin:30px 0;padding:20px;background:var(--card-background,#f9fafb);border:1px solid var(--card-separator-color,#e5e7eb);border-radius:12px}.sns-share-buttons,.sns-follow-links{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.sns-follow-links{margin-top:12px;padding-top:12px;border-top:1px solid var(--card-separator-color,#e5e7eb)}.sns-share-label{font-size:14px;color:var(--card-text-color-tertiary,#6b7280);font-weight:600;min-width:90px}.sns-btn{display:inline-block;padding:10px 22px;border-radius:6px;font-size:15px;font-weight:700;text-decoration:none;transition:opacity .2s ease}.sns-btn:hover{opacity:.8}.sns-x{background:#000;color:#fff}.sns-fb{background:#1877f2;color:#fff}.sns-hatena{background:#00a4de;color:#fff}</style><aside class=related-content--wrapper><h2 class=section-title>関連するコンテンツ</h2><div class=related-content><div class="flex article-list--tile"><article><a href=/post/network-security-design-guide/><div class=article-details><h2 class=article-title>🛡️ GCPネットワークセキュリティ設計ガイド：Cloud Armor / LB / IAP で構築する多層防御とゼロトラスト</h2></div></a></article><article><a href=/post/%EF%B8%8F-%E3%83%8F%E3%82%A4%E3%83%96%E3%83%AA%E3%83%83%E3%83%89%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E3%83%8D%E3%83%83%E3%83%88%E3%83%AF%E3%83%BC%E3%82%AF%E6%88%A6%E7%95%A5-%E3%83%9E%E3%83%AB%E3%83%81%E3%82%AF%E3%83%A9%E3%82%A6%E3%83%89%E7%B5%B1%E5%90%88%E8%A8%AD%E8%A8%88/><div class=article-details><h2 class=article-title>☁️ ハイブリッドクラウド・ネットワーク戦略 - マルチクラウド統合設計</h2></div></a></article><article><a href=/post/network-financial-security-design/><div class=article-details><h2 class=article-title>🏦 金融・高セキュリティ向けネットワーク設計 - PCI DSS準拠</h2></div></a></article><article><a href=/post/network-vpc-connection-guide/><div class=article-details><h2 class=article-title>🔄 VPC間接続方式の完全ガイド - Peering vs PSC vs TCP Proxy</h2></div></a></article><article><a href=/post/windows-security-baseline-guide/><div class=article-details><h2 class=article-title>GCP上でのWindows ServerセキュリティBaseline適用時の注意点とトラブルシューティング完全ガイド</h2></div></a></article></div></div></aside><footer class=site-footer><section class=copyright>&copy;
+2025 -
+2026 パソコ</section><section class=powerby>技術ネタ、趣味や備忘録などを書いているブログです<br><a href=https://gohugo.io/ target=_blank rel=noopener>Hugo</a> で構築されています。<br>テーマ <b><a href=https://github.com/CaiJimmy/hugo-theme-stack target=_blank rel=noopener data-version=3.30.0>Stack</a></b> は <a href=https://jimmycai.com target=_blank rel=noopener>Jimmy</a> によって設計されています。</section></footer><div class=pswp tabindex=-1 role=dialog aria-hidden=true><div class=pswp__bg></div><div class=pswp__scroll-wrap><div class=pswp__container><div class=pswp__item></div><div class=pswp__item></div><div class=pswp__item></div></div><div class="pswp__ui pswp__ui--hidden"><div class=pswp__top-bar><div class=pswp__counter></div><button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+<button class="pswp__button pswp__button--share" title=Share></button>
+<button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+<button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button><div class=pswp__preloader><div class=pswp__preloader__icn><div class=pswp__preloader__cut><div class=pswp__preloader__donut></div></div></div></div></div><div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap"><div class=pswp__share-tooltip></div></div><button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+</button>
+<button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)"></button><div class=pswp__caption><div class=pswp__caption__center></div></div></div></div></div><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo=" crossorigin=anonymous defer></script><script src=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU=" crossorigin=anonymous defer></script><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css crossorigin=anonymous><link rel=stylesheet href=https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css crossorigin=anonymous></main></div><footer class=site-footer><div class=footer-container><div class=footer-content><div class=footer-section><h3 class=footer-title>firebirdテックトーク</h3><p class=footer-description>技術ネタ、趣味や備忘録などを書いているブログです</p><div class=footer-social><a href=https://twitter.com/firebird19245 class=social-link target=_blank title=Twitter rel=me><svg class="icon icon-tabler icon-tabler-brand-twitter" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M22 4.01c-1 .49-1.98.689-3 .99-1.121-1.265-2.783-1.335-4.38-.737S11.977 6.323 12 8v1c-3.245.083-6.135-1.395-8-4 0 0-4.182 7.433 4 11-1.872 1.247-3.739 2.088-6 2 3.308 1.803 6.913 2.423 10.034 1.517 3.58-1.04 6.522-3.723 7.651-7.742a13.84 13.84.0 00.497-3.753C20.18 7.773 21.692 5.25 22 4.009z"/></svg></a></div></div><div class=footer-section><h3 class=footer-title>カテゴリー</h3><ul class=footer-links><li><a href=/categories/%E3%83%9E%E3%82%A4%E3%83%96%E3%83%AD%E3%82%B0/>マイブログ (94)</a></li><li><a href=/categories/%E6%97%85%E8%A1%8C%E8%A8%98/>旅行記 (30)</a></li><li><a href=/categories/%E3%83%84%E3%83%BC%E3%83%AB/>ツール (13)</a></li><li><a href=/categories/technology-strategy/>Technology Strategy (1)</a></li></ul></div><div class=footer-section><h3 class=footer-title>人気タグ</h3><div class=footer-tags><a href=/tags/author-created/ class=tag-link>Author-Created
+<span class=tag-count>78</span>
+</a><a href=/tags/gcp/ class=tag-link>Gcp
+<span class=tag-count>28</span>
+</a><a href=/tags/ai/ class=tag-link>Ai
+<span class=tag-count>14</span>
+</a><a href=/tags/%E3%83%84%E3%83%BC%E3%83%AB/ class=tag-link>ツール
+<span class=tag-count>13</span>
+</a><a href=/tags/%E6%97%85%E8%A1%8C/ class=tag-link>旅行
+<span class=tag-count>13</span>
+</a><a href=/tags/travel/ class=tag-link>Travel
+<span class=tag-count>11</span>
+</a><a href=/tags/network/ class=tag-link>Network
+<span class=tag-count>10</span>
+</a><a href=/tags/security/ class=tag-link>Security
+<span class=tag-count>9</span>
+</a><a href=/tags/css/ class=tag-link>CSS
+<span class=tag-count>8</span>
+</a><a href=/tags/vpc/ class=tag-link>VPC
+<span class=tag-count>8</span></a></div></div><div class=footer-section><h3 class=footer-title>アーカイブ</h3><ul class=footer-links><li><a href=/archives/#2026>2026年 (38)</a></li><li><a href=/archives/#2025>2025年 (91)</a></li><li><a href=/archives/#2024>2024年 (2)</a></li><li><a href=/archives/#0001>0001年 (15)</a></li></ul></div><div class=footer-section><h3 class=footer-title>このサイトについて</h3><ul class=footer-links><li><a href=/about/>サイトについて</a></li><li><a href=/privacy/>プライバシーポリシー</a></li><li><a href=/sitemap.xml>サイトマップ</a></li><li><a href=/index.xml>RSS（全文）</a></li><li><a href=/rss-x.xml>RSS（SNS用・短文）</a></li></ul></div></div><div class=footer-bottom><div class=footer-affiliate-disclosure><p>当サイトはアフィリエイト広告（Amazonアソシエイト・楽天アフィリエイト含む）を掲載しています。Amazonのアソシエイトとして、当サイトは適格販売により収入を得ています。</p></div><div class=footer-copyright><p>&copy; 2026 firebirdテックトーク. All rights reserved.</p></div></div></div></footer><style>.site-footer{background:var(--card-background);border-top:1px solid var(--card-separator-color);margin-top:60px;padding:40px 0 20px}.footer-container{max-width:1200px;margin:0 auto;padding:0 20px}.footer-content{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px;margin-bottom:40px}.footer-section{display:flex;flex-direction:column}.footer-title{color:var(--card-text-color-main);font-size:1.1em;font-weight:600;margin:0 0 20px;padding-bottom:10px;border-bottom:2px solid var(--accent-color)}.footer-description{color:var(--card-text-color-secondary);line-height:1.6;margin-bottom:20px}.footer-links{list-style:none;padding:0;margin:0}.footer-links li{margin-bottom:8px}.footer-links a{color:var(--card-text-color-secondary);text-decoration:none;font-size:.9em;transition:color .2s}.footer-links a:hover{color:var(--accent-color)}.footer-social{display:flex;gap:12px;flex-wrap:wrap}.social-link{display:flex;align-items:center;justify-content:center;width:36px;height:36px;background:var(--card-separator-color);border-radius:50%;color:var(--card-text-color-secondary);text-decoration:none;transition:all .2s}.social-link:hover{background:var(--accent-color);color:#fff}.footer-tags{display:flex;flex-wrap:wrap;gap:8px}.tag-link{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:var(--card-separator-color);border-radius:4px;color:var(--card-text-color-secondary);text-decoration:none;font-size:.8em;transition:all .2s}.tag-link:hover{background:var(--accent-color-light);color:var(--accent-color)}.tag-count{background:var(--accent-color);color:#fff;padding:1px 4px;border-radius:3px;font-size:.7em;font-weight:700}.footer-bottom{padding-top:20px;border-top:1px solid var(--card-separator-color);text-align:center}.footer-copyright{color:var(--card-text-color-tertiary);font-size:.8em}.footer-copyright p{margin:4px 0}.footer-affiliate-disclosure{color:var(--card-text-color-tertiary);font-size:.75em;margin-bottom:8px}.footer-affiliate-disclosure p{margin:0}@media(max-width:768px){.site-footer{padding:30px 0 15px;margin-top:40px}.footer-container{padding:0 15px}.footer-content{grid-template-columns:1fr;gap:30px;margin-bottom:30px}.footer-section{text-align:center}.footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:15px}.footer-tags{justify-content:center}.footer-social{justify-content:center}}</style><script src=https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z+KMkF24hUW8WePSA9HM=" crossorigin=anonymous></script><script type=text/javascript src=/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js defer></script><script>(function(){const e=document.createElement("link");e.href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap",e.type="text/css",e.rel="stylesheet",document.head.appendChild(e)})()</script></body></html>
